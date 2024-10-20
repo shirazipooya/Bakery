@@ -7,12 +7,88 @@ from app.database.models import Bakery
 from app.extensions import db
 from sqlalchemy import or_, asc, desc
 import pandas as pd
+import geopandas as gpd
 
 
 blueprint = Blueprint(
     name='database',
     import_name=__name__,
 )
+
+
+def clean_csv_file(df):
+    gdf_regions = gpd.read_file('app/assets/data/geodatabase/Region.geojson')
+    gdf_district = gpd.read_file('app/assets/data/geodatabase/District.geojson')
+    
+    COLs = ['first_name', 'last_name', 'ownership_status', 'second_fuel', 'city', 'household_risk', 'bakers_risk', 'type_bread', 'nid', 'phone', 'bakery_id']
+    df[COLs] = df[COLs].astype(str)
+    df[COLs] = df[COLs].apply(lambda x: x.str.rstrip())
+    df[COLs] = df[COLs].apply(lambda x: x.str.lstrip())
+    df[COLs] = df[COLs].apply(lambda x: x.str.replace(' +', ' '))
+    df[COLs] = df[COLs].apply(lambda x: x.str.replace('ي','ی'))
+    df[COLs] = df[COLs].apply(lambda x: x.str.replace('ئ','ی'))
+    df[COLs] = df[COLs].apply(lambda x: x.str.replace('ك', 'ک'))
+
+    COLs = ['number_violations', 'type_flour', 'bread_rations']
+    df[COLs] = df[COLs].astype(int, errors='ignore')
+
+    COLs = ['lat', 'lon']
+    df[COLs] = df[COLs].astype(float)
+
+    # Drop All NULL Value from Lat & Lon Columns
+    df.dropna(subset=['lat', 'lon'], inplace=True)
+
+    # Remove All Duplicates Row
+    df.drop_duplicates(inplace=True)
+
+    # Convert nid and phone to `str`
+    df['nid'] = df['nid'].apply(lambda x: str(x).zfill(10))
+    df['phone'] = df['phone'].apply(lambda x: str(x).zfill(11))
+
+    df.reset_index(drop=True, inplace=True)
+
+    gdf = gpd.GeoDataFrame(
+        df,
+        geometry=gpd.points_from_xy(df['lon'], df['lat'])
+    )
+
+    gdf = gdf.set_crs('EPSG:4326')
+    gdf_regions = gdf_regions.to_crs('EPSG:4326')
+    gdf_district = gdf_district.to_crs('EPSG:4326')
+
+    COLs = ['first_name', 'last_name', 'nid', 'phone', 'bakery_id',
+        'ownership_status', 'number_violations', 'second_fuel', 'city', 'lat',
+        'lon', 'household_risk', 'bakers_risk', 'type_flour', 'type_bread',
+        'bread_rations']
+    gdf_joined_gdf_regions = gpd.sjoin(gdf, gdf_regions, how='left', predicate='within')
+    gdf_joined_gdf_regions.drop_duplicates(subset=COLs, inplace=True)
+    gdf_joined_gdf_district = gpd.sjoin(gdf, gdf_district, how='left', predicate='within')
+    gdf_joined_gdf_district.drop_duplicates(subset=COLs, inplace=True)
+
+    df['region'] = gdf_joined_gdf_district['region']
+    df['district'] = gdf_joined_gdf_district['district']
+
+    # Drop All NULL Value from Region & Lon District
+    df.dropna(subset=['region', 'district'], inplace=True)
+
+    COLs = ['first_name', 'last_name', 'ownership_status', 'second_fuel', 'city', 'household_risk', 'bakers_risk', 'type_bread', 'nid', 'phone', 'bakery_id']
+    df[COLs] = df[COLs].astype(str)
+    
+    # Convert nid and phone to `str`
+    df['nid'] = df['nid'].apply(lambda x: str(x).zfill(10))
+    df['phone'] = df['phone'].apply(lambda x: str(x).zfill(11))
+
+    COLs = ['number_violations', 'type_flour', 'bread_rations', 'region', 'district']
+    df[COLs] = df[COLs].astype(int, errors='ignore')
+
+    COLs = ['lat', 'lon']
+    df[COLs] = df[COLs].astype(float)
+
+    # Reset Index
+    df.reset_index(drop=True, inplace=True)
+    
+    return df
+    
 
 
 @blueprint.route(rule='/database', methods=['POST', 'GET'])
@@ -104,7 +180,7 @@ def upload_csv():
     if file and file.filename.endswith('.csv'):
         file_path = os.path.join('uploads', file.filename)
         file.save(file_path)
-        data = pd.read_csv(file_path)
+        data = clean_csv_file(pd.read_csv(file_path))
         for _, row in data.iterrows():
             record = Bakery(
                 first_name=row['first_name'],
