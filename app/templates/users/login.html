@@ -1,0 +1,59 @@
+{% extends 'users/base.html' %}
+
+{% block title %}
+ورود
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-body">
+
+    <!-- Logo -->
+    <div class="app-brand justify-content-center">
+      <a class="app-brand-link gap-2">
+        <img src="/assets/img/HydroCode.png" alt="HydroCode" width="60" />
+      </a>
+    </div>
+    <!-- /Logo -->
+
+    <div class="text-center">
+      <h4 class="mb-2">فرم ورود</h4>
+    </div>
+
+    <form class="mb-3" action="" method="POST">
+
+      {{ form.csrf_token }}
+
+      <div class="mb-3">
+        {{ form.username.label(class="form-label") }}
+        {{ form.username(class="form-control") }}
+      </div>
+
+
+      <div class="mb-3 form-password-toggle">
+        <div class="d-flex justify-content-between">
+          {{ form.password.label(class="form-label") }}
+          <a href="#">
+            <small>پسورد خود را فراموش کرده‌اید؟</small>
+          </a>
+        </div>
+        {{ form.password(class="form-control") }}
+      </div>
+
+      <div class="mb-3">
+        <div class="form-check">
+          {{ form.remember(class="form-check-input") }}
+          {{ form.remember.label(class="form-check-label") }}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <button class="btn btn-primary d-grid w-100" type="submit">ورود</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

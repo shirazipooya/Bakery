@@ -1,0 +1,81 @@
+{% extends 'users/base.html' %}
+
+{% block title %}
+ثبت نام
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+
+    <!-- Logo -->
+    <div class="app-brand justify-content-center">
+      <a class="app-brand-link gap-2">
+        <img src="/assets/img/HydroCode.png" alt="HydroCode" width="60" />
+      </a>
+    </div>
+    <!-- /Logo -->
+
+    <div class="text-center">
+      <h4 class="mb-2">فرم ثبت‌نام</h4>
+    </div>
+
+    <form class="mb-3" action="" method="POST">
+
+      {{ form.csrf_token }}
+      
+      <div class="mb-3">
+        {{ form.first_name.label(class="form-label") }}
+        {{ form.first_name(class="form-control") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.last_name.label(class="form-label") }}
+        {{ form.last_name(class="form-control") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.username.label(class="form-label") }}
+        {{ form.username(class="form-control") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.phone.label(class="form-label") }}
+        {{ form.phone(class="form-control") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.password.label(class="form-label") }}
+        {{ form.password(class="form-control") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.confirm_password.label(class="form-label") }}
+        {{ form.confirm_password(class="form-control") }}
+      </div>
+
+      <div class="mb-3">
+        <button class="btn btn-primary d-grid w-100">ثبت نام</button>
+      </div>
+
+    </form>
+
+    <p class="text-center">
+      <span>قبلاً ثبت نام کرده‌اید؟</span>
+      <a href="{{ url_for('users.login' ) }}">
+        <span>ورود</span>
+      </a>
+    </p>
+
+    <div class="divider my-4">
+      <div class="divider-text">یا</div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <a href="#" class="menu-link">
+        <div class="text-primary">برگشت به خانه</div>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

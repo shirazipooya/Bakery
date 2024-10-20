@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html lang="fa" class="light-style layout-menu-fixed layout-compact" dir="rtl" data-theme="theme-default"
+    data-assets-path="../../assets/" data-template="horizontal-menu">
+
+<head>
+    {% include 'exceptions/includes/meta.html' %}
+    {% include 'exceptions/includes/links.html' %}
+    <title>
+        {% block title %} {% endblock %}
+    </title>
+</head>
+
+<body>
+    <div class="container-xxl container-p-y">
+        <div class="misc-wrapper">
+                {% block content %}{% endblock %}
+                <div class="content-backdrop fade"></div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+    <!-- / Overlay -->
+
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+    <!-- / Drag Target Area To SlideIn Menu On Small Screens -->
+
+    {% include 'exceptions/includes/scripts.html' %}
+</body>
+
+</html>

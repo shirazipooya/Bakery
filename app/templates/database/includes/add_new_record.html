@@ -1,0 +1,200 @@
+<!-- Add New Record -->
+<div class="row">
+
+    <!-- Divider -->
+    <div class="col-12 mb-2">
+        <div class="divider">
+            <div class="divider-text fs-4">افزودن رکورد جدید</div>
+        </div>
+    </div>
+    <!-- / Divider -->
+
+    <!-- Form Add New Record -->
+    <div class="col-12 mb-4">
+        <div class="bs-stepper wizard-numbered mt-2">
+
+            <!-- Error Form -->
+            {% if form.is_submitted() and form.errors|count > 0 %}
+            <div class="alert-danger p-3" role="alert">
+                {{ form.errors|count }} خطا رخ داده است:
+                <ul>
+                    {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+                        {% for error in field_errors %}
+                            <li>{{ form[field_name].label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}    
+            <!-- / Error Form -->
+
+            <div class="bs-stepper-header">
+                <div class="step" data-target="#account-details">
+                    <button type="button" class="step-trigger">
+                        <span class="bs-stepper-circle">1</span>
+                        <span class="bs-stepper-label">
+                            <span class="bs-stepper-title">مشخصات فردی</span>
+                            <span class="bs-stepper-subtitle">مشخصات صاحب نانوایی</span>
+                        </span>
+                    </button>
+                </div>
+                <div class="line"></div>
+                <div class="step" data-target="#personal-info">
+                    <button type="button" class="step-trigger">
+                        <span class="bs-stepper-circle">2</span>
+                        <span class="bs-stepper-label">
+                            <span class="bs-stepper-title">موقعیت جغرافیایی</span>
+                            <span class="bs-stepper-subtitle">مشخصات موقعیت مکانی</span>
+                        </span>
+                    </button>
+                </div>
+                <div class="line"></div>
+                <div class="step" data-target="#social-links">
+                    <button type="button" class="step-trigger">
+                        <span class="bs-stepper-circle">3</span>
+                        <span class="bs-stepper-label">
+                            <span class="bs-stepper-title">ویژگی‌ها</span>
+                            <span class="bs-stepper-subtitle">پارامترهای مهم</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bs-stepper-content">
+                <form action="" method="POST" novalidate>
+                    {{ form.csrf_token }}
+                    <div id="account-details" class="content">
+                        <div class="content-header mb-3">
+                            <small>لطفا مشخصات شناسایی صاحب نانوایی را اینجا
+                                وارد کنید:</small>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-sm-4">
+                                {{ form.first_name.label(class="form-label") }}
+                                {{ form.first_name(class="form-control") }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.last_name.label(class="form-label") }}
+                                {{ form.last_name(class="form-control") }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.nid.label(class="form-label") }}
+                                {{ form.nid(class="form-control") }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.phone.label(class="form-label") }}
+                                {{ form.phone(class="form-control") }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.bakery_id.label(class="form-label") }}
+                                {{ form.bakery_id(class="form-control") }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.ownership_status.label(class="form-label") }}
+                                {{ form.ownership_status(class="select2", **{"data-placeholder":"نوع ملک نانوایی را انتخاب کنید"}) }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.number_violations.label(class="form-label") }}
+                                {{ form.number_violations(class="form-control") }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.second_fuel.label(class="form-label") }}
+                                {{ form.second_fuel(class="select2", **{"data-placeholder":"نوع سوخت دوم را انتخاب کنید"}) }}
+                            </div>
+                            <div class="col-12 d-flex justify-content-between">
+                                <a class="btn btn-label-secondary btn-prev disabled" style="color: white;">
+                                    <i class="bx bx-chevron-left bx-sm ms-sm-n2"></i>
+                                    <span class="d-sm-inline-block d-none">قبلی</span>
+                                </a>
+                                <a class="btn btn-primary btn-next" style="color: white;">
+                                    <span class="d-sm-inline-block d-none" >بعدی</span>
+                                    <i class="bx bx-chevron-right bx-sm me-sm-n2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="personal-info" class="content">
+                        <div class="content-header mb-3">
+                            <small>لطفا مشخصات موقعیت مکانی نانوایی را وارد
+                                کنید:</small>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-sm-4">
+                                {{ form.city.label(class="form-label") }}
+                                {{ form.city(class="select2", **{"data-placeholder":"شهر را انتخاب کنید"}) }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.region.label(class="form-label") }}
+                                {{ form.region(class="select2", **{"data-placeholder":"منطقه را انتخاب کنید"}) }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.district.label(class="form-label") }}
+                                {{ form.district(class="select2", **{"data-placeholder":"ناحیه را انتخاب کنید"}) }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.lat.label(class="form-label") }}
+                                {{ form.lat(class="form-control") }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.lon.label(class="form-label") }}
+                                {{ form.lon(class="form-control") }}
+                            </div>
+
+                            <div class="col-12 d-flex justify-content-between">
+                                <a class="btn btn-primary btn-prev" style="color: white;">
+                                    <i class="bx bx-chevron-left bx-sm ms-sm-n2"></i>
+                                    <span class="d-sm-inline-block d-none">قبلی</span>
+                                </a>
+                                <a class="btn btn-primary btn-next" style="color: white;">
+                                    <span class="d-sm-inline-block d-none" >بعدی</span>
+                                    <i class="bx bx-chevron-right bx-sm me-sm-n2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="social-links" class="content">
+                        <div class="content-header mb-3">
+                            <small>لطفا پارامترهای مورد نیاز را وارد
+                                کنید:</small>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-sm-4">
+                                {{ form.type_flour.label(class="form-label") }}
+                                {{ form.type_flour(class="select2", **{"data-placeholder":"نوع آرد را انتخاب کنید"}) }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.type_bread.label(class="form-label") }}
+                                {{ form.type_bread(class="select2", **{"data-placeholder":"نوع پخت را انتخاب کنید"}) }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ form.bread_rations.label(class="form-label") }}
+                                {{ form.bread_rations(class="form-control") }}
+                            </div>
+                            <div class="col-sm-6">
+                                {{ form.household_risk.label(class="form-label") }}
+                                {{ form.household_risk(class="select2", **{"data-placeholder":"ریسک خانوار را انتخاب کنید"}) }}
+                            </div>
+                            <div class="col-sm-6">
+                                {{ form.bakers_risk.label(class="form-label") }}
+                                {{ form.bakers_risk(class="select2", **{"data-placeholder":"ریسک نانوا را انتخاب کنید"}) }}
+                            </div>
+                            <div class="col-12 d-flex justify-content-between">
+                                <a class="btn btn-primary btn-prev" style="color: white;">
+                                    <i class="bx bx-chevron-left bx-sm ms-sm-n2"></i>
+                                    <span class="d-sm-inline-block d-none">قبلی</span>
+                                </a>
+                                <button type="submit" class="btn btn-success btn-submit">
+                                    اضافه کردن
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <!-- / Form Add New Record -->
+
+</div>
+<!-- / Add New Record -->

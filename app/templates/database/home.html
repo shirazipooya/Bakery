@@ -1,0 +1,104 @@
+{% extends 'database/base.html' %}
+
+{% block title %} مدیریت پایگاه داده {% endblock %}
+
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+  
+  <!-- Table -->
+  <div class="row">
+
+    <!-- Divider -->
+    <div class="col-12 mb-2">
+      <div class="divider">
+        <div class="divider-text fs-4">ویرایش پایگاه داده</div>
+      </div>
+    </div>
+    <!-- / Divider -->
+
+    <!-- Table -->
+    <div class="col-12 mb-4">
+      <div class="card p-3">
+
+        <!-- Search Box -->
+        <div class="search-container pb-4">
+          <div class="col-12">
+            <div class="input-group input-group-merge">
+              <span class="input-group-text" id="basic-addon-search31"><i class="bx bx-search"></i></span>
+              <input type="text" id="search" class="form-control" placeholder="جستجو ...">
+            </div>
+          </div>
+        </div>
+        <!-- Search Box -->
+
+        <!-- Pagination Controls -->
+        <div class="col-12 mb-2">
+          <div class="divider divider-dashed">
+            <div class="divider-text fs-5">
+              <button id="prev-page" class="btn btn-secondary btn-sm">قبلی</button>
+              <span id="page-info"></span>
+              <button id="next-page" class="btn btn-secondary btn-sm">بعدی</button>
+            </div>
+          </div>
+        </div>
+        <!-- / Pagination Controls -->
+
+        <!-- Div Table -->
+        <div class="table-responsive text-nowrap">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th></th>
+                <th onclick="sortTable('id')">ردیف</th>
+                <th onclick="sortTable('first_name')">نام</th>
+                <th onclick="sortTable('last_name')">نام خانوادگی</th>
+                <th onclick="sortTable('nid')">کدملی</th>
+                <th onclick="sortTable('phone')">تلفن همراه</th>
+                <th onclick="sortTable('bakery_id')">شماره خبازی</th>
+                <th onclick="sortTable('ownership_status')">نوع ملک نانوایی</th>
+                <th onclick="sortTable('number_violations')">تعداد تخلفات نانوایی</th>
+                <th onclick="sortTable('second_fuel')">سوخت دوم</th>
+                <th onclick="sortTable('city')">شهر</th>
+                <th onclick="sortTable('region')">منطقه</th>
+                <th onclick="sortTable('district')">ناحیه</th>
+                <th onclick="sortTable('lat')">عرض جغرافیایی</th>
+                <th onclick="sortTable('lon')">طول جغرافیایی</th>
+                <th onclick="sortTable('household_risk')">ریسک خانوار</th>
+                <th onclick="sortTable('bakers_risk')">ریسک نانوا</th>
+                <th onclick="sortTable('type_flour')">نوع آرد</th>
+                <th onclick="sortTable('type_bread')">نوع پخت</th>
+                <th onclick="sortTable('bread_rations')">سهمیه</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0" id="bakeries-table-body">
+            </tbody>
+          </table>
+        </div>
+        <!-- / Div Table -->
+
+        <!-- Delete Modal -->
+        {% include 'database/includes/delete_record_modal.html' %}
+        <!-- / Delete Modal -->
+
+        <!-- Edit Modal -->
+        {% include 'database/includes/edit_record_modal.html' %}
+        <!-- / Edit Modal -->
+
+      </div>
+    </div>
+    <!-- / Table -->
+
+  </div>
+  <!-- / Table -->
+
+  <!-- Add New Record -->
+  {% include 'database/includes/add_new_record.html' %}
+  <!-- / Add New Record -->
+
+  <!-- Upload File -->
+  {% include 'database/includes/upload_file.html' %}
+  <!-- / Upload File -->
+
+</div>
+{% endblock %}

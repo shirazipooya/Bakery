@@ -1,0 +1,17 @@
+{% extends 'exceptions/base.html' %}
+
+{% block title %}
+خطای 404 :(
+{% endblock %}
+
+{% block content %}
+
+
+<h1 class="mb-2 mx-2">خطای 404 :(</h1>
+<p class="mb-4 mx-2">صفحه‌ای که دنبال آن بودید پیدا نشد!</p>
+<a href="{{ url_for('dashboard.home') }}" class="btn btn-primary">برگشت به صفحه اصلی</a>
+<div class="mt-3">
+    <img src="{{ url_for('static', filename='img/illustrations/confused person.png') }}" alt="page-misc-error-light" width="500"
+        class="img-fluid"/>
+</div>
+{% endblock %}

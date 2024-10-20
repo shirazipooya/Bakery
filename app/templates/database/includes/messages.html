@@ -1,0 +1,10 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for cat, msg in messages %}
+            <div class="alert alert-{{ cat }} p-3" role="alert">
+                <h5 class="alert-heading mb-2 pb-1">پیام سیستم</h5>
+                <span>{{ msg }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}

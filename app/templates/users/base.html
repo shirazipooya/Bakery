@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html lang="fa" class="light-style layout-menu-fixed layout-compact" dir="rtl" data-theme="theme-default"
+    data-assets-path="../../assets/" data-template="horizontal-menu">
+
+<head>
+    {% include 'users/includes/meta.html' %}
+    {% include 'users/includes/links.html' %}
+    <title>
+        {% block title %} {% endblock %}
+    </title>
+</head>
+
+<body>
+    <div class="container-xxl">
+        <div class="authentication-wrapper authentication-basic container-p-y">
+            <div class="authentication-inner py-4">
+                {% include 'users/includes/messages.html' %}
+                {% include 'users/includes/form_errors.html' %}
+                {% block content %}{% endblock %}
+                <div class="content-backdrop fade"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+    <!-- / Overlay -->
+
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+    <!-- / Drag Target Area To SlideIn Menu On Small Screens -->
+
+    {% include 'users/includes/scripts.html' %}
+</body>
+
+</html>
