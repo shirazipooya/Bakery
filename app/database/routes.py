@@ -8,6 +8,8 @@ from app.extensions import db
 from sqlalchemy import or_, asc, desc
 import pandas as pd
 import geopandas as gpd
+from sqlalchemy.exc import IntegrityError
+from flask_login import current_user, login_required
 
 
 blueprint = Blueprint(
@@ -92,6 +94,7 @@ def clean_csv_file(df):
 
 
 @blueprint.route(rule='/database', methods=['POST', 'GET'])
+@login_required
 def home():
     form = BakeryForm()
     if form.validate_on_submit():
@@ -123,13 +126,14 @@ def home():
 
 
 @blueprint.route(rule='/api/database/table', methods=['GET'])
+@login_required
 def show_table():
     search = request.args.get('search', '')
     search = search.split()
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
     page = int(request.args.get('page', 1))
-    per_page = 15
+    per_page = 10
     offset = (page - 1) * per_page
     
     columns = [column.name for column in Bakery.__table__.columns]
@@ -149,6 +153,9 @@ def show_table():
             query = query.order_by(asc(getattr(Bakery, sort_by)))
     
     total_results = query.count()
+    
+    query = query.limit(per_page).offset(offset)
+    
     results = query.all()
     
     result_list = [
@@ -167,6 +174,7 @@ def show_table():
 
 
 @blueprint.route(rule='/api/database/upload', methods=['POST'])
+@login_required
 def upload_csv():
     
     if 'file' not in request.files:
@@ -180,9 +188,10 @@ def upload_csv():
     if file and file.filename.endswith('.csv'):
         file_path = os.path.join('uploads', file.filename)
         file.save(file_path)
-        data = clean_csv_file(pd.read_csv(file_path))
+        data = clean_csv_file(pd.read_csv(file_path, dtype=str))
+        records_to_insert = []
         for _, row in data.iterrows():
-            record = Bakery(
+            existing_record = Bakery.query.filter_by(
                 first_name=row['first_name'],
                 last_name=row['last_name'],
                 nid=row['nid'],
@@ -201,8 +210,39 @@ def upload_csv():
                 type_flour=row['type_flour'],
                 type_bread=row['type_bread'],
                 bread_rations=row['bread_rations'],
-            )
-            db.session.add(record)
+            ).first()
+            
+            if not existing_record:
+                record = Bakery(
+                    first_name=row['first_name'],
+                    last_name=row['last_name'],
+                    nid=row['nid'],
+                    phone=row['phone'],
+                    bakery_id=row['bakery_id'],
+                    ownership_status=row['ownership_status'],
+                    number_violations=row['number_violations'],
+                    second_fuel=row['second_fuel'],
+                    city=row['city'],
+                    region=row['region'],
+                    district=row['district'],
+                    lat=row['lat'],
+                    lon=row['lon'],
+                    household_risk=row['household_risk'],
+                    bakers_risk=row['bakers_risk'],
+                    type_flour=row['type_flour'],
+                    type_bread=row['type_bread'],
+                    bread_rations=row['bread_rations'],
+                )
+                records_to_insert.append(record)
+                # db.session.add(record)
+        if records_to_insert:
+            try:
+                db.session.bulk_save_objects(records_to_insert)
+                db.session.commit()
+            except IntegrityError as e:
+                db.session.rollback()  # Roll back the session if there's an error
+                print(f"Error occurred: {e}")
+        os.remove(file_path)        
         db.session.commit()
         flash(message='پایگاه داده با موفقیت ایجاد گردید!', category='success')
         return redirect(location=url_for(endpoint='database.home'))
@@ -212,6 +252,7 @@ def upload_csv():
 
 
 @blueprint.route('/api/database/delete/<int:id>', methods=['DELETE'])
+@login_required
 def delete_record(id):
     record = Bakery.query.get(id)
     if record:

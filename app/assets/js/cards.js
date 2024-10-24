@@ -1,489 +1,235 @@
-// Maps Leaflet
-
 "use strict";
 
 (function () {
-  // Get All Data From `/get_all_data`
+    load_data();
 
-  get_all_data();
-
-  async function get_all_data() {
-    const response = await fetch("/get_all_data");
-    const data = await response.json(); 
-    
-    // Number of Bakers
-    if (data.number_of_row && data.number_of_row !== undefined) {
-        document.getElementById("numberBakers").innerHTML =
-          data.number_of_row;
-      } else {
-        document.getElementById("numberBakers").innerHTML = "-";
-      }
-
-
-    // TypeBread
-
-    if (data.type_bread_cat && data.type_bread_cat["سنگک"] !== undefined) {
-      var tmp = (
-        (data.type_bread_cat["سنگک"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("TypeBread_A_Count").innerHTML =
-        data.type_bread_cat["سنگک"];
-      document.getElementById("TypeBread_A_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeBread_A_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeBread_A_Count").innerHTML = "-";
-      document.getElementById("TypeBread_A_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeBread_A_Bar").style.width = "0%";
+    async function load_data() {
+        const selectedRegion = document.getElementById("selectedRegion").value;
+        const response = await fetch("/api/dashboard/data/" + selectedRegion);
+        const data = await response.json();
+        updateUI(data);
     }
 
-    if (data.type_bread_cat && data.type_bread_cat["بربری"] !== undefined) {
-      var tmp = (
-        (data.type_bread_cat["بربری"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("TypeBread_B_Count").innerHTML =
-        data.type_bread_cat["بربری"];
-      document.getElementById("TypeBread_B_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeBread_B_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeBread_B_Count").innerHTML = "-";
-      document.getElementById("TypeBread_B_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeBread_B_Bar").style.width = "0%";
+    function updateUI(data) {
+        // Number of Bakers
+        if (data.number_of_row && data.number_of_row !== undefined) {
+            document.getElementById("numberBakers").innerHTML =
+                data.number_of_row;
+        } else {
+            document.getElementById("numberBakers").innerHTML = "-";
+        }
+
+        // TypeBread
+        updateTypeBread(data);
+        // TypeFlour
+        updateTypeFlour(data);
+        // BreadRations
+        updateBreadRations(data);
+        // BakersRisk
+        updateBakersRiskChart(data);
+        // HouseholdRisk
+        updateHouseholdRiskChart(data);
     }
 
-    if (data.type_bread_cat && data.type_bread_cat["تافتون"] !== undefined) {
-      var tmp = (
-        (data.type_bread_cat["تافتون"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("TypeBread_C_Count").innerHTML =
-        data.type_bread_cat["تافتون"];
-      document.getElementById("TypeBread_C_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeBread_C_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeBread_C_Count").innerHTML = "-";
-      document.getElementById("TypeBread_C_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeBread_C_Bar").style.width = "0%";
+    function updateTypeBread(data) {
+        const breadTypes = ["سنگک", "بربری", "تافتون", "لواش"];
+        breadTypes.forEach((type, index) => {
+            const count = data.type_bread_cat[type] || 0;
+            const tmp = ((count * 100) / (data.number_of_row || 1)).toFixed(0); // avoid division by zero
+            document.getElementById(
+                `TypeBread_${String.fromCharCode(65 + index)}_Count`
+            ).innerHTML = count;
+            document.getElementById(
+                `TypeBread_${String.fromCharCode(65 + index)}_Percent`
+            ).innerHTML = `(${tmp}%)`;
+            document.getElementById(
+                `TypeBread_${String.fromCharCode(65 + index)}_Bar`
+            ).style.width = `${tmp}%`;
+        });
     }
 
-    if (data.type_bread_cat && data.type_bread_cat["لواش"] !== undefined) {
-      var tmp = (
-        (data.type_bread_cat["لواش"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("TypeBread_D_Count").innerHTML =
-        data.type_bread_cat["لواش"];
-      document.getElementById("TypeBread_D_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeBread_D_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeBread_D_Count").innerHTML = "-";
-      document.getElementById("TypeBread_D_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeBread_D_Bar").style.width = "0%";
+    function updateTypeFlour(data) {
+        const flourTypes = ["1", "2", "3", "4", "5", "6"];
+        flourTypes.forEach((type, index) => {
+            const count = data.type_flour_cat[type] || 0;
+            const tmp = ((count * 100) / (data.number_of_row || 1)).toFixed(0);
+            document.getElementById(
+                `TypeFlour_${String.fromCharCode(65 + index)}_Count`
+            ).innerHTML = count;
+            document.getElementById(
+                `TypeFlour_${String.fromCharCode(65 + index)}_Percent`
+            ).innerHTML = `(${tmp}%)`;
+            document.getElementById(
+                `TypeFlour_${String.fromCharCode(65 + index)}_Bar`
+            ).style.width = `${tmp}%`;
+        });
     }
 
-    // TypeFlour
-
-    if (data.type_flour_cat && data.type_flour_cat["1"] !== undefined) {
-      var tmp = ((data.type_flour_cat["1"] * 100) / data.number_of_row).toFixed(
-        0
-      );
-      document.getElementById("TypeFlour_A_Count").innerHTML =
-        data.type_flour_cat["1"];
-      document.getElementById("TypeFlour_A_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeFlour_A_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeFlour_A_Count").innerHTML = "-";
-      document.getElementById("TypeFlour_A_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeFlour_A_Bar").style.width = "0%";
+    function updateBreadRations(data) {
+        const rations = ["0", "1", "2", "3", "4", "5"];
+        rations.forEach((ration, index) => {
+            const count = data.bread_rations_cat[ration] || 0;
+            const tmp = ((count * 100) / (data.number_of_row || 1)).toFixed(0);
+            document.getElementById(
+                `BreadRations_${String.fromCharCode(65 + index)}_Count`
+            ).innerHTML = count;
+            document.getElementById(
+                `BreadRations_${String.fromCharCode(65 + index)}_Percent`
+            ).innerHTML = `(${tmp}%)`;
+            document.getElementById(
+                `BreadRations_${String.fromCharCode(65 + index)}_Bar`
+            ).style.width = `${tmp}%`;
+        });
     }
 
-    if (data.type_flour_cat && data.type_flour_cat["2"] !== undefined) {
-      var tmp = ((data.type_flour_cat["2"] * 100) / data.number_of_row).toFixed(
-        0
-      );
-      document.getElementById("TypeFlour_B_Count").innerHTML =
-        data.type_flour_cat["2"];
-      document.getElementById("TypeFlour_B_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeFlour_B_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeFlour_B_Count").innerHTML = "-";
-      document.getElementById("TypeFlour_B_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeFlour_B_Bar").style.width = "0%";
-    }
+    let bakersRiskChart;
+    let householdRiskBarChart;
 
-    if (data.type_flour_cat && data.type_flour_cat["3"] !== undefined) {
-      var tmp = ((data.type_flour_cat["3"] * 100) / data.number_of_row).toFixed(
-        0
-      );
-      document.getElementById("TypeFlour_C_Count").innerHTML =
-        data.type_flour_cat["3"];
-      document.getElementById("TypeFlour_C_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeFlour_C_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeFlour_C_Count").innerHTML = "-";
-      document.getElementById("TypeFlour_C_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeFlour_C_Bar").style.width = "0%";
-    }
-
-    if (data.type_flour_cat && data.type_flour_cat["4"] !== undefined) {
-      var tmp = ((data.type_flour_cat["4"] * 100) / data.number_of_row).toFixed(
-        0
-      );
-      document.getElementById("TypeFlour_D_Count").innerHTML =
-        data.type_flour_cat["4"];
-      document.getElementById("TypeFlour_D_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeFlour_D_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeFlour_D_Count").innerHTML = "-";
-      document.getElementById("TypeFlour_D_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeFlour_D_Bar").style.width = "0%";
-    }
-
-    if (data.type_flour_cat && data.type_flour_cat["5"] !== undefined) {
-      var tmp = ((data.type_flour_cat["5"] * 100) / data.number_of_row).toFixed(
-        0
-      );
-      document.getElementById("TypeFlour_E_Count").innerHTML =
-        data.type_flour_cat["5"];
-      document.getElementById("TypeFlour_E_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeFlour_E_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeFlour_E_Count").innerHTML = "-";
-      document.getElementById("TypeFlour_E_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeFlour_E_Bar").style.width = "0%";
-    }
-
-    if (data.type_flour_cat && data.type_flour_cat["6"] !== undefined) {
-      var tmp = ((data.type_flour_cat["6"] * 100) / data.number_of_row).toFixed(
-        0
-      );
-      document.getElementById("TypeFlour_F_Count").innerHTML =
-        data.type_flour_cat["6"];
-      document.getElementById("TypeFlour_F_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("TypeFlour_F_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("TypeFlour_F_Count").innerHTML = "-";
-      document.getElementById("TypeFlour_F_Percent").innerHTML = "(0%)";
-      document.getElementById("TypeFlour_F_Bar").style.width = "0%";
-    }
-
-    // BreadRations
-
-    if (data.bread_rations_cat && data.bread_rations_cat["50"] !== undefined) {
-      var tmp = (
-        (data.bread_rations_cat["50"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("BreadRations_A_Count").innerHTML =
-        data.bread_rations_cat["50"];
-      document.getElementById("BreadRations_A_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("BreadRations_A_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("BreadRations_A_Count").innerHTML = "-";
-      document.getElementById("BreadRations_A_Percent").innerHTML = "(0%)";
-      document.getElementById("BreadRations_A_Bar").style.width = "0%";
-    }
-
-    if (data.bread_rations_cat && data.bread_rations_cat["100"] !== undefined) {
-      var tmp = (
-        (data.bread_rations_cat["100"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("BreadRations_B_Count").innerHTML =
-        data.bread_rations_cat["100"];
-      document.getElementById("BreadRations_B_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("BreadRations_B_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("BreadRations_B_Count").innerHTML = "-";
-      document.getElementById("BreadRations_B_Percent").innerHTML = "(0%)";
-      document.getElementById("BreadRations_B_Bar").style.width = "0%";
-    }
-
-    if (data.bread_rations_cat && data.bread_rations_cat["150"] !== undefined) {
-      var tmp = (
-        (data.bread_rations_cat["150"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("BreadRations_C_Count").innerHTML =
-        data.bread_rations_cat["150"];
-      document.getElementById("BreadRations_C_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("BreadRations_C_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("BreadRations_C_Count").innerHTML = "-";
-      document.getElementById("BreadRations_C_Percent").innerHTML = "(0%)";
-      document.getElementById("BreadRations_C_Bar").style.width = "0%";
-    }
-
-    if (data.bread_rations_cat && data.bread_rations_cat["200"] !== undefined) {
-      var tmp = (
-        (data.bread_rations_cat["200"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("BreadRations_D_Count").innerHTML =
-        data.bread_rations_cat["200"];
-      document.getElementById("BreadRations_D_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("BreadRations_D_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("BreadRations_D_Count").innerHTML = "-";
-      document.getElementById("BreadRations_D_Percent").innerHTML = "(0%)";
-      document.getElementById("BreadRations_D_Bar").style.width = "0%";
-    }
-
-    if (data.bread_rations_cat && data.bread_rations_cat["250"] !== undefined) {
-      var tmp = (
-        (data.bread_rations_cat["250"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("BreadRations_E_Count").innerHTML =
-        data.bread_rations_cat["250"];
-      document.getElementById("BreadRations_E_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("BreadRations_E_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("BreadRations_E_Count").innerHTML = "-";
-      document.getElementById("BreadRations_E_Percent").innerHTML = "(0%)";
-      document.getElementById("BreadRations_E_Bar").style.width = "0%";
-    }
-
-    if (data.bread_rations_cat && data.bread_rations_cat["300"] !== undefined) {
-      var tmp = (
-        (data.bread_rations_cat["300"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("BreadRations_F_Count").innerHTML =
-        data.bread_rations_cat["300"];
-      document.getElementById("BreadRations_F_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("BreadRations_F_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("BreadRations_F_Count").innerHTML = "-";
-      document.getElementById("BreadRations_F_Percent").innerHTML = "(0%)";
-      document.getElementById("BreadRations_F_Bar").style.width = "0%";
-    }
-
-    if (data.bread_rations_cat && data.bread_rations_cat["350"] !== undefined) {
-      var tmp = (
-        (data.bread_rations_cat["350"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("BreadRations_G_Count").innerHTML =
-        data.bread_rations_cat["350"];
-      document.getElementById("BreadRations_G_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("BreadRations_G_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("BreadRations_G_Count").innerHTML = "-";
-      document.getElementById("BreadRations_G_Percent").innerHTML = "(0%)";
-      document.getElementById("BreadRations_G_Bar").style.width = "0%";
-    }
-
-    if (data.bread_rations_cat && data.bread_rations_cat["400"] !== undefined) {
-      var tmp = (
-        (data.bread_rations_cat["400"] * 100) /
-        data.number_of_row
-      ).toFixed(0);
-      document.getElementById("BreadRations_H_Count").innerHTML =
-        data.bread_rations_cat["400"];
-      document.getElementById("BreadRations_H_Percent").innerHTML = `(${tmp}%)`;
-      document.getElementById("BreadRations_H_Bar").style.width = `${tmp}%`;
-    } else {
-      document.getElementById("BreadRations_H_Count").innerHTML = "-";
-      document.getElementById("BreadRations_H_Percent").innerHTML = "(0%)";
-      document.getElementById("BreadRations_H_Bar").style.width = "0%";
-    }
-
-    // BakersRisk
-
-    const sortedDataBakersRisk = Object.entries(data.bakers_risk_cat)
-    .sort((a, b) => b[1] - a[1]);
-
-    const bakersRiskBarChartConfig = {
-      chart: {
-        height: 200,
-        type: "bar",
-        toolbar: {
-          show: false,
+    let ChartConfig = {
+        chart: {
+            height: 200,
+            type: "bar",
+            toolbar: {
+                show: false,
+            },
         },
-      },
-      plotOptions: {
-        bar: {
-          barHeight: "60%",
-          columnWidth: "60%",
-          startingShape: "rounded",
-          endingShape: "rounded",
-          borderRadius: 4,
-          distributed: true,
+        plotOptions: {
+            bar: {
+                barHeight: "60%",
+                columnWidth: "60%",
+                startingShape: "rounded",
+                endingShape: "rounded",
+                borderRadius: 4,
+                distributed: true,
+            },
         },
-      },
-      grid: {
-        show: false,
-        padding: {
-          top: -20,
-          bottom: 0,
-          left: -10,
-          right: -10,
+        grid: {
+            show: false,
+            padding: {
+                top: -20,
+                bottom: 0,
+                left: -10,
+                right: -10,
+            },
         },
-      },
-      colors: [
-        config.colors.danger,
-        config.colors_label.primary,
-        config.colors_label.primary,
-        config.colors.success,
-      ],
-      dataLabels: {
-        enabled: false,
-      },
-      series: [
-        {
-          name: "ریسک نانوا",
-          data: sortedDataBakersRisk.map(item => item[1]),
+        colors: [
+            config.colors.danger,
+            config.colors_label.primary,
+            config.colors_label.primary,
+            config.colors.success,
+        ],
+        dataLabels: {
+            enabled: false,
         },
-      ],
-      legend: {
-        show: false,
-      },
-      xaxis: {
-        categories: sortedDataBakersRisk.map(item => item[0]),
-        axisBorder: {
-          show: false,
+        series: [
+            {
+                name: "",
+                data: [],
+            },
+        ],
+        legend: {
+            show: false,
         },
-        axisTicks: {
-          show: false,
+        xaxis: {
+            categories: [],
+            axisBorder: {
+                show: false,
+            },
+            axisTicks: {
+                show: false,
+            },
+            labels: {
+                style: {
+                    colors: config.colors.dark,
+                    fontSize: "13px",
+                    fontFamily: "iranyekan",
+                },
+            },
         },
-        labels: {
-          style: {
-            colors: config.colors.dark,
-            fontSize: "13px",
-            fontFamily: "iranyekan",
-          },
+        yaxis: {
+            labels: {
+                show: false,
+            },
         },
-      },
-      yaxis: {
-        labels: {
-          show: false,
+        tooltip: {
+            enabled: false,
         },
-      },
-      tooltip: {
-        enabled: false,
-      },
-      dataLabels: {
-        enabled: true,
-        formatter: function (val) {
-          return val;
+        dataLabels: {
+            enabled: true,
+            formatter: function (val) {
+                return val;
+            },
+            offsetY: 0,
+            style: {
+                fontSize: "16px",
+                fontFamily: "iranyekan",
+                colors: ["#000"],
+            },
         },
-        offsetY: 0,
-        style: {
-          fontSize: "16px",
-          fontFamily: "iranyekan",
-          colors: ["#000"],
-        },
-      },
     };
 
-    const barChart = new ApexCharts(
-        document.querySelector("#bakersRiskBarChart"),
-        bakersRiskBarChartConfig
-    );
+    function initBakersRiskChart() {
+      bakersRiskChart = new ApexCharts(
+            document.querySelector("#bakersRiskBarChart"),
+            ChartConfig
+        );
+        bakersRiskChart.render();
+    }
 
-    barChart.render();
+    function initHouseholdRiskChart() {
+        householdRiskBarChart = new ApexCharts(
+            document.querySelector("#householdRiskBarChart"),
+            ChartConfig
+        );
+        householdRiskBarChart.render();
+    }
 
+    function updateBakersRiskChart(data) {
+        const sortedDataBakersRisk = Object.entries(data.bakers_risk_cat).sort(
+            (a, b) => b[1] - a[1]
+        );
 
+        bakersRiskChart.updateOptions({
+            series: [
+                {
+                    name: "ریسک نانوا",
+                    data: sortedDataBakersRisk.map((item) => item[1]),
+                },
+            ],
+            xaxis: {
+                categories: sortedDataBakersRisk.map((item) => item[0]),
+            },
+        });
+    }
 
-    // HouseholdRisk
+    function updateHouseholdRiskChart(data) {
+        const sortedDataHouseholdRisk = Object.entries(
+            data.household_risk_cat
+        ).sort((a, b) => b[1] - a[1]);
 
-    const sortedDataHouseholdRisk = Object.entries(data.household_risk_cat)
-            .sort((a, b) => b[1] - a[1]);
+        householdRiskBarChart.updateOptions({
+            series: [
+                {
+                    name: "ریسک خانوار",
+                    data: sortedDataHouseholdRisk.map((item) => item[1]),
+                },
+            ],
+            xaxis: {
+                categories: sortedDataHouseholdRisk.map((item) => item[0]),
+            },
+        });
+    }
 
-    const householdRiskBarChartConfig = {
-      chart: {
-        height: 200,
-        type: "bar",
-        toolbar: {
-          show: false,
-        },
-      },
-      plotOptions: {
-        bar: {
-          barHeight: "60%",
-          columnWidth: "60%",
-          startingShape: "rounded",
-          endingShape: "rounded",
-          borderRadius: 4,
-          distributed: true,
-        },
-      },
-      grid: {
-        show: false,
-        padding: {
-          top: -20,
-          bottom: 0,
-          left: -10,
-          right: -10,
-        },
-      },
-      colors: [
-        config.colors.danger,
-        config.colors_label.primary,
-        config.colors_label.primary,
-        config.colors.success,
-      ],
-      dataLabels: {
-        enabled: false,
-      },
-      series: [
-        {
-          name: "ریسک خانوار",
-        //   data: Object.values(data.household_risk_cat),
-          data: sortedDataHouseholdRisk.map(item => item[1]),
-        },
-      ],
-      legend: {
-        show: false,
-      },
-      xaxis: {
-        // categories: Object.keys(data.household_risk_cat),
-        categories: sortedDataHouseholdRisk.map(item => item[0]),
-        axisBorder: {
-          show: false,
-        },
-        axisTicks: {
-          show: false,
-        },
-        labels: {
-          style: {
-            colors: config.colors.dark,
-            fontSize: "13px",
-            fontFamily: "iranyekan",
-          },
-        },
-      },
-      yaxis: {
-        labels: {
-          show: false,
-        },
-      },
-      tooltip: {
-        enabled: false,
-      },
-      dataLabels: {
-        enabled: true,
-        formatter: function (val) {
-          return val;
-        },
-        offsetY: 0,
-        style: {
-          fontSize: "16px",
-          fontFamily: "iranyekan",
-          colors: ["#000"],
-        },
-      },
-    };
+    initBakersRiskChart();
+    initHouseholdRiskChart();
 
-    const householdRiskBarChart = new ApexCharts(
-        document.querySelector("#householdRiskBarChart"),
-        householdRiskBarChartConfig
-    );
+    $(document).ready(function () {
+        $(".select2").select2({
+            placeholder: "منطقه را انتخاب کنید ...",
+        });
 
-    householdRiskBarChart.render();
-
-
-  }
+        $("#selectedRegion").on("change", function () {
+            load_data();
+        });
+    });
 })();

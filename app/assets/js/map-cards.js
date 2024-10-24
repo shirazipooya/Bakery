@@ -12,8 +12,10 @@
     get_all_data();
 
     async function get_all_data() {
-        const response = await fetch('/get_all_data');
+        const response = await fetch('/api/dashboard/map/data/');
         const data = await response.json();
+        console.log(data);
+        
         await addMarkers(data.data);    
     };
 
@@ -68,16 +70,16 @@
             },
             onEachFeature: function (feature, layer) {
                 layer.bindTooltip(
-                    `${feature.properties.Region}`
+                    `${feature.properties.region}`
                 );
-                layer.on('click', function() {
-                    fetch(`/region/${feature.properties.Region}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log(data.n);
+                // layer.on('click', function() {
+                //     fetch(`/region/${feature.properties.Region}`)
+                //         .then(response => response.json())
+                //         .then(data => {
+                //             console.log(data.n);
                             
-                        })
-                });
+                //         })
+                // });
             }
         }).addTo(map);
     }
@@ -104,47 +106,6 @@
     })
 
 
-
-    // // District
-    // let geojsonLayerDistrict = null;
-
-    // function addGeoJSONLayerDistrict(geojsonData) {       
-    //     geojsonLayerDistrict = L.geoJSON(geojsonData, {
-    //         style: function () {
-    //             return {
-    //                 color: "#3388ff", 
-    //                 weight: 2,
-    //                 opacity: 1,
-    //                 fillColor: "#3388ff",
-    //                 fillOpacity: 0.2
-    //             };
-    //         },
-    //     }).addTo(map);
-    //     geojsonLayerDistrict = L.geoJSON(geojsonData).addTo(map);
-    // }
-
-    // fetch('/assets/data/geodatabase/District.geojson')
-    //     .then(response => response.json())
-    //     .then(geojsonData => {                      
-    //         addGeoJSONLayerDistrict(geojsonData);
-    //     })
-    //     .catch(error => {
-    //         console.error("Error loading the GeoJSON file:", error);
-    //     })
-    
-    // document.getElementById('showDistrict').addEventListener('change', function() {
-    //     if (this.checked) {                    
-    //         if (geojsonLayerDistrict) {
-    //             geojsonLayerDistrict.addTo(map);
-    //         }
-    //     } else {
-    //         if (geojsonLayerDistrict) {
-    //             map.removeLayer(geojsonLayerDistrict);
-    //         }
-    //     }
-    // })
-
-
     const markerClusters = L.markerClusterGroup();
 
     map.addLayer(markerClusters);
@@ -156,62 +117,74 @@
         markerClusters.clearLayers();
         const bounds = L.latLngBounds();
         data.forEach(row => {
-            const marker = L.marker([row.Lat, row.Lon]);
+            const marker = L.marker([row.lat, row.lon]);
             marker.bindPopup(
                 `
-                    <h4 class="pb-2" style="text-align: center !important;">${row.FirstName} ${row.LastName}</h4>
+                    <h4 class="pb-2" style="text-align: center !important;">${row.first_name} ${row.last_name}</h4>
                     <div class="table-responsive medium">
                         <table class="table table-striped table-sm">
                             <tbody>
-                                 <tr>
-                                    <th>کد ملی</th>
-                                    <td>${row.NID}</td>
+                                <tr>
+                                    <th>شماره خبازی</th>
+                                    <td>${row.bakery_id}</td>
                                 </tr>
                                 <tr>
                                     <th>نوع آرد</th>
-                                    <td>${row.TypeFlour}</td>
+                                    <td>${row.type_flour}</td>
+                                </tr>
+                                 <tr>
+                                    <th>تعداد تخلفات نانوایی</th>
+                                    <td>${row.number_violations}</td>
+                                </tr>
+                                 <tr>
+                                    <th>نوع ملک نانوایی</th>
+                                    <td>${row.ownership_status}</td>
+                                </tr>
+                                 <tr>
+                                    <th>سوخت دوم</th>
+                                    <td>${row.second_fuel}</td>
                                 </tr>
                                 <tr>
                                     <th>نوع پخت</th>
-                                    <td>${row.TypeBread}</td>
+                                    <td>${row.type_bread}</td>
                                 </tr>
                                 <tr>
                                     <th>سهمیه (تعداد کیسه)</th>
-                                    <td>${row.BreadRations}</td>
+                                    <td>${row.bread_rations}</td>
                                 </tr>
                                 <tr>
                                     <th>ریسک خانوار</th>
-                                    <td>${row.HouseholdRisk}</td>
+                                    <td>${row.bread_rations}</td>
                                 </tr>
                                 <tr>
                                     <th>ریسک نانوا</th>
-                                    <td>${row.BakersRisk}</td>
+                                    <td>${row.bakers_risk}</td>
                                 </tr>
                                  <tr>
                                     <th>شهر</th>
-                                    <td>${row.City}</td>
+                                    <td>${row.city}</td>
                                 </tr>
                                  <tr>
                                     <th>منطقه</th>
-                                    <td>${row.Region}</td>
+                                    <td>${row.region}</td>
                                 </tr>
                                  <tr>
                                     <th>ناحیه</th>
-                                    <td>${row.District}</td>
+                                    <td>${row.district}</td>
                                 </tr>
                                 <tr>
                                     <th>طول جغرافیایی</th>
-                                    <td>${Number((row.Lon).toFixed(2))}</td>
+                                    <td>${Number((row.lon).toFixed(2))}</td>
                                 </tr>
                                 <tr>
                                     <th>عرض جغرافیایی</th>
-                                    <td>${Number((row.Lat).toFixed(2))}</td>
+                                    <td>${Number((row.lat).toFixed(2))}</td>
                                 </tr>
                             </tbody>
                 `
             );
             markerClusters.addLayer(marker);
-            bounds.extend([row.Lat, row.Lon]);        
+            bounds.extend([row.lat, row.lon]);        
         });
         if (data.length > 0) {
             map.fitBounds(bounds);        
@@ -223,6 +196,8 @@
         let regionSelect = document.getElementById('region').value;
         let districtSelect = document.getElementById('district').value;
         let typeBreadSelect = document.getElementById('typeBread').value;
+        let typeFlourSelect = document.getElementById('typeFlour').value;
+        let secondFuelSelect = document.getElementById('secondFuel').value;
 
         if (!citySelect) {
             citySelect = "999";
@@ -236,8 +211,14 @@
         if (!typeBreadSelect) {
             typeBreadSelect = "999";
         }
+        if (!typeFlourSelect) {
+            typeFlourSelect = "999";
+        }
+        if (!secondFuelSelect) {
+            secondFuelSelect = "999";
+        }
 
-        fetch(`/api/filtered/${citySelect}/${regionSelect}/${districtSelect}/${typeBreadSelect}`)
+        fetch(`/api/dashboard/map/filter/${citySelect}/${regionSelect}/${districtSelect}/${typeBreadSelect}/${typeFlourSelect}/${secondFuelSelect}`)
         .then(response => response.json())
         .then(data => {
             addMarkers(data.data);

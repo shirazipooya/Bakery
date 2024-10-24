@@ -5,7 +5,7 @@ function fetchInfo() {
   const svgElement = document.getElementById("sunburst");
   svgElement.innerHTML = "";
 
-  fetch("/sunburst_data/" + selectedColumn)
+  fetch("/api/dashboard/sunburst/" + selectedColumn)
     .then((response) => response.json())
     .then((data) => {
       const partition = (data) => {

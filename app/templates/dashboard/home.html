@@ -24,6 +24,26 @@
           <span class="d-block mb-3 text-nowrap">تعداد کل نانوایی‌ها</span>
           <h1 class="display-1"><span id="numberBakers">-</span></h1>
         </div>
+        <div class="card-footer">
+          <div class="ecommerce-select2-dropdow">
+            <select id="selectedRegion" class="select2 form-select" data-placeholder="منطقه را انتخاب کنید ...">
+              <option value="0">همه مناطق</option>
+              <option value="1">منطقه 1</option>
+              <option value="2">منطقه 2</option>
+              <option value="3">منطقه 3</option>
+              <option value="4">منطقه 4</option>
+              <option value="5">منطقه 5</option>
+              <option value="6">منطقه 6</option>
+              <option value="7">منطقه 7</option>
+              <option value="8">منطقه 8</option>
+              <option value="9">منطقه 9</option>
+              <option value="10">منطقه 10</option>
+              <option value="11">منطقه 11</option>
+              <option value="12">منطقه 12</option>
+              <option value="13">منطقه 13</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
     <!--/ Top Referrals -->
@@ -37,21 +57,17 @@
         </div>
         <div class="card-body">
           <div class="progress progress-stacked mb-3" style="height: 8px">
-            <div id="BreadRations_A_Bar" class="progress-bar bg-success m-0" role="progressbar" style="width: 12.5%"
+            <div id="BreadRations_A_Bar" class="progress-bar bg-success m-0" role="progressbar" style="width: 16.667%"
               aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_B_Bar" class="progress-bar bg-danger m-0" role="progressbar" style="width: 12.5%"
+            <div id="BreadRations_B_Bar" class="progress-bar bg-danger m-0" role="progressbar" style="width: 16.667%"
               aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_C_Bar" class="progress-bar bg-warning m-0" role="progressbar" style="width: 12.5%"
+            <div id="BreadRations_C_Bar" class="progress-bar bg-warning m-0" role="progressbar" style="width: 16.667%"
               aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_D_Bar" class="progress-bar bg-primary m-0" role="progressbar" style="width: 12.5%"
+            <div id="BreadRations_D_Bar" class="progress-bar bg-primary m-0" role="progressbar" style="width: 16.667%"
               aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_E_Bar" class="progress-bar bg-dark m-0" role="progressbar" style="width: 12.5%"
+            <div id="BreadRations_E_Bar" class="progress-bar bg-dark m-0" role="progressbar" style="width: 16.667%"
               aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_F_Bar" class="progress-bar bg-info m-0" role="progressbar" style="width: 12.5%"
-              aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_G_Bar" class="progress-bar bg-light m-0" role="progressbar" style="width: 12.5%"
-              aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_H_Bar" class="progress-bar bg-secondary m-0" role="progressbar" style="width: 12.5%"
+            <div id="BreadRations_F_Bar" class="progress-bar bg-info m-0" role="progressbar" style="width: 16.667%"
               aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
 
@@ -59,7 +75,7 @@
             <li class="mb-2 d-flex justify-content-between">
               <div class="d-flex align-items-center lh-1 me-3">
                 <span class="badge badge-dot bg-success me-2"></span>
-                <span id="BreadRations_A_Name">50 کیسه</span>
+                <span id="BreadRations_A_Name">0-100 کیسه</span>
               </div>
               <div class="d-flex gap-1">
                 <span id="BreadRations_A_Percent" class="text-muted">(-)</span>
@@ -70,7 +86,7 @@
             <li class="mb-2 d-flex justify-content-between">
               <div class="d-flex align-items-center lh-1 me-3">
                 <span class="badge badge-dot bg-danger me-2"></span>
-                <span id="BreadRations_B_Name">100 کیسه</span>
+                <span id="BreadRations_B_Name">100-200 کیسه</span>
               </div>
               <div class="d-flex gap-1">
                 <span id="BreadRations_B_Percent" class="text-muted">(-)</span>
@@ -81,7 +97,7 @@
             <li class="mb-2 d-flex justify-content-between">
               <div class="d-flex align-items-center lh-1 me-3">
                 <span class="badge badge-dot bg-warning me-2"></span>
-                <span id="BreadRations_C_Name">150 کیسه</span>
+                <span id="BreadRations_C_Name">200-300 کیسه</span>
               </div>
               <div class="d-flex gap-1">
                 <span id="BreadRations_C_Percent" class="text-muted">(-)</span>
@@ -92,7 +108,7 @@
             <li class="mb-2 d-flex justify-content-between">
               <div class="d-flex align-items-center lh-1 me-3">
                 <span class="badge badge-dot bg-primary me-2"></span>
-                <span id="BreadRations_D_Name">200 کیسه</span>
+                <span id="BreadRations_D_Name">300-400 کیسه</span>
               </div>
               <div class="d-flex gap-1">
                 <span id="BreadRations_D_Percent" class="text-muted">(-)</span>
@@ -103,7 +119,7 @@
             <li class="mb-2 d-flex justify-content-between">
               <div class="d-flex align-items-center lh-1 me-3">
                 <span class="badge badge-dot bg-dark me-2"></span>
-                <span id="BreadRations_E_Name">250 کیسه</span>
+                <span id="BreadRations_E_Name">400-500 کیسه</span>
               </div>
               <div class="d-flex gap-1">
                 <span id="BreadRations_E_Percent" class="text-muted">(-)</span>
@@ -114,7 +130,7 @@
             <li class="mb-2 d-flex justify-content-between">
               <div class="d-flex align-items-center lh-1 me-3">
                 <span class="badge badge-dot bg-info me-2"></span>
-                <span id="BreadRations_F_Name">300 کیسه</span>
+                <span id="BreadRations_F_Name">500-600 کیسه</span>
               </div>
               <div class="d-flex gap-1">
                 <span id="BreadRations_F_Percent" class="text-muted">(-)</span>
@@ -122,27 +138,6 @@
               </div>
             </li>
 
-            <li class="mb-2 d-flex justify-content-between">
-              <div class="d-flex align-items-center lh-1 me-3">
-                <span class="badge badge-dot bg-light me-2"></span>
-                <span id="BreadRations_G_Name">350 کیسه</span>
-              </div>
-              <div class="d-flex gap-1">
-                <span id="BreadRations_G_Percent" class="text-muted">(-)</span>
-                <span class="fw-semibold" id="BreadRations_G_Count">-</span>
-              </div>
-            </li>
-
-            <li class="mb-2 d-flex justify-content-between">
-              <div class="d-flex align-items-center lh-1 me-3">
-                <span class="badge badge-dot bg-secondary me-2"></span>
-                <span id="BreadRations_H_Name">400 کیسه</span>
-              </div>
-              <div class="d-flex gap-1">
-                <span id="BreadRations_H_Percent" class="text-muted">(-)</span>
-                <span class="fw-semibold" id="BreadRations_H_Count">-</span>
-              </div>
-            </li>
           </ul>
         </div>
       </div>
@@ -416,6 +411,24 @@
             </select>
           </div>
 
+          <!-- Type Bread -->
+          <div class="mb-3 col ecommerce-select2-dropdown">
+            <label class="form-label mb-1" for="typeFlour">نوع آرد
+            </label>
+            <select id="typeFlour" class="form-select" data-placeholder="نوع آرد را انتخاب کنید ...">
+              <option value="">نوع آرد را انتخاب کنید ...</option>
+            </select>
+          </div>
+
+          <!-- Type Bread -->
+          <div class="mb-3 col ecommerce-select2-dropdown">
+            <label class="form-label mb-1" for="secondFuel">سوخت دوم
+            </label>
+            <select id="secondFuel" class="form-select" data-placeholder="نوع سوخت دوم را انتخاب کنید ...">
+              <option value="">نوع سوخت دوم را انتخاب کنید ...</option>
+            </select>
+          </div>
+
           <div class="row">
             <div class="demo-inline-spacing justify-content-center d-inline-flex">
               <button type="button" class="btn rounded-pill btn-label-primary" id="apply_filter">
@@ -451,11 +464,14 @@
       <div class="ecommerce-select2-dropdow">
         <select id="selectColumn" class="select2 form-select" data-placeholder="پارامتر را انتخاب کنید ..."
           onchange="fetchInfo()">
-          <option value="TypeBread">نوع پخت</option>
-          <option value="BreadRations">سهمیه (تعداد کیسه)</option>
-          <option value="TypeFlour">نوع آرد</option>
-          <option value="BakersRisk">ریسک نانوا</option>
-          <option value="HouseholdRisk">ریسک خانوار</option>
+          <option value="type_bread">نوع پخت</option>
+          <option value="bread_rations">سهمیه (تعداد کیسه)</option>
+          <option value="type_flour">نوع آرد</option>
+          <option value="household_risk">ریسک خانوار</option>
+          <option value="bakers_risk">ریسک نانوا</option>
+          <option value="ownership_status">نوع ملک نانوایی</option>
+          <option value="number_violations">تعداد تخلفات نانوایی</option>
+          <option value="second_fuel">سوخت دوم</option>
         </select>
       </div>
       <div class="card card-sunburst" id="card-sunburst">
