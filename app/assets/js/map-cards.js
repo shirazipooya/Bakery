@@ -144,7 +144,7 @@
                     L.geoJson(geojson, {
                         style: style,
                         onEachFeature: function(feature, layer) {
-                            layer.bindPopup('منطقه: ' + feature.properties.region + '<br>نسبت جمعیت به تعداد نانوایی: ' + (data.find(d => d.region == feature.properties.region)?.ratio || 'N/A'));
+                            layer.bindPopup('منطقه: ' + feature.properties.region + '<br>به ازای هر  ' + (Math.floor(data.find(d => d.region == feature.properties.region)?.ratio) || 'N/A') + ' نفر یک عدد نانوایی');
                         }
                     }).addTo(map);
                 });
