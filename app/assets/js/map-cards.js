@@ -49,7 +49,15 @@
 
     L.control.layers(baseLayers).addTo(map);
 
-
+    L.easyPrint({
+        title: 'پرینت',
+        position: 'topright',
+        defaultSizeTitles: {Current: 'سایز نقشه',},
+        sizeModes: ['Current'],
+        exportOnly: true,
+        hidden: false,
+        hideControlContainer: true
+    }).addTo(map);
 
 
     // Region
@@ -250,6 +258,7 @@
             map.fitBounds(bounds);        
         }
     }
+
 
     document.getElementById('apply_filter').addEventListener('click', function () {
         let citySelect = document.getElementById('city').value;
