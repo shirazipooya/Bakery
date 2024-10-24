@@ -111,6 +111,7 @@
         }
     })
 
+    let ratio_map;
 
     fetch('/api/dashboard/map/ratio')
         .then(response => response.json())
@@ -143,18 +144,24 @@
                             ratio > 1500   ? '#ef3b2c' :
                             ratio > 1000    ? '#cb181d' :
                                             '#99000d';
-                    }
-
-                    console.log(geojson);
-                    
+                    }                    
 
                     // Add GeoJSON layer
-                    L.geoJson(geojson, {
+                    ratio_map = L.geoJson(geojson, {
                         style: style,
                         onEachFeature: function(feature, layer) {
                             layer.bindPopup('منطقه: ' + feature.properties.region + '<br>به ازای هر  ' + (Math.floor(data.find(d => d.region == feature.properties.region)?.ratio) || 'N/A') + ' نفر یک عدد نانوایی');
                         }
                     }).addTo(map);
+
+                    const toggleLayerCheckbox = document.getElementById('showRatio');
+                    toggleLayerCheckbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            map.addLayer(ratio_map); // Add layer when checked
+                        } else {
+                            map.removeLayer(ratio_map); // Remove layer when unchecked
+                        }
+                    });
                 });
         })
 
