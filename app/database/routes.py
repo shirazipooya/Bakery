@@ -261,3 +261,31 @@ def delete_record(id):
         return jsonify({"message": f"نانوایی با شماره ردیف {id} با موفقیت از پایگاه داده حذف شد!"}), 200
     else:
         return jsonify({"error": f"نانوایی با شماره ردیف {id} پیدا نشد"}), 404
+
+
+@blueprint.route('/api/database/update/<int:id>', methods=['GET', 'POST'])
+@login_required
+def update_record(id):
+    data = request.json
+    bakery = Bakery.query.filter_by(id=id).first()
+    if bakery:
+        bakery.first_name = data.get('first_name')
+        bakery.last_name = data.get('last_name')
+        bakery.nid = data.get('nid')
+        bakery.phone = data.get('phone')
+        bakery.bakery_id = data.get('bakery_id')
+        bakery.ownership_status = data.get('ownership_status')
+        bakery.number_violations = data.get('number_violations')
+        bakery.second_fuel = data.get('second_fuel')
+        bakery.city = data.get('city')
+        bakery.region = data.get('region')
+        bakery.district = data.get('district')
+        bakery.lat = data.get('lat')
+        bakery.lon = data.get('lon')
+        bakery.household_risk = data.get('household_risk')
+        bakery.bakers_risk = data.get('bakers_risk')
+        bakery.type_flour = data.get('type_flour')
+        bakery.type_bread = data.get('type_bread')
+        bakery.bread_rations = data.get('bread_rations')
+        db.session.commit()
+        return jsonify({'message': 'Bakery Updated Successfully'})

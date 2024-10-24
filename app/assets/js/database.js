@@ -18,6 +18,7 @@ function loadBakeriesTable() {
             const { data, total_count, per_page, page } = response;           
             totalCountPage = Math.ceil(total_count / per_page);
             const tableBody = $("#bakeries-table-body");
+            document.getElementById("total").innerHTML = total_count;
             tableBody.empty();
 
             data.forEach((bakery) => {
@@ -86,22 +87,27 @@ $("#confirmDelete").on("click", function () {
 
 function showEditModal(id) {
     const search = $("#search").val();
-    $.get(`/api/bakeries`, { search: search, page: currentPage }, function(response) {
-        const bakery = response.data.find(b => b.ID === id);
-        $('#editID').val(bakery.ID);
-        $('#editFirstName').val(bakery.FirstName);
-        $('#editLastName').val(bakery.LastName);
-        $('#editNID').val(bakery.NID);
-        $('#editCity').val(bakery.City).change();
-        $('#editRegion').val(bakery.Region).change();
-        $('#editDistrict').val(bakery.District).change();
-        $('#editLat').val(bakery.Lat);
-        $('#editLon').val(bakery.Lon);
-        $('#editHouseholdRisk').val(bakery.HouseholdRisk).change();
-        $('#editBakersRisk').val(bakery.BakersRisk).change();
-        $('#editTypeFlour').val(bakery.TypeFlour).change();
-        $('#editTypeBread').val(bakery.TypeBread).change();
-        $('#editBreadRations').val(bakery.BreadRations).change();
+    $.get(`/api/database/table`, { search: search, page: currentPage }, function(response) {
+        const bakery = response.data.find(b => b.id === id);
+        $('#editID').val(bakery.id);
+        $('#editFirstName').val(bakery.first_name);
+        $('#editLastName').val(bakery.last_name);
+        $('#editNID').val(bakery.nid);
+        $('#editPhone').val(bakery.phone);
+        $('#editBakeryID').val(bakery.bakery_id);
+        $('#editOwnershipStatus').val(bakery.ownership_status).change();
+        $('#editNumberViolations').val(bakery.number_violations);
+        $('#editSecondFuel').val(bakery.second_fuel).change();
+        $('#editCity').val(bakery.city).change();
+        $('#editRegion').val(bakery.region).change();
+        $('#editDistrict').val(bakery.district).change();
+        $('#editLat').val(bakery.lat);
+        $('#editLon').val(bakery.lon);
+        $('#editHouseholdRisk').val(bakery.household_risk).change();
+        $('#editBakersRisk').val(bakery.bakers_risk).change();
+        $('#editTypeFlour').val(bakery.type_flour).change();
+        $('#editTypeBread').val(bakery.type_bread).change();
+        $('#editBreadRations').val(bakery.bread_rations);
         $('#editModal').modal('show');
     });
 };
@@ -110,23 +116,28 @@ $('#editForm').on('submit', function(event) {
     event.preventDefault();
     const id = $('#editID').val();
     const updatedData = {
-        FirstName: $('#editFirstName').val(),
-        LastName: $('#editLastName').val(),
-        NID: $('#editNID').val(),
-        City: $('#editCity').val(),
-        Region: $('#editRegion').val(),
-        District: $('#editDistrict').val(),
-        Lat: $('#editLat').val(),
-        Lon: $('#editLon').val(),
-        HouseholdRisk: $('#editHouseholdRisk').val(),
-        BakersRisk: $('#editBakersRisk').val(),
-        TypeFlour: $('#editTypeFlour').val(),
-        TypeBread: $('#editTypeBread').val(),
-        BreadRations: $('#editBreadRations').val(),
+        first_name: $('#editFirstName').val(),
+        last_name: $('#editLastName').val(),
+        nid: $('#editNID').val(),
+        phone: $('#editPhone').val(),
+        bakery_id: $('#editBakeryID').val(),
+        ownership_status: $('#editOwnershipStatus').val(),
+        number_violations: $('#editNumberViolations').val(),
+        second_fuel: $('#editSecondFuel').val(),
+        city: $('#editCity').val(),
+        region: $('#editRegion').val(),
+        district: $('#editDistrict').val(),
+        lat: $('#editLat').val(),
+        lon: $('#editLon').val(),
+        household_risk: $('#editHouseholdRisk').val(),
+        bakers_risk: $('#editBakersRisk').val(),
+        type_flour: $('#editTypeFlour').val(),
+        type_bread: $('#editTypeBread').val(),
+        bread_rations: $('#editBreadRations').val(),
     };
 
     $.ajax({
-        url: `/api/bakeries/${id}`,
+        url: `/api/database/update/${id}`,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(updatedData),
@@ -168,3 +179,9 @@ $(document).ready(function () {
 
 });
 // Table and Search and Sort End
+
+
+document.getElementById('fileInput').addEventListener('change', function() {
+    const fileName = this.files[0] ? this.files[0].name : 'هیچ فایلی انتخاب نشده';
+    document.getElementById('fileName').value = fileName;
+});
