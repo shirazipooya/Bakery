@@ -215,3 +215,25 @@ def second_fuel_data():
     second_fuel = query.all()
     data = sorted([sf[0] for sf in second_fuel])
     return jsonify(data)
+
+import sqlite3
+population_data = pd.read_csv('./app/assets/data/mashhad_amarnameh.csv', dtype=float)
+
+def get_bakery_counts():
+    conn = sqlite3.connect('app.db')
+    query = "SELECT region, COUNT(bakery_id) as bakery_count FROM bakery GROUP BY region"
+    bakery_counts = pd.read_sql_query(query, conn)
+    conn.close()
+    return bakery_counts  
+
+
+@blueprint.route('/api/dashboard/map/ratio', methods=['GET'])
+@login_required
+def ratio_data():
+    bakery_counts = get_bakery_counts()
+    print(bakery_counts)
+    merged_data = pd.merge(population_data, bakery_counts, on='region', how='left').fillna(0)
+    merged_data['ratio'] = merged_data['population'] / merged_data['bakery_count']
+    
+    # Return the ratio data as JSON
+    return merged_data[['region', 'ratio']].to_json(orient='records')

@@ -13,9 +13,7 @@
 
     async function get_all_data() {
         const response = await fetch('/api/dashboard/map/data/');
-        const data = await response.json();
-        console.log(data);
-        
+        const data = await response.json();        
         await addMarkers(data.data);    
     };
 
@@ -104,6 +102,68 @@
             }
         }
     })
+
+
+    fetch('/api/dashboard/map/ratio')
+        .then(response => response.json())
+        .then(data => {
+            // Load GeoJSON
+            fetch('/assets/data/geodatabase/Region.geojson')
+                .then(response => response.json())
+                .then(geojson => {
+                    // Define a style function
+                    function style(feature) {
+                        const regionData = data.find(d => d.region == feature.properties.region);
+                        const ratio = regionData ? regionData.ratio : 0;
+                        return {
+                            fillColor: getColor(ratio),
+                            weight: 2,
+                            opacity: 1,
+                            color: 'white',
+                            dashArray: '3',
+                            fillOpacity: 0.7
+                        };
+                    }
+
+                    // Function to get color based on ratio
+                    function getColor(ratio) {
+                        return ratio > 4000 ? '#fff5f0' :
+                            ratio > 3500 ? '#fee0d2' :
+                            ratio > 3000  ? '#fcbba1' :
+                            ratio > 2500 ? '#fc9272' :
+                            ratio > 2000   ? '#fb6a4a' :
+                            ratio > 1500   ? '#ef3b2c' :
+                            ratio > 1000    ? '#cb181d' :
+                                            '#99000d';
+                    }
+
+                    console.log(geojson);
+                    
+
+                    // Add GeoJSON layer
+                    L.geoJson(geojson, {
+                        style: style,
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup('منطقه: ' + feature.properties.region + '<br>نسبت جمعیت به تعداد نانوایی: ' + (data.find(d => d.region == feature.properties.region)?.ratio || 'N/A'));
+                        }
+                    }).addTo(map);
+                });
+        })
+
+
+
+    
+    // document.getElementById('showRatio').addEventListener('change', function() {
+    //     if (this.checked) {           
+    //         if (geojsonLayerRegion) {
+    //             geojsonLayerRegion.addTo(map);
+    //         }
+    //     } else {
+    //         if (geojsonLayerRegion) {
+    //             map.removeLayer(geojsonLayerRegion);
+    //         }
+    //     }
+    // })
 
 
     const markerClusters = L.markerClusterGroup();
