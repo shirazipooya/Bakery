@@ -150,7 +150,10 @@
                     ratio_map = L.geoJson(geojson, {
                         style: style,
                         onEachFeature: function(feature, layer) {
-                            layer.bindPopup('منطقه: ' + feature.properties.region + '<br>به ازای هر  ' + (Math.floor(data.find(d => d.region == feature.properties.region)?.ratio) || 'N/A') + ' نفر یک عدد نانوایی');
+                            layer.bindPopup(
+                                '<b>منطقه: ' + feature.properties.region + '</b><br>' +
+                                '- به ازای هر  ' + (Math.floor(data.find(d => d.region == feature.properties.region)?.ratio) || 'N/A') + ' نفر یک عدد نانوایی<br>' +
+                                '- به ازای هر 100 نفر  ' + (Math.floor(data.find(d => d.region == feature.properties.region)?.ration) || 'N/A') + ' عدد کیسه آرد');
                         }
                     }).addTo(map);
 

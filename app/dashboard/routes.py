@@ -2,7 +2,9 @@ from flask import Blueprint, render_template, jsonify
 from flask_login import current_user, login_required
 import pandas as pd
 from app.database.models import Bakery
+from app.extensions import db
 from sqlalchemy import distinct
+from sqlalchemy import func
 
 
 blueprint = Blueprint(
@@ -219,21 +221,37 @@ def second_fuel_data():
 import sqlite3
 population_data = pd.read_csv('./app/assets/data/mashhad_amarnameh.csv', dtype=float)
 
-def get_bakery_counts():
-    conn = sqlite3.connect('app.db')
-    query = "SELECT region, COUNT(bakery_id) as bakery_count FROM bakery GROUP BY region"
-    bakery_counts = pd.read_sql_query(query, conn)
-    conn.close()
-    return bakery_counts  
+def bakery_query():
+    
+    data = db.session.query(
+        Bakery.region,
+        func.count(Bakery.id)
+    ).group_by(Bakery.region).all()
+    
+    region_bakery_counts = pd.DataFrame(data, columns=['region', 'bakery_count'])
+    
+    data = db.session.query(
+        Bakery.region,
+        func.sum(Bakery.bread_rations)
+    ).group_by(Bakery.region).all()
+    
+    region_bread_rations = pd.DataFrame(data, columns=['region', 'bread_rations'])
+    
+    return {
+        "region_bakery_counts": region_bakery_counts,
+        "region_bread_rations": region_bread_rations
+    }  
 
 
 @blueprint.route('/api/dashboard/map/ratio', methods=['GET'])
 @login_required
 def ratio_data():
-    bakery_counts = get_bakery_counts()
-    print(bakery_counts)
-    merged_data = pd.merge(population_data, bakery_counts, on='region', how='left').fillna(0)
-    merged_data['ratio'] = merged_data['population'] / merged_data['bakery_count']
+    region_bakery_counts = bakery_query().get("region_bakery_counts")
+    region_bread_rations = bakery_query().get("region_bread_rations")
+    data = pd.merge(population_data, region_bakery_counts, on='region', how='left').fillna(0)
+    data = pd.merge(data, region_bread_rations, on='region', how='left').fillna(0)
+    data['ratio'] = data['population'] / data['bakery_count']
+    data['ration'] = (data['bread_rations'] * 100) / data['population']
     
     # Return the ratio data as JSON
-    return merged_data[['region', 'ratio']].to_json(orient='records')
+    return data[['region', 'ratio', 'ration']].to_json(orient='records')
