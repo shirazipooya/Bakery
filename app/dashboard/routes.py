@@ -218,10 +218,11 @@ def second_fuel_data():
     data = sorted([sf[0] for sf in second_fuel])
     return jsonify(data)
 
-import sqlite3
-population_data = pd.read_csv('./app/assets/data/mashhad_amarnameh.csv', dtype=float)
 
-def bakery_query():
+population_data_region = pd.read_csv('./app/assets/data/mashhad_amarnameh_region.csv', dtype=float)
+population_data_district = pd.read_csv('./app/assets/data/mashhad_amarnameh_district.csv', dtype=float)
+
+def region_ratio_query():
     
     data = db.session.query(
         Bakery.region,
@@ -243,15 +244,53 @@ def bakery_query():
     }  
 
 
-@blueprint.route('/api/dashboard/map/ratio', methods=['GET'])
+@blueprint.route('/api/dashboard/map/region_ratio', methods=['GET'])
 @login_required
-def ratio_data():
-    region_bakery_counts = bakery_query().get("region_bakery_counts")
-    region_bread_rations = bakery_query().get("region_bread_rations")
-    data = pd.merge(population_data, region_bakery_counts, on='region', how='left').fillna(0)
+def region_ratio():
+    region_bakery_counts = region_ratio_query().get("region_bakery_counts")
+    region_bread_rations = region_ratio_query().get("region_bread_rations")
+    data = pd.merge(population_data_region, region_bakery_counts, on='region', how='left').fillna(0)
     data = pd.merge(data, region_bread_rations, on='region', how='left').fillna(0)
     data['ratio'] = data['population'] / data['bakery_count']
     data['ration'] = (data['bread_rations'] * 100) / data['population']
     
     # Return the ratio data as JSON
     return data[['region', 'ratio', 'ration']].to_json(orient='records')
+
+
+
+def district_ratio_query():
+    
+    data = db.session.query(
+        Bakery.region,
+        Bakery.district,
+        func.count(Bakery.id)
+    ).group_by(Bakery.region, Bakery.district).all()
+    
+    district_bakery_counts = pd.DataFrame(data, columns=['region', 'district', 'bakery_count'])
+    
+    data = db.session.query(
+        Bakery.region,
+        Bakery.district,
+        func.sum(Bakery.bread_rations)
+    ).group_by(Bakery.region, Bakery.district).all()
+    
+    district_bread_rations = pd.DataFrame(data, columns=['region', 'district', 'bread_rations'])
+    
+    return {
+        "district_bakery_counts": district_bakery_counts,
+        "district_bread_rations": district_bread_rations
+    }
+    
+@blueprint.route('/api/dashboard/map/district_ratio', methods=['GET'])
+@login_required
+def district_ratio():
+    district_bakery_counts = district_ratio_query().get("district_bakery_counts")
+    district_bread_rations = district_ratio_query().get("district_bread_rations")
+    data = pd.merge(population_data_district, district_bakery_counts, on=['region', 'district'], how='left').fillna(0)
+    data = pd.merge(data, district_bread_rations, on=['region', 'district'], how='left').fillna(0)
+    data['ratio'] = data['population'] / data['bakery_count']
+    data['ration'] = (data['bread_rations'] * 100) / data['population']
+    
+    # Return the ratio data as JSON
+    return data[['region', 'district', 'ratio', 'ration']].to_json(orient='records')

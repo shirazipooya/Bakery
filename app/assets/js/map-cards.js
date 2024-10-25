@@ -93,7 +93,6 @@
     fetch('/assets/data/geodatabase/Region.geojson')
         .then(response => response.json())
         .then(geojsonData => {  
-            console.log(geojsonData);         
             addGeoJSONLayerRegion(geojsonData);
         })
         .catch(error => {
@@ -143,9 +142,7 @@
 
     fetch('/assets/data/geodatabase/District.geojson')
         .then(response => response.json())
-        .then(geojsonData => {    
-            console.log(geojsonData);
-                   
+        .then(geojsonData => {                       
             addgeojsonLayerDistrict(geojsonData);
         })
         .catch(error => {
@@ -166,7 +163,7 @@
 
     let ratio_map;
 
-    fetch('/api/dashboard/map/ratio')
+    fetch('/api/dashboard/map/region_ratio')
         .then(response => response.json())
         .then(data => {
             // Load GeoJSON
@@ -205,12 +202,12 @@
                         onEachFeature: function(feature, layer) {
                             layer.bindPopup(
                                 '<b>منطقه: ' + feature.properties.region + '</b><br>' +
-                                '- به ازای هر  ' + (Math.floor(data.find(d => d.region == feature.properties.region)?.ratio) || 'N/A') + ' نفر یک عدد نانوایی<br>' +
-                                '- به ازای هر 100 نفر  ' + (Math.floor(data.find(d => d.region == feature.properties.region)?.ration) || 'N/A') + ' عدد کیسه آرد');
+                                '- به ازای هر  ' + (Math.floor(data.find(d => d.region == feature.properties.region)?.ratio) || 'N/A') + ' نفر، یک عدد نانوایی<br>' +
+                                '- به ازای هر 100 نفر،  ' + (Math.floor(data.find(d => d.region == feature.properties.region)?.ration) || 'N/A') + ' عدد کیسه آرد');
                         }
                     }).addTo(map);
 
-                    const toggleLayerCheckbox = document.getElementById('showRatio');
+                    const toggleLayerCheckbox = document.getElementById('showRatioRegion');
                     toggleLayerCheckbox.addEventListener('change', function() {
                         if (this.checked) {
                             map.addLayer(ratio_map); // Add layer when checked
@@ -222,19 +219,65 @@
         })
 
 
+        let ratio_map_district;
 
+        fetch('/api/dashboard/map/district_ratio')
+            .then(response => response.json())
+            .then(data => {
+                // Load GeoJSON
+                fetch('/assets/data/geodatabase/District.geojson')
+                    .then(response => response.json())
+                    .then(geojson => {
+                        // Define a style function
+                        function style(feature) {
+                            
+                            
+                            const regionData = data.find(d => d.region == feature.properties.region && d.district == feature.properties.district);                            
+                            const ratio = regionData ? regionData.ratio : 0;
+                            return {
+                                fillColor: getColor(ratio),
+                                weight: 2,
+                                opacity: 1,
+                                color: 'white',
+                                dashArray: '3',
+                                fillOpacity: 0.7
+                            };
+                        }
     
-    // document.getElementById('showRatio').addEventListener('change', function() {
-    //     if (this.checked) {           
-    //         if (geojsonLayerRegion) {
-    //             geojsonLayerRegion.addTo(map);
-    //         }
-    //     } else {
-    //         if (geojsonLayerRegion) {
-    //             map.removeLayer(geojsonLayerRegion);
-    //         }
-    //     }
-    // })
+                        // Function to get color based on ratio
+                        function getColor(ratio) {
+                            return ratio > 4000 ? '#fff5f0' :
+                                ratio > 3500 ? '#fee0d2' :
+                                ratio > 3000  ? '#fcbba1' :
+                                ratio > 2500 ? '#fc9272' :
+                                ratio > 2000   ? '#fb6a4a' :
+                                ratio > 1500   ? '#ef3b2c' :
+                                ratio > 1000    ? '#cb181d' :
+                                                '#99000d';
+                        }                    
+    
+                        // Add GeoJSON layer
+                        ratio_map_district = L.geoJson(geojson, {
+                            style: style,
+                            onEachFeature: function(feature, layer) {
+                                layer.bindPopup(
+                                    '<b>منطقه: ' + feature.properties.region + ' ناحیه: ' + feature.properties.district + '</b><br>' +
+                                    '- به ازای هر  ' + (Math.floor(data.find(d => d.region == feature.properties.region && d.district == feature.properties.district)?.ratio) || 'N/A') + ' نفر، یک عدد نانوایی<br>' +
+                                    '- به ازای هر 100 نفر،  ' + (Math.floor(data.find(d => d.region == feature.properties.region && d.district == feature.properties.district)?.ration) || 'N/A') + ' عدد کیسه آرد');
+                            }
+                        }).addTo(map);
+    
+                        const toggleLayerCheckboxDistrict = document.getElementById('showRatioDistrict');
+                        toggleLayerCheckboxDistrict.addEventListener('change', function() {
+                            if (this.checked) {
+                                map.addLayer(ratio_map_district); // Add layer when checked
+                            } else {
+                                map.removeLayer(ratio_map_district); // Remove layer when unchecked
+                            }
+                        });
+                    });
+            })
+
 
 
     const markerClusters = L.markerClusterGroup();
