@@ -18,3 +18,10 @@
 .bs-stepper .bs-stepper-header .step .bs-stepper-circle {
   font-family: iranyekan !important;
 }
+
+.leaflet-tooltip {
+  font-family: iranyekan !important;
+  background-color: transparent;
+  border: 0px;
+  box-shadow: none;
+}

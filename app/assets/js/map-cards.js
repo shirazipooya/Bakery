@@ -51,12 +51,12 @@
 
     L.easyPrint({
         title: 'پرینت',
+        sizeModes: ['Current'],
+        filename: 'Map',
+        exportOnly: true,
+        hideControlContainer: true,
         position: 'topright',
         defaultSizeTitles: {Current: 'سایز نقشه',},
-        sizeModes: ['Current'],
-        exportOnly: true,
-        hidden: false,
-        hideControlContainer: true
     }).addTo(map);
 
 
@@ -76,7 +76,7 @@
             },
             onEachFeature: function (feature, layer) {
                 layer.bindTooltip(
-                    `${feature.properties.region}`
+                    `منطقه ${feature.properties.region}`
                 );
                 // layer.on('click', function() {
                 //     fetch(`/region/${feature.properties.Region}`)
@@ -92,7 +92,8 @@
 
     fetch('/assets/data/geodatabase/Region.geojson')
         .then(response => response.json())
-        .then(geojsonData => {           
+        .then(geojsonData => {  
+            console.log(geojsonData);         
             addGeoJSONLayerRegion(geojsonData);
         })
         .catch(error => {
@@ -107,6 +108,58 @@
         } else {
             if (geojsonLayerRegion) {
                 map.removeLayer(geojsonLayerRegion);
+            }
+        }
+    })
+
+    // District
+    let geojsonLayerDistrict = null;
+
+    function addgeojsonLayerDistrict(geojsonData) {
+        geojsonLayerDistrict = L.geoJSON(geojsonData, {
+            style: function (feature) {
+                return {
+                    color: "#808080",  // Outline color
+                    weight: 2,
+                    opacity: 1,
+                    fillColor: "#808080",
+                    fillOpacity: 0.2
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindTooltip(
+                    `منطقه ${feature.properties.region} - ناحیه ${feature.properties.district}`,
+                );
+                // layer.on('click', function() {
+                //     fetch(`/region/${feature.properties.Region}`)
+                //         .then(response => response.json())
+                //         .then(data => {
+                //             console.log(data.n);
+                //         })
+                // });
+            }
+        }).addTo(map);
+    }
+
+    fetch('/assets/data/geodatabase/District.geojson')
+        .then(response => response.json())
+        .then(geojsonData => {    
+            console.log(geojsonData);
+                   
+            addgeojsonLayerDistrict(geojsonData);
+        })
+        .catch(error => {
+            console.error("Error loading the GeoJSON file:", error);
+        })
+    
+    document.getElementById('showDistrict').addEventListener('change', function() {
+        if (this.checked) {           
+            if (geojsonLayerDistrict) {
+                geojsonLayerDistrict.addTo(map);
+            }
+        } else {
+            if (geojsonLayerDistrict) {
+                map.removeLayer(geojsonLayerDistrict);
             }
         }
     })
