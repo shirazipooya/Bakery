@@ -25,8 +25,14 @@ def load_data(option):
        
     if option == "0":
         query = Bakery.query.all()
+        region_bread_rations = db.session.query(
+            func.sum(Bakery.bread_rations)
+        ).scalar()
     else:
         query = Bakery.query.filter_by(region=int(option))
+        region_bread_rations = db.session.query(
+            func.sum(Bakery.bread_rations)
+        ).filter_by(region=int(option)).scalar()
     
     data = [
         {
@@ -73,7 +79,8 @@ def load_data(option):
         'bakers_risk_cat': bakers_risk_cat,
         'household_risk_cat': household_risk_cat,
         'bread_rations_cat': bread_rations_cat,
-        'region_info': region_info
+        'region_info': region_info,
+        'region_bread_rations': region_bread_rations
     }
     
     return jsonify(response)

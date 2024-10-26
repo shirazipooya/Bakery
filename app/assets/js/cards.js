@@ -46,6 +46,14 @@
         document.getElementById('region_info_n_households').innerHTML = numberWithCommas(data.region_info[0].n_households);
         document.getElementById('region_info_number_bakers').innerHTML = numberWithCommas(data.number_of_row);
         document.getElementById('region_info_area').innerHTML = numberWithCommas(data.region_info[0].area);
+        document.getElementById('region_info_population_bakery_1').innerHTML = numberWithCommas(Math.floor(data.region_info[0].population / data.number_of_row));
+        document.getElementById('region_info_population_bakery_2').innerHTML = numberWithCommas(Math.floor(data.region_info[0].population / data.number_of_row));
+        document.getElementById('region_info_area_bakery_1').innerHTML = numberWithCommas(Math.floor(data.region_info[0].area / data.number_of_row));
+        document.getElementById('region_info_area_bakery_2').innerHTML = numberWithCommas(Math.floor(data.region_info[0].area / data.number_of_row));
+        document.getElementById('region_info_households_bakery_1').innerHTML = numberWithCommas(Math.floor(data.region_info[0].n_households / data.number_of_row));
+        document.getElementById('region_info_households_bakery_2').innerHTML = numberWithCommas(Math.floor(data.region_info[0].n_households / data.number_of_row));
+        document.getElementById('region_info_ration_population_1').innerHTML = numberWithCommas(Math.floor(100 * data.region_bread_rations / data.region_info[0].population));
+        document.getElementById('region_info_ration_population_2').innerHTML = numberWithCommas(Math.floor(100 * data.region_bread_rations / data.region_info[0].population));
     }
 
     function updateTypeBread(data) {
