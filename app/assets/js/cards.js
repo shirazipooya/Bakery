@@ -7,6 +7,7 @@
         const selectedRegion = document.getElementById("selectedRegion").value;
         const response = await fetch("/api/dashboard/data/" + selectedRegion);
         const data = await response.json();
+        
         updateUI(data);
     }
 
@@ -14,7 +15,7 @@
         // Number of Bakers
         if (data.number_of_row && data.number_of_row !== undefined) {
             document.getElementById("numberBakers").innerHTML =
-                data.number_of_row;
+            numberWithCommas(data.number_of_row);
         } else {
             document.getElementById("numberBakers").innerHTML = "-";
         }
@@ -29,6 +30,22 @@
         updateBakersRiskChart(data);
         // HouseholdRisk
         updateHouseholdRiskChart(data);
+        // RegionInformation
+        updateRegionInformation(data);
+    }
+
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+
+    function updateRegionInformation(data) {
+        document.getElementById('region_info_population').innerHTML = numberWithCommas(data.region_info[0].population);
+        document.getElementById('region_info_population_male').innerHTML = numberWithCommas(data.region_info[0].population_male);
+        document.getElementById('region_info_population_female').innerHTML = numberWithCommas(data.region_info[0].population_female);
+        document.getElementById('region_info_n_households').innerHTML = numberWithCommas(data.region_info[0].n_households);
+        document.getElementById('region_info_number_bakers').innerHTML = numberWithCommas(data.number_of_row);
+        document.getElementById('region_info_area').innerHTML = numberWithCommas(data.region_info[0].area);
     }
 
     function updateTypeBread(data) {

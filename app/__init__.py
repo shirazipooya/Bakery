@@ -35,7 +35,7 @@ db.init_app(app)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 from app.users.models import User
-from app.database.models import Bakery
+from app.database.models import Bakery, RegionInformation
 migrate.init_app(app=app, db=db)
 login_manager.init_app(app=app)
 bcrypt.init_app(app=app)
@@ -43,5 +43,3 @@ bcrypt.init_app(app=app)
 login_manager.login_view = 'users.login'
 login_manager.login_message = 'لطفا ابتدا وارد حساب کاربری خود بشوید!'
 login_manager.login_message_category = 'info'
-
-

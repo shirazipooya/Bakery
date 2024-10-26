@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, jsonify
 from flask_login import current_user, login_required
 import pandas as pd
-from app.database.models import Bakery
+from app.database.models import Bakery, RegionInformation
 from app.extensions import db
 from sqlalchemy import distinct
 from sqlalchemy import func
@@ -55,6 +55,16 @@ def load_data(option):
     bread_rations_cat = {k: int(v) for k, v in bread_rations_cat.items()}
     
     
+    # Second Database
+    
+    query = RegionInformation.query.filter_by(region=int(option))
+    region_info = [
+        {
+            column: getattr(record, column) for column in record.__table__.columns.keys()
+        } for record in query
+    ]
+    
+    
     response = {
         'data': data,
         'number_of_row': len(data),
@@ -62,7 +72,8 @@ def load_data(option):
         'type_flour_cat': type_flour_cat,
         'bakers_risk_cat': bakers_risk_cat,
         'household_risk_cat': household_risk_cat,
-        'bread_rations_cat': bread_rations_cat
+        'bread_rations_cat': bread_rations_cat,
+        'region_info': region_info
     }
     
     return jsonify(response)

@@ -5,7 +5,7 @@ from flask_login import UserMixin
 
 class Bakery(BaseModel, UserMixin):
     
-    first_name = db.Column(db.String(30), unique=False, nullable=True, )
+    first_name = db.Column(db.String(30), unique=False, nullable=True)
     last_name = db.Column(db.String(30), unique=False, nullable=True)
     nid = db.Column(db.String(10), unique=False, nullable=True)
     phone = db.Column(db.String(11), unique=False, nullable=True)
@@ -25,4 +25,16 @@ class Bakery(BaseModel, UserMixin):
     bread_rations = db.Column(db.Integer, unique=False, nullable=True)    
     
     def __repr__(self):
-        return f'{self.__class__.__name__} ({self.first_name}, {self.last_name}, {self.nid}, {self.type_bread}, {self.bread_rations} )'
+        return f'{self.__class__.__name__} ({self.first_name}, {self.last_name}, {self.nid}, {self.type_bread}, {self.bread_rations})'
+
+
+class RegionInformation(BaseModel):
+    region = db.Column(db.Integer, unique=True, nullable=False)
+    area = db.Column(db.Float, unique=False, nullable=False)
+    population = db.Column(db.Integer, unique=False, nullable=False)
+    population_male = db.Column(db.Integer, unique=False, nullable=False)
+    population_female = db.Column(db.Integer, unique=False, nullable=False)
+    n_households = db.Column(db.Integer, unique=False, nullable=False)
+    
+    def __repr__(self):
+        return f'{self.__class__.__name__} ({self.region}, {self.population})'
