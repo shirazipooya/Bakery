@@ -4,7 +4,7 @@ import os
 from flask import Blueprint, render_template, flash, redirect, url_for, request, jsonify
 from app.database.forms import BakeryForm
 from app.database.models import Bakery
-from app.extensions import db
+from app.extensions import db, cache
 from sqlalchemy import or_, asc, desc
 import pandas as pd
 import geopandas as gpd
@@ -95,6 +95,7 @@ def clean_csv_file(df):
 
 @blueprint.route(rule='/database', methods=['POST', 'GET'])
 @login_required
+@cache.cached(timeout=300)
 def home():
     form = BakeryForm()
     if form.validate_on_submit():
@@ -127,6 +128,7 @@ def home():
 
 @blueprint.route(rule='/api/database/table', methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def show_table():
     search = request.args.get('search', '')
     search = search.split()

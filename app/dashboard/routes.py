@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, jsonify
 from flask_login import current_user, login_required
 import pandas as pd
 from app.database.models import Bakery, RegionInformation
-from app.extensions import db
+from app.extensions import db, cache
 from sqlalchemy import distinct
 from sqlalchemy import func
 
@@ -21,6 +21,7 @@ def home():
 
 @blueprint.route('/api/dashboard/data/<option>', methods=["GET"])
 @login_required
+@cache.cached(timeout=300)
 def load_data(option):
        
     if option == "0":
@@ -88,6 +89,7 @@ def load_data(option):
 
 @blueprint.route('/api/dashboard/sunburst/<option>', methods=["GET"])
 @login_required
+@cache.cached(timeout=300)
 def sunburst_data(option):
     selected_column = option
     query = Bakery.query.all()
@@ -125,6 +127,7 @@ def sunburst_data(option):
 
 @blueprint.route(rule='/api/dashboard/cities', methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def cities_data():
     query = Bakery.query.with_entities(Bakery.city).distinct()
     cities = query.all()
@@ -134,6 +137,7 @@ def cities_data():
 
 @blueprint.route('/api/dashboard/regions/<city>', methods=["GET"])
 @login_required
+@cache.cached(timeout=300)
 def regions_data(city):
     query = Bakery.query.with_entities(distinct(Bakery.region)).filter(Bakery.city == city)
     regions = query.all()
@@ -142,6 +146,7 @@ def regions_data(city):
 
 @blueprint.route('/api/dashboard/districts/<city>/<region>', methods=["GET"])
 @login_required
+@cache.cached(timeout=300)
 def districts_data(city, region):
     query = Bakery.query.with_entities(distinct(Bakery.district)).filter(Bakery.city == city, Bakery.region == region)
     districts = query.all()
@@ -151,6 +156,7 @@ def districts_data(city, region):
 
 @blueprint.route('/api/dashboard/map/data/', methods=["GET"])
 @login_required
+@cache.cached(timeout=300)
 def load_map_data():
     
     query = Bakery.query.all()
@@ -170,6 +176,7 @@ def load_map_data():
 
 @blueprint.route(rule='/api/dashboard/map/filter/<city>/<region>/<district>/<typebread>/<typeflour>/<secondfuel>', methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def get_filtered_data(city, region, district, typebread, typeflour, secondfuel):
     query = Bakery.query
     
@@ -214,6 +221,7 @@ def get_filtered_data(city, region, district, typebread, typeflour, secondfuel):
 
 @blueprint.route(rule='/api/dashboard/type_bread', methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def type_bread_data():
     query = Bakery.query.with_entities(Bakery.type_bread).distinct()
     type_bread = query.all()
@@ -222,6 +230,7 @@ def type_bread_data():
 
 @blueprint.route(rule='/api/dashboard/type_flour', methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def type_flour_data():
     query = Bakery.query.with_entities(Bakery.type_flour).distinct()
     type_flour = query.all()
@@ -230,6 +239,7 @@ def type_flour_data():
 
 @blueprint.route(rule='/api/dashboard/second_fuel', methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def second_fuel_data():
     query = Bakery.query.with_entities(Bakery.second_fuel).distinct()
     second_fuel = query.all()
@@ -264,6 +274,7 @@ def region_ratio_query():
 
 @blueprint.route('/api/dashboard/map/region_ratio', methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def region_ratio():
     region_bakery_counts = region_ratio_query().get("region_bakery_counts")
     region_bread_rations = region_ratio_query().get("region_bread_rations")
@@ -302,6 +313,7 @@ def district_ratio_query():
     
 @blueprint.route('/api/dashboard/map/district_ratio', methods=['GET'])
 @login_required
+@cache.cached(timeout=300)
 def district_ratio():
     district_bakery_counts = district_ratio_query().get("district_bakery_counts")
     district_bread_rations = district_ratio_query().get("district_bread_rations")

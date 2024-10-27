@@ -5,7 +5,7 @@ from app.users.routes import blueprint as users_blueprint
 from app.dashboard.routes import blueprint as dashboard_blueprint
 from app.database.routes import blueprint as database_blueprint
 
-from app.extensions import db, migrate, login_manager, bcrypt
+from app.extensions import db, migrate, login_manager, bcrypt, cache
 import app.exceptions as app_exception
 
 
@@ -39,6 +39,7 @@ from app.database.models import Bakery, RegionInformation
 migrate.init_app(app=app, db=db)
 login_manager.init_app(app=app)
 bcrypt.init_app(app=app)
+cache.init_app(app=app)
 
 login_manager.login_view = 'users.login'
 login_manager.login_message = 'لطفا ابتدا وارد حساب کاربری خود بشوید!'
