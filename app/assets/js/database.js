@@ -67,10 +67,32 @@ function loadBakeriesTable() {
     );
 };
 
+function showDeleteTableModal() {
+    $("#deleteTableModal").modal("show");
+};
+
+
+
+$("#confirmTableDelete").on("click", function () {
+    if (true) {
+        $.ajax({
+            url: `/api/database/delete/`,
+            type: "DELETE",
+            success: function () {
+                $("#deleteTableModal").modal("hide");
+                loadBakeriesTable();
+            },
+        });
+    }
+});
+
+
 function showDeleteModal(id) {
     deleteID = id;
     $("#deleteModal").modal("show");
 };
+
+
 
 $("#confirmDelete").on("click", function () {
     if (deleteID) {

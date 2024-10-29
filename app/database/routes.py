@@ -72,6 +72,8 @@ def clean_csv_file(df):
 
     # Drop All NULL Value from Region & Lon District
     df.dropna(subset=['region', 'district'], inplace=True)
+    
+    # df['number_violations'] = df['number_violations'].fillna(0)
 
     COLs = ['first_name', 'last_name', 'ownership_status', 'second_fuel', 'city', 'household_risk', 'bakers_risk', 'type_bread', 'nid', 'phone', 'bakery_id']
     df[COLs] = df[COLs].astype(str)
@@ -95,7 +97,6 @@ def clean_csv_file(df):
 
 @blueprint.route(rule='/database', methods=['POST', 'GET'])
 @login_required
-@cache.cached(timeout=300)
 def home():
     form = BakeryForm()
     if form.validate_on_submit():
@@ -128,7 +129,6 @@ def home():
 
 @blueprint.route(rule='/api/database/table', methods=['GET'])
 @login_required
-@cache.cached(timeout=300)
 def show_table():
     search = request.args.get('search', '')
     search = search.split()
@@ -263,6 +263,17 @@ def delete_record(id):
         return jsonify({"message": f"نانوایی با شماره ردیف {id} با موفقیت از پایگاه داده حذف شد!"}), 200
     else:
         return jsonify({"error": f"نانوایی با شماره ردیف {id} پیدا نشد"}), 404
+
+@blueprint.route('/api/database/delete/', methods=['DELETE'])
+@login_required
+def delete_table():
+    try:
+        db.session.query(Bakery).delete()
+        db.session.commit()
+        return jsonify({"message": f"همه ردیف های جدول حذف گردید!"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 
 @blueprint.route('/api/database/update/<int:id>', methods=['GET', 'POST'])

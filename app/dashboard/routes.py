@@ -21,113 +21,116 @@ def home():
 
 @blueprint.route('/api/dashboard/data/<option>', methods=["GET"])
 @login_required
-@cache.cached(timeout=300)
 def load_data(option):
-       
-    if option == "0":
-        query = Bakery.query.all()
-        region_bread_rations = db.session.query(
-            func.sum(Bakery.bread_rations)
-        ).scalar()
-    else:
-        query = Bakery.query.filter_by(region=int(option))
-        region_bread_rations = db.session.query(
-            func.sum(Bakery.bread_rations)
-        ).filter_by(region=int(option)).scalar()
     
-    data = [
-        {
-            column: getattr(record, column) for column in record.__table__.columns.keys()
-        } for record in query
-    ]
-    
-    df = pd.DataFrame(data)
-    
-    type_bread_cat = df.groupby("type_bread")["type_bread"].count().to_dict()
-    type_bread_cat = {k: int(v) for k, v in type_bread_cat.items()}
-    
-    type_flour_cat = df.groupby("type_flour")["type_flour"].count().to_dict()
-    type_flour_cat = {k: int(v) for k, v in type_flour_cat.items()}
-    
-    bakers_risk_cat = df.groupby("bakers_risk")["bakers_risk"].count().to_dict()
-    bakers_risk_cat = {k: int(v) for k, v in bakers_risk_cat.items()}
+    try: 
+        if option == "0":
+            query = Bakery.query.all()
+            region_bread_rations = db.session.query(
+                func.sum(Bakery.bread_rations)
+            ).scalar()
+        else:
+            query = Bakery.query.filter_by(region=int(option))
+            region_bread_rations = db.session.query(
+                func.sum(Bakery.bread_rations)
+            ).filter_by(region=int(option)).scalar()
         
-    household_risk_cat = df.groupby("household_risk")["household_risk"].count().to_dict()
-    household_risk_cat = {k: int(v) for k, v in household_risk_cat.items()}
-    
-    bins = list(range(0, 700, 100))
-    df['category'] = pd.cut(df['bread_rations'], bins=bins, right=False)
-    category_counts = df['category'].value_counts().sort_index()   
-    bread_rations_cat = pd.DataFrame(category_counts).reset_index(drop=False).to_dict()['count']
-    bread_rations_cat = {k: int(v) for k, v in bread_rations_cat.items()}
-    
-    
-    # Second Database
-    
-    query = RegionInformation.query.filter_by(region=int(option))
-    region_info = [
-        {
-            column: getattr(record, column) for column in record.__table__.columns.keys()
-        } for record in query
-    ]
-    
-    
-    response = {
-        'data': data,
-        'number_of_row': len(data),
-        'type_bread_cat': type_bread_cat,
-        'type_flour_cat': type_flour_cat,
-        'bakers_risk_cat': bakers_risk_cat,
-        'household_risk_cat': household_risk_cat,
-        'bread_rations_cat': bread_rations_cat,
-        'region_info': region_info,
-        'region_bread_rations': region_bread_rations
-    }
-    
-    return jsonify(response)
+        data = [
+            {
+                column: getattr(record, column) for column in record.__table__.columns.keys()
+            } for record in query
+        ]
+        
+        df = pd.DataFrame(data)
+        
+        type_bread_cat = df.groupby("type_bread")["type_bread"].count().to_dict()
+        type_bread_cat = {k: int(v) for k, v in type_bread_cat.items()}
+        
+        type_flour_cat = df.groupby("type_flour")["type_flour"].count().to_dict()
+        type_flour_cat = {k: int(v) for k, v in type_flour_cat.items()}
+        
+        bakers_risk_cat = df.groupby("bakers_risk")["bakers_risk"].count().to_dict()
+        bakers_risk_cat = {k: int(v) for k, v in bakers_risk_cat.items()}
+            
+        household_risk_cat = df.groupby("household_risk")["household_risk"].count().to_dict()
+        household_risk_cat = {k: int(v) for k, v in household_risk_cat.items()}
+        
+        bins = list(range(0, 700, 100))
+        df['category'] = pd.cut(df['bread_rations'], bins=bins, right=False)
+        category_counts = df['category'].value_counts().sort_index()   
+        bread_rations_cat = pd.DataFrame(category_counts).reset_index(drop=False).to_dict()['count']
+        bread_rations_cat = {k: int(v) for k, v in bread_rations_cat.items()}
+        
+        
+        # Second Database
+        
+        query = RegionInformation.query.filter_by(region=int(option))
+        region_info = [
+            {
+                column: getattr(record, column) for column in record.__table__.columns.keys()
+            } for record in query
+        ]
+        
+        
+        response = {
+            'data': data,
+            'number_of_row': len(data),
+            'type_bread_cat': type_bread_cat,
+            'type_flour_cat': type_flour_cat,
+            'bakers_risk_cat': bakers_risk_cat,
+            'household_risk_cat': household_risk_cat,
+            'bread_rations_cat': bread_rations_cat,
+            'region_info': region_info,
+            'region_bread_rations': region_bread_rations
+        }
+        
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 @blueprint.route('/api/dashboard/sunburst/<option>', methods=["GET"])
 @login_required
-@cache.cached(timeout=300)
 def sunburst_data(option):
-    selected_column = option
-    query = Bakery.query.all()
-    data = [
-        {
-            column: getattr(record, column) for column in record.__table__.columns.keys()
-        } for record in query
-    ]    
-    data = pd.DataFrame(data)[['city', 'region', 'district', selected_column]]
+    try:
+        selected_column = option
+        query = Bakery.query.all()
+        data = [
+            {
+                column: getattr(record, column) for column in record.__table__.columns.keys()
+            } for record in query
+        ]    
+        data = pd.DataFrame(data)[['city', 'region', 'district', selected_column]]
 
-    def build_hierarchy(data, keys):
-        if not keys:
-            return {'size': len(data)}
-        result = []
-        for key, group in data.groupby(keys[0]):
-            
-            if key in list(data[selected_column].unique()):
-                result.append({
-                    'name': key,
-                    'size': len(group[selected_column])
-                })
-            else:
-                result.append({
-                    'name': key,
-                    'children': build_hierarchy(group, keys[1:]) if len(keys) > 1 else len(group[selected_column])
-                })                
-        return result
+        def build_hierarchy(data, keys):
+            if not keys:
+                return {'size': len(data)}
+            result = []
+            for key, group in data.groupby(keys[0]):
+                
+                if key in list(data[selected_column].unique()):
+                    result.append({
+                        'name': key,
+                        'size': len(group[selected_column])
+                    })
+                else:
+                    result.append({
+                        'name': key,
+                        'children': build_hierarchy(group, keys[1:]) if len(keys) > 1 else len(group[selected_column])
+                    })                
+            return result
 
-    hierarchy = build_hierarchy(data, ['city', 'region', 'district', selected_column])
+        hierarchy = build_hierarchy(data, ['city', 'region', 'district', selected_column])
 
-    hierarchical_json = {'name': 'Root', 'children': hierarchy}
-    
-    return jsonify(hierarchical_json)
+        hierarchical_json = {'name': 'Root', 'children': hierarchy}
+        
+        return jsonify(hierarchical_json)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 @blueprint.route(rule='/api/dashboard/cities', methods=['GET'])
 @login_required
-@cache.cached(timeout=300)
 def cities_data():
     query = Bakery.query.with_entities(Bakery.city).distinct()
     cities = query.all()
@@ -137,7 +140,6 @@ def cities_data():
 
 @blueprint.route('/api/dashboard/regions/<city>', methods=["GET"])
 @login_required
-@cache.cached(timeout=300)
 def regions_data(city):
     query = Bakery.query.with_entities(distinct(Bakery.region)).filter(Bakery.city == city)
     regions = query.all()
@@ -146,7 +148,6 @@ def regions_data(city):
 
 @blueprint.route('/api/dashboard/districts/<city>/<region>', methods=["GET"])
 @login_required
-@cache.cached(timeout=300)
 def districts_data(city, region):
     query = Bakery.query.with_entities(distinct(Bakery.district)).filter(Bakery.city == city, Bakery.region == region)
     districts = query.all()
@@ -156,7 +157,6 @@ def districts_data(city, region):
 
 @blueprint.route('/api/dashboard/map/data/', methods=["GET"])
 @login_required
-@cache.cached(timeout=300)
 def load_map_data():
     
     query = Bakery.query.all()
@@ -176,7 +176,6 @@ def load_map_data():
 
 @blueprint.route(rule='/api/dashboard/map/filter/<city>/<region>/<district>/<typebread>/<typeflour>/<secondfuel>', methods=['GET'])
 @login_required
-@cache.cached(timeout=300)
 def get_filtered_data(city, region, district, typebread, typeflour, secondfuel):
     query = Bakery.query
     
@@ -221,7 +220,6 @@ def get_filtered_data(city, region, district, typebread, typeflour, secondfuel):
 
 @blueprint.route(rule='/api/dashboard/type_bread', methods=['GET'])
 @login_required
-@cache.cached(timeout=300)
 def type_bread_data():
     query = Bakery.query.with_entities(Bakery.type_bread).distinct()
     type_bread = query.all()
@@ -230,7 +228,6 @@ def type_bread_data():
 
 @blueprint.route(rule='/api/dashboard/type_flour', methods=['GET'])
 @login_required
-@cache.cached(timeout=300)
 def type_flour_data():
     query = Bakery.query.with_entities(Bakery.type_flour).distinct()
     type_flour = query.all()
@@ -239,7 +236,6 @@ def type_flour_data():
 
 @blueprint.route(rule='/api/dashboard/second_fuel', methods=['GET'])
 @login_required
-@cache.cached(timeout=300)
 def second_fuel_data():
     query = Bakery.query.with_entities(Bakery.second_fuel).distinct()
     second_fuel = query.all()
@@ -274,7 +270,6 @@ def region_ratio_query():
 
 @blueprint.route('/api/dashboard/map/region_ratio', methods=['GET'])
 @login_required
-@cache.cached(timeout=300)
 def region_ratio():
     region_bakery_counts = region_ratio_query().get("region_bakery_counts")
     region_bread_rations = region_ratio_query().get("region_bread_rations")
@@ -313,7 +308,6 @@ def district_ratio_query():
     
 @blueprint.route('/api/dashboard/map/district_ratio', methods=['GET'])
 @login_required
-@cache.cached(timeout=300)
 def district_ratio():
     district_bakery_counts = district_ratio_query().get("district_bakery_counts")
     district_bread_rations = district_ratio_query().get("district_bread_rations")

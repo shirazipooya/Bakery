@@ -90,10 +90,20 @@
         {% include 'database/includes/edit_record_modal.html' %}
         <!-- / Edit Modal -->
 
+        <!-- Delete Table Modal -->
+        {% include 'database/includes/delete_table.html' %}
+        <!-- / Delete Table Modal -->
+
       </div>
     </div>
     <!-- / Table -->
 
+    <div>
+      <button type="button" class="btn btn-danger" onclick="showDeleteTableModal()">
+        <i class="bx bx-trash me-1"></i>حذف جدول داده‌ها
+      </button>
+    </div>
+      
   </div>
   <!-- / Table -->
 
