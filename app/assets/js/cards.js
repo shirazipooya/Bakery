@@ -1,6 +1,7 @@
 "use strict";
 
 (function () {
+    
     load_data();
 
     async function load_data() {
