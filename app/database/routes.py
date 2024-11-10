@@ -3,13 +3,14 @@ import io
 import os
 from flask import Blueprint, render_template, flash, redirect, url_for, request, jsonify
 from app.database.forms import BakeryForm
-from app.database.models import Bakery
-from app.extensions import db, cache
+from app.database.models import Bakery, OwnershipStatus, SecondFuel, HouseholdRisk, BakersRisk, TypeFlour, TypeBread
+from app.extensions import db, socketio
 from sqlalchemy import or_, asc, desc
 import pandas as pd
 import geopandas as gpd
 from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_required
+from flask_socketio import emit
 
 
 blueprint = Blueprint(
@@ -18,18 +19,23 @@ blueprint = Blueprint(
 )
 
 
+def virastar(df, columns):
+    df[columns] = df[columns].astype(str)
+    df[columns] = df[columns].apply(lambda x: x.str.rstrip())
+    df[columns] = df[columns].apply(lambda x: x.str.lstrip())
+    df[columns] = df[columns].apply(lambda x: x.str.replace(' +', ' '))
+    df[columns] = df[columns].apply(lambda x: x.str.replace('ي','ی'))
+    df[columns] = df[columns].apply(lambda x: x.str.replace('ئ','ی'))
+    df[columns] = df[columns].apply(lambda x: x.str.replace('ك', 'ک'))
+    return df
+
+
 def clean_csv_file(df):
     gdf_regions = gpd.read_file('app/assets/data/geodatabase/Region.geojson')
     gdf_district = gpd.read_file('app/assets/data/geodatabase/District.geojson')
     
     COLs = ['first_name', 'last_name', 'ownership_status', 'second_fuel', 'city', 'household_risk', 'bakers_risk', 'type_bread', 'nid', 'phone', 'bakery_id']
-    df[COLs] = df[COLs].astype(str)
-    df[COLs] = df[COLs].apply(lambda x: x.str.rstrip())
-    df[COLs] = df[COLs].apply(lambda x: x.str.lstrip())
-    df[COLs] = df[COLs].apply(lambda x: x.str.replace(' +', ' '))
-    df[COLs] = df[COLs].apply(lambda x: x.str.replace('ي','ی'))
-    df[COLs] = df[COLs].apply(lambda x: x.str.replace('ئ','ی'))
-    df[COLs] = df[COLs].apply(lambda x: x.str.replace('ك', 'ک'))
+    df = virastar(df=df, columns=COLs)
 
     COLs = ['number_violations', 'type_flour', 'bread_rations']
     df[COLs] = df[COLs].astype(int, errors='ignore')
@@ -177,7 +183,7 @@ def show_table():
 
 @blueprint.route(rule='/api/database/upload', methods=['POST'])
 @login_required
-def upload_csv():
+def upload_csv():    
     
     if 'file' not in request.files:
         return 'No file part'
@@ -302,3 +308,97 @@ def update_record(id):
         bakery.bread_rations = data.get('bread_rations')
         db.session.commit()
         return jsonify({'message': 'Bakery Updated Successfully'})
+
+
+@blueprint.route('/api/database/all_items', methods=['GET', 'POST'])
+@login_required
+def all_items():
+    column = request.json.get('column')
+    if column == "ownership_status":
+        items = sorted([x[0] for x in db.session.query(OwnershipStatus.name).all()])
+        return jsonify(items)
+    if column == "second_fuel":
+        items = sorted([x[0] for x in db.session.query(SecondFuel.name).all()])
+        return jsonify(items)
+    if column == "household_risk":
+        items = sorted([x[0] for x in db.session.query(HouseholdRisk.name).all()])
+        return jsonify(items)
+    if column == "bakers_risk":
+        items = sorted([x[0] for x in db.session.query(BakersRisk.name).all()])
+        return jsonify(items)
+    if column == "type_flour":
+        items = sorted([x[0] for x in db.session.query(TypeFlour.name).all()])
+        return jsonify(items)
+    if column == "type_bread":
+        items = sorted([x[0] for x in db.session.query(TypeBread.name).all()])
+        return jsonify(items)
+
+
+@blueprint.route('/api/database/add_category', methods=['GET', 'POST'])
+@login_required
+def add_category():
+    column = request.json.get('column')
+    new_category = request.json.get('new_category')
+    
+   
+    if column == "ownership_status":
+        items = [x[0] for x in db.session.query(OwnershipStatus.name).all()]
+        if new_category not in items:               
+            item = OwnershipStatus(name=new_category)
+            db.session.add(item)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
+        else:
+            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
+    
+    if column == "second_fuel":
+        items = [x[0] for x in db.session.query(SecondFuel.name).all()]
+        if new_category not in items:               
+            item = SecondFuel(name=new_category)
+            db.session.add(item)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
+        else:
+            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
+    
+    if column == "household_risk":
+        items = [x[0] for x in db.session.query(HouseholdRisk.name).all()]
+        if new_category not in items:               
+            item = HouseholdRisk(name=new_category)
+            db.session.add(item)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
+        else:
+            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
+    
+    if column == "bakers_risk":
+        items = [x[0] for x in db.session.query(BakersRisk.name).all()]
+        if new_category not in items:               
+            item = BakersRisk(name=new_category)
+            db.session.add(item)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
+        else:
+            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
+    
+    if column == "type_flour":
+        items = [x[0] for x in db.session.query(TypeFlour.name).all()]
+        if new_category not in items:               
+            item = TypeFlour(name=new_category)
+            db.session.add(item)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
+        else:
+            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
+    
+    if column == "type_bread":
+        items = [x[0] for x in db.session.query(TypeBread.name).all()]
+        if new_category not in items:               
+            item = TypeBread(name=new_category)
+            db.session.add(item)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
+        else:
+            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
+    
+    jsonify({'message': 'مشخصه موجود نمی‌باشد!', 'type': 'danger'})
