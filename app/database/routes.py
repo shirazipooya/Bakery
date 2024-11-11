@@ -29,10 +29,44 @@ def virastar(df, columns):
     df[columns] = df[columns].apply(lambda x: x.str.replace('ك', 'ک'))
     return df
 
+warnings = []
+
+def emit(warnings, message):
+    ms = message
+    warnings.append(ms)
+    socketio.emit('validation_message', ms)
+    return None
+    
 
 def clean_csv_file(df):
+        
     gdf_regions = gpd.read_file('app/assets/data/geodatabase/Region.geojson')
+    emit(warnings=warnings, message="Load Region.geojson")   
+    
     gdf_district = gpd.read_file('app/assets/data/geodatabase/District.geojson')
+    emit(warnings=warnings, message="Load District.geojson")
+    
+    originalCols = COLs = [
+        'first_name',
+        'last_name',
+        'nid',
+        'phone',
+        'bakery_id'
+        'ownership_status',
+        'second_fuel',
+        'city',
+        'lat',
+        'lon',
+        'household_risk',
+        'bakers_risk',
+        'type_flour',
+        'type_bread',
+        'bread_rations'
+    ]
+    
+    # Check Columns
+    csvFileColumns = df.columns
+    
     
     COLs = ['first_name', 'last_name', 'ownership_status', 'second_fuel', 'city', 'household_risk', 'bakers_risk', 'type_bread', 'nid', 'phone', 'bakery_id']
     df = virastar(df=df, columns=COLs)
