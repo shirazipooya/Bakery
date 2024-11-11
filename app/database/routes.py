@@ -6,6 +6,7 @@ from app.database.forms import BakeryForm
 from app.database.models import Bakery, OwnershipStatus, SecondFuel, HouseholdRisk, BakersRisk, TypeFlour, TypeBread
 from app.extensions import db, socketio
 from sqlalchemy import or_, asc, desc
+import numpy as np
 import pandas as pd
 import geopandas as gpd
 from sqlalchemy.exc import IntegrityError
@@ -29,6 +30,26 @@ def virastar(df, columns):
     df[columns] = df[columns].apply(lambda x: x.str.replace('ك', 'ک'))
     return df
 
+def virastarNoSpace(df, columns):
+    df[columns] = df[columns].astype(str)
+    df[columns] = df[columns].apply(lambda x: x.str.rstrip())
+    df[columns] = df[columns].apply(lambda x: x.str.lstrip())
+    df[columns] = df[columns].apply(lambda x: x.str.replace(' ', ''))
+    df[columns] = df[columns].apply(lambda x: x.str.replace('ي','ی'))
+    df[columns] = df[columns].apply(lambda x: x.str.replace('ئ','ی'))
+    df[columns] = df[columns].apply(lambda x: x.str.replace('ك', 'ک'))
+    return df
+
+def virastarStr(x):
+    x = str(x)
+    x = x.rstrip()
+    x = x.lstrip()
+    x = x.replace(' +', ' ')
+    x = x.replace('ي','ی')
+    x = x.replace('ئ','ی')
+    x = x.replace('ك', 'ک')
+    return x
+
 warnings = []
 
 def emit(warnings, message):
@@ -36,23 +57,63 @@ def emit(warnings, message):
     warnings.append(ms)
     socketio.emit('validation_message', ms)
     return None
+
+
+def validate_bakery_id(bid):
+    if len(bid) != 6:
+        return False    
+    elif bid == "000000":
+        return False
+    else:
+        return True
+
+def validate_phone_number(phone):    
+    if len(phone) != 11:
+        return False    
+    elif phone == "00000000000":
+        return False
+    else:
+        return True
+    
+
+def validate_iranian_national_code(code):
+    code_len = len(code)
+    if code_len > 10 or code_len < 8:
+        return False
+
+    if len(set(code)) == 1:
+        return False
+
+    if len(code) < 10:
+        code = code.zfill(10)
+
+    factors = [10, 9, 8, 7, 6, 5, 4, 3, 2]
+    checksum = sum(int(code[i]) * factors[i] for i in range(len(code) - 1))
+    remainder = checksum % 11
+    last_digit = int(code[-1])
+
+    if remainder < 2:
+        return remainder == last_digit
+    else:
+        return 11 - remainder == last_digit
     
 
 def clean_csv_file(df):
         
     gdf_regions = gpd.read_file('app/assets/data/geodatabase/Region.geojson')
-    emit(warnings=warnings, message="Load Region.geojson")   
+    emit(warnings=warnings, message="\u2705 فایل Region.geojson با موفقیت بارگزاری شد!")   
     
     gdf_district = gpd.read_file('app/assets/data/geodatabase/District.geojson')
-    emit(warnings=warnings, message="Load District.geojson")
+    emit(warnings=warnings, message="\u2705 فایل District.geojson با موفقیت بارگزاری شد!")   
     
-    originalCols = COLs = [
+    originalCols = [
         'first_name',
         'last_name',
         'nid',
         'phone',
-        'bakery_id'
+        'bakery_id',
         'ownership_status',
+        'number_violations',
         'second_fuel',
         'city',
         'lat',
@@ -64,24 +125,110 @@ def clean_csv_file(df):
         'bread_rations'
     ]
     
-    # Check Columns
-    csvFileColumns = df.columns
+    # ⚠️: ⚠️
+    # ❌: \u274C
+    # ✅: \u2705
+    
+    # Check Columns Count
+    if df.columns.__len__() != originalCols.__len__():
+        emit(warnings=warnings, message=f"\u274C ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
+        return None
+    
+    # Check Columns Name
+    if set(originalCols) != set(df.columns):
+        emit(warnings=warnings, message=f"\u274C ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
+        return None
+    
+    if df.shape[0] == 0:
+        emit(warnings=warnings, message=f"\u274C فایل ورودی هیچگونه رکوردی ندارد!")
+        return None
+    
+    # Remove Duplicate Rows
+    if df.duplicated().sum() > 0:
+        emit(warnings=warnings, message=f"⚠️ در فایل ورودی شما {df.duplicated().sum()} ردیف تکراری وجود داشت که حذف گردید!")
+        df.drop_duplicates(inplace=True)
+    
+    # Remove None lat and lon
+    df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
+    df['lon'] = pd.to_numeric(df['lon'], errors='coerce')
+    df[['lat', 'lon']] = df[['lat', 'lon']].astype(float)
+    missing_lat_lon = df[(df['lat'].isna()) | (df['lon'].isna())]
+    if missing_lat_lon.shape[0] == df.shape[0]:
+        emit(warnings=warnings, message=f"\u274C دو ستون lat و lon حتما باید دارای مقدار باشند!")
+        emit(warnings=warnings, message=f"\u274C تمام ردیف‌های این فایل فاقد مقدار برای دو ستون lat و lon می‌باشند!")
+        return None
+    if missing_lat_lon.shape[0] != 0:
+        emit(warnings=warnings, message=f"⚠️ دو ستون lat و lon حتما باید دارای مقدار عددی باشند!")
+        emit(warnings=warnings, message=f"\u2705 تعداد {missing_lat_lon.shape[0]} ردیف، بدون طول و عرض جغرافیایی، از فایل ورودی حذف شدند!")
+        df.dropna(subset=['lat', 'lon'], inplace=True)
+        
+    # Reset Index
+    df.reset_index(drop=True, inplace=True)
+    
+    # first_name:
+    df['first_name'] = df['first_name'].fillna('نامشخص')
+    df['first_name'] = df['first_name'].replace(0, 'نامشخص')
+    df['first_name'] = df['first_name'].replace("0", 'نامشخص')
+    df = virastar(df=df, columns=['first_name'])
+    df['first_name'] = df['first_name'].astype(str)
+    
+    # last_name:
+    df['last_name'] = df['last_name'].fillna('نامشخص')
+    df['last_name'] = df['last_name'].replace(0, 'نامشخص')
+    df['last_name'] = df['last_name'].replace("0", 'نامشخص')
+    df = virastar(df=df, columns=['last_name'])
+    df['last_name'] = df['last_name'].astype(str)
+    
+    # nid:
+    df['nid'] = df['nid'].astype(str)
+    df = virastarNoSpace(df=df, columns=['nid'])
+    df['nid'] = pd.to_numeric(df['nid'], errors='coerce')
+    df['nid'] = df['nid'].astype('Int64')
+    df['nid'] = df['nid'].fillna(0)
+    df['nid'] = df['nid'].apply(lambda x: str(x).zfill(10))
+    number_wrong_nid = df['nid'].apply(lambda x: not validate_iranian_national_code(x)).sum()
+    df['nid'] = df['nid'].apply(lambda x: x if validate_iranian_national_code(x) else 'نامشخص')
+    emit(warnings=warnings, message=f"⚠️ {number_wrong_nid} ردیف دارای کد ملی اشتباه می‌باشند!")
+    
+    # phone:
+    df['phone'] = df['phone'].astype(str)
+    df = virastarNoSpace(df=df, columns=['phone'])
+    df['phone'] = pd.to_numeric(df['phone'], errors='coerce')
+    df['phone'] = df['phone'].astype('Int64')
+    df['phone'] = df['phone'].fillna(0)
+    df['phone'] = df['phone'].apply(lambda x: str(x).zfill(11))    
+    number_wrong_phone = df['phone'].apply(lambda x: not validate_phone_number(x)).sum()
+    df['phone'] = df['phone'].apply(lambda x: x if validate_phone_number(x) else 'نامشخص')
+    emit(warnings=warnings, message=f"⚠️ {number_wrong_phone} ردیف دارای تلفن اشتباه می‌باشند!")
+    
+    # bakery_id:
+    df['bakery_id'] = df['bakery_id'].astype(str)
+    df = virastarNoSpace(df=df, columns=['bakery_id'])
+    df['bakery_id'] = pd.to_numeric(df['bakery_id'], errors='coerce')
+    df['bakery_id'] = df['bakery_id'].astype('Int64')
+    df['bakery_id'] = df['bakery_id'].fillna(0)
+    df['bakery_id'] = df['bakery_id'].apply(lambda x: str(x).zfill(6))    
+    number_wrong_bakery_id = df['bakery_id'].apply(lambda x: not validate_bakery_id(x)).sum()
+    df['bakery_id'] = df['bakery_id'].apply(lambda x: x if validate_bakery_id(x) else 'نامشخص')
+    emit(warnings=warnings, message=f"⚠️ {number_wrong_bakery_id} ردیف دارای شماره خبازی اشتباه می‌باشند!")
     
     
+    
+    
+    
+    
+    print(df['bakery_id'].head(30))
+    
+
+    return None
+
     COLs = ['first_name', 'last_name', 'ownership_status', 'second_fuel', 'city', 'household_risk', 'bakers_risk', 'type_bread', 'nid', 'phone', 'bakery_id']
     df = virastar(df=df, columns=COLs)
 
     COLs = ['number_violations', 'type_flour', 'bread_rations']
     df[COLs] = df[COLs].astype(int, errors='ignore')
-
-    COLs = ['lat', 'lon']
-    df[COLs] = df[COLs].astype(float)
-
-    # Drop All NULL Value from Lat & Lon Columns
-    df.dropna(subset=['lat', 'lon'], inplace=True)
-
-    # Remove All Duplicates Row
-    df.drop_duplicates(inplace=True)
+     
+   
 
     # Convert nid and phone to `str`
     df['nid'] = df['nid'].apply(lambda x: str(x).zfill(10))
@@ -225,12 +372,15 @@ def upload_csv():
     file = request.files['file']
         
     if file.filename == '':
-        return 'No selected file'
+        emit(warnings=warnings, message="\u274C فایلی انتخاب نشده است!") 
+        return '', 204 
     
     if file and file.filename.endswith('.csv'):
         file_path = os.path.join('uploads', file.filename)
         file.save(file_path)
         data = clean_csv_file(pd.read_csv(file_path, dtype=str))
+        if data is None:
+            return '', 204       
         records_to_insert = []
         for _, row in data.iterrows():
             existing_record = Bakery.query.filter_by(
@@ -288,8 +438,10 @@ def upload_csv():
         db.session.commit()
         flash(message='پایگاه داده با موفقیت ایجاد گردید!', category='success')
         return redirect(location=url_for(endpoint='database.home'))
-    flash(message='فقط فایل با فرمت *.csv قابل قبول است!', category='danger')
-    return redirect(location=url_for(endpoint='database.home'))
+    else:
+        emit(warnings=warnings, message="\u274C فرمت فایل انتخابی حتما باید csv و نویسه کدگذاری آن utf-8 باشد!")
+        return '', 204 
+        # return redirect(location=url_for(endpoint='database.home'))
 
 
 
