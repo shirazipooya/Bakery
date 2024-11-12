@@ -26,7 +26,7 @@ def virastar(df, columns):
     df[columns] = df[columns].apply(lambda x: x.str.lstrip())
     df[columns] = df[columns].apply(lambda x: x.str.replace(' +', ' '))
     df[columns] = df[columns].apply(lambda x: x.str.replace('ي','ی'))
-    df[columns] = df[columns].apply(lambda x: x.str.replace('ئ','ی'))
+    # df[columns] = df[columns].apply(lambda x: x.str.replace('ئ','ی'))
     df[columns] = df[columns].apply(lambda x: x.str.replace('ك', 'ک'))
     return df
 
@@ -36,7 +36,7 @@ def virastarNoSpace(df, columns):
     df[columns] = df[columns].apply(lambda x: x.str.lstrip())
     df[columns] = df[columns].apply(lambda x: x.str.replace(' ', ''))
     df[columns] = df[columns].apply(lambda x: x.str.replace('ي','ی'))
-    df[columns] = df[columns].apply(lambda x: x.str.replace('ئ','ی'))
+    # df[columns] = df[columns].apply(lambda x: x.str.replace('ئ','ی'))
     df[columns] = df[columns].apply(lambda x: x.str.replace('ك', 'ک'))
     return df
 
@@ -46,7 +46,7 @@ def virastarStr(x):
     x = x.lstrip()
     x = x.replace(' +', ' ')
     x = x.replace('ي','ی')
-    x = x.replace('ئ','ی')
+    # x = x.replace('ئ','ی')
     x = x.replace('ك', 'ک')
     return x
 
@@ -100,29 +100,28 @@ def validate_iranian_national_code(code):
 
 def clean_csv_file(df):
         
+    gdf_bakhsh = gpd.read_file('app/assets/data/geodatabase/Bakhsh.geojson')
+    gdf_shahr = gpd.read_file('app/assets/data/geodatabase/Shahr.geojson')
     gdf_regions = gpd.read_file('app/assets/data/geodatabase/Region.geojson')
-    emit(warnings=warnings, message="\u2705 فایل Region.geojson با موفقیت بارگزاری شد!")   
-    
     gdf_district = gpd.read_file('app/assets/data/geodatabase/District.geojson')
-    emit(warnings=warnings, message="\u2705 فایل District.geojson با موفقیت بارگزاری شد!")   
     
     originalCols = [
-        'first_name',
-        'last_name',
-        'nid',
-        'phone',
-        'bakery_id',
-        'ownership_status',
-        'number_violations',
-        'second_fuel',
-        'city',
-        'lat',
-        'lon',
-        'household_risk',
-        'bakers_risk',
-        'type_flour',
-        'type_bread',
-        'bread_rations'
+        'first_name', #Done
+        'last_name', #Done
+        'nid', #Done
+        'phone', #Done
+        'bakery_id', #Done
+        'ownership_status', #Done
+        'second_fuel', #Done
+        'city', #Done
+        'lat', #Done
+        'lon', #Done
+        'household_risk', #Done
+        'bakers_risk', #Done
+        'type_flour', #Done
+        'type_bread', #Done
+        'number_violations', #Done
+        'bread_rations' #Done
     ]
     
     # ⚠️: ⚠️
@@ -131,16 +130,16 @@ def clean_csv_file(df):
     
     # Check Columns Count
     if df.columns.__len__() != originalCols.__len__():
-        emit(warnings=warnings, message=f"\u274C ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
+        emit(warnings=warnings, message=f"\u274C خطایی رخ داده است:\n ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
         return None
     
     # Check Columns Name
     if set(originalCols) != set(df.columns):
-        emit(warnings=warnings, message=f"\u274C ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
+        emit(warnings=warnings, message=f"\u274C خطایی رخ داده است:\n ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
         return None
     
     if df.shape[0] == 0:
-        emit(warnings=warnings, message=f"\u274C فایل ورودی هیچگونه رکوردی ندارد!")
+        emit(warnings=warnings, message=f"\u274C خطایی رخ داده است:\n فایل ورودی هیچگونه رکوردی ندارد!")
         return None
     
     # Remove Duplicate Rows
@@ -154,11 +153,11 @@ def clean_csv_file(df):
     df[['lat', 'lon']] = df[['lat', 'lon']].astype(float)
     missing_lat_lon = df[(df['lat'].isna()) | (df['lon'].isna())]
     if missing_lat_lon.shape[0] == df.shape[0]:
-        emit(warnings=warnings, message=f"\u274C دو ستون lat و lon حتما باید دارای مقدار باشند!")
-        emit(warnings=warnings, message=f"\u274C تمام ردیف‌های این فایل فاقد مقدار برای دو ستون lat و lon می‌باشند!")
+        emit(warnings=warnings, message=f"\u274C دو ستون «طول جغرافیایی» و «عرض جغرافیایی» حتما باید دارای مقدار باشند!")
+        emit(warnings=warnings, message=f"\u274C خطایی رخ داده است:\n تمام ردیف‌های این فایل فاقد مقدار برای دو ستون «طول جغرافیایی» و «عرض جغرافیایی» می‌باشند!")
         return None
     if missing_lat_lon.shape[0] != 0:
-        emit(warnings=warnings, message=f"⚠️ دو ستون lat و lon حتما باید دارای مقدار عددی باشند!")
+        emit(warnings=warnings, message=f"⚠️ دو ستون «طول جغرافیایی» و «عرض جغرافیایی» حتما باید دارای مقدار عددی باشند!")
         emit(warnings=warnings, message=f"\u2705 تعداد {missing_lat_lon.shape[0]} ردیف، بدون طول و عرض جغرافیایی، از فایل ورودی حذف شدند!")
         df.dropna(subset=['lat', 'lon'], inplace=True)
         
@@ -188,7 +187,8 @@ def clean_csv_file(df):
     df['nid'] = df['nid'].apply(lambda x: str(x).zfill(10))
     number_wrong_nid = df['nid'].apply(lambda x: not validate_iranian_national_code(x)).sum()
     df['nid'] = df['nid'].apply(lambda x: x if validate_iranian_national_code(x) else 'نامشخص')
-    emit(warnings=warnings, message=f"⚠️ {number_wrong_nid} ردیف دارای کد ملی اشتباه می‌باشند!")
+    if number_wrong_nid != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «کد ملی» دارای {number_wrong_nid} ردیف با مقدار «نامشخص» می‌باشد!")
     
     # phone:
     df['phone'] = df['phone'].astype(str)
@@ -199,7 +199,8 @@ def clean_csv_file(df):
     df['phone'] = df['phone'].apply(lambda x: str(x).zfill(11))    
     number_wrong_phone = df['phone'].apply(lambda x: not validate_phone_number(x)).sum()
     df['phone'] = df['phone'].apply(lambda x: x if validate_phone_number(x) else 'نامشخص')
-    emit(warnings=warnings, message=f"⚠️ {number_wrong_phone} ردیف دارای تلفن اشتباه می‌باشند!")
+    if number_wrong_phone != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «تلفن همراه» دارای {number_wrong_phone} ردیف با مقدار «نامشخص» می‌باشد!")
     
     # bakery_id:
     df['bakery_id'] = df['bakery_id'].astype(str)
@@ -210,74 +211,207 @@ def clean_csv_file(df):
     df['bakery_id'] = df['bakery_id'].apply(lambda x: str(x).zfill(6))    
     number_wrong_bakery_id = df['bakery_id'].apply(lambda x: not validate_bakery_id(x)).sum()
     df['bakery_id'] = df['bakery_id'].apply(lambda x: x if validate_bakery_id(x) else 'نامشخص')
-    emit(warnings=warnings, message=f"⚠️ {number_wrong_bakery_id} ردیف دارای شماره خبازی اشتباه می‌باشند!")
+    if number_wrong_bakery_id != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «شماره خبازی» دارای {number_wrong_bakery_id} ردیف با مقدار «نامشخص» می‌باشد!")
     
+    # ownership_status:
+    df['ownership_status'] = df['ownership_status'].fillna('نامشخص')
+    df['ownership_status'] = df['ownership_status'].replace("0", 'نامشخص')
+    df['ownership_status'] = df['ownership_status'].astype(str)
+    df = virastar(df=df, columns=['ownership_status'])
     
+    os_df_unique = df['ownership_status'].unique()   
+    os_items = [x[0] for x in db.session.query(OwnershipStatus.name).all()]
     
+    if not set(os_df_unique).issubset(set(os_items)):
+        emit(
+            warnings=warnings,
+            message=f"\u274C خطایی رخ داده است:\n- در ستون «نوع ملک» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(os_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «نوع ملک» مقادیر زیر وجود دارد: {', '.join(os_items)}"
+        )
+        return None
     
+    if df['ownership_status'].value_counts().get('نامشخص', 0) != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «نوع ملک» دارای {df['ownership_status'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
     
+    # second_fuel:
+    df['second_fuel'] = df['second_fuel'].fillna('نامشخص')
+    df['second_fuel'] = df['second_fuel'].replace("0", 'نامشخص')
+    df['second_fuel'] = df['second_fuel'].astype(str)
+    df = virastar(df=df, columns=['second_fuel'])
     
-    print(df['bakery_id'].head(30))
+    sf_df_unique = df['second_fuel'].unique()   
+    sf_items = [x[0] for x in db.session.query(SecondFuel.name).all()]
     
+    if not set(sf_df_unique).issubset(set(sf_items)):
+        emit(
+            warnings=warnings,
+            message=f"\u274C خطایی رخ داده است:\n- در ستون «سوخت دوم» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(sf_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «سوخت دوم» مقادیر زیر وجود دارد: {', '.join(sf_items)}"
+        )
+        return None
+    
+    if df['second_fuel'].value_counts().get('نامشخص', 0) != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «سوخت دوم» دارای {df['second_fuel'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
 
-    return None
+    
+    # household_risk:
+    df['household_risk'] = df['household_risk'].fillna('نامشخص')
+    df['household_risk'] = df['household_risk'].replace("0", 'نامشخص')
+    df['household_risk'] = df['household_risk'].astype(str)
+    df = virastar(df=df, columns=['household_risk'])
+    
+    hr_df_unique = df['household_risk'].unique()   
+    hr_items = [x[0] for x in db.session.query(HouseholdRisk.name).all()]
+    
+    if not set(hr_df_unique).issubset(set(hr_items)):
+        emit(
+            warnings=warnings,
+            message=f"\u274C خطایی رخ داده است:\n- در ستون «ریسک خانوار» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(hr_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «ریسک خانوار» مقادیر زیر وجود دارد: {', '.join(hr_items)}"
+        )
+        return None
+    
+    if df['household_risk'].value_counts().get('نامشخص', 0) != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «ریسک خانوار» دارای {df['household_risk'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+        
+    # bakers_risk:
+    df['bakers_risk'] = df['bakers_risk'].fillna('نامشخص')
+    df['bakers_risk'] = df['bakers_risk'].replace("0", 'نامشخص')
+    df['bakers_risk'] = df['bakers_risk'].astype(str)
+    df = virastar(df=df, columns=['bakers_risk'])
+    
+    br_df_unique = df['bakers_risk'].unique()   
+    br_items = [x[0] for x in db.session.query(BakersRisk.name).all()]
+    
+    if not set(br_df_unique).issubset(set(br_items)):
+        emit(
+            warnings=warnings,
+            message=f"\u274C خطایی رخ داده است:\n- در ستون «ریسک نانوا» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(br_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «ریسک نانوا» مقادیر زیر وجود دارد: {', '.join(br_items)}"
+        )
+        return None
+    
+    if df['bakers_risk'].value_counts().get('نامشخص', 0) != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «ریسک نانوا» دارای {df['bakers_risk'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+    
+    
+    # type_flour:
+    df['type_flour'] = df['type_flour'].fillna('نامشخص')
+    df['type_flour'] = df['type_flour'].replace("0", 'نامشخص')
+    df['type_flour'] = df['type_flour'].astype(str)
+    df = virastar(df=df, columns=['type_flour'])
+    
+    tf_df_unique = df['type_flour'].unique()   
+    tf_items = [x[0] for x in db.session.query(TypeFlour.name).all()]
+    
+    if not set(tf_df_unique).issubset(set(tf_items)):
+        emit(
+            warnings=warnings,
+            message=f"\u274C خطایی رخ داده است:\n- در ستون «نوع آرد» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(tf_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «نوع آرد» مقادیر زیر وجود دارد: {', '.join(tf_items)}"
+        )
+        return None
+    
+    if df['type_flour'].value_counts().get('نامشخص', 0) != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «نوع آرد» دارای {df['type_flour'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+    
+    
+    # type_bread:
+    df['type_bread'] = df['type_bread'].fillna('نامشخص')
+    df['type_bread'] = df['type_bread'].replace("0", 'نامشخص')
+    df['type_bread'] = df['type_bread'].astype(str)
+    df = virastar(df=df, columns=['type_bread'])
+    
+    tb_df_unique = df['type_bread'].unique()   
+    tb_items = [x[0] for x in db.session.query(TypeBread.name).all()]
+    
+    if not set(tb_df_unique).issubset(set(tb_items)):
+        emit(
+            warnings=warnings,
+            message=f"\u274C خطایی رخ داده است:\n- در ستون «نوع پخت» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(tb_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «نوع پخت» مقادیر زیر وجود دارد: {', '.join(tb_items)}"
+        )
+        return None
+    
+    if df['type_bread'].value_counts().get('نامشخص', 0) != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «نوع پخت» دارای {df['type_bread'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+    
+    # city:
+    df['city'] = df['city'].fillna('نامشخص')
+    df['city'] = df['city'].replace("0", 'نامشخص')
+    df['city'] = df['city'].astype(str)
+    df = virastar(df=df, columns=['city'])
+    
+    if df['city'].value_counts().get('نامشخص', 0) != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «شهر» دارای {df['city'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+    
+    # number_violations:
+    df['number_violations'] = df['number_violations'].astype(str)
+    df = virastarNoSpace(df=df, columns=['number_violations'])
+    df['number_violations'] = pd.to_numeric(df['number_violations'], errors='coerce')
+    df['number_violations'] = df['number_violations'].astype('Int64')
+    number_na_nv = df['number_violations'].isna().sum()
+    df['number_violations'] = df['number_violations'].fillna(0)
 
-    COLs = ['first_name', 'last_name', 'ownership_status', 'second_fuel', 'city', 'household_risk', 'bakers_risk', 'type_bread', 'nid', 'phone', 'bakery_id']
-    df = virastar(df=df, columns=COLs)
+    if number_na_nv != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «تعداد تخلفات نانوایی» دارای {number_na_nv} ردیف با مقدار «نامشخص» می‌باشد که با مقدار صفر جایگزین شد!")
+    
+    # bread_rations:
+    df['bread_rations'] = df['bread_rations'].astype(str)
+    df = virastarNoSpace(df=df, columns=['bread_rations'])
+    df['bread_rations'] = pd.to_numeric(df['bread_rations'], errors='coerce')
+    df['bread_rations'] = df['bread_rations'].astype('Int64')
+    number_na_br = df['bread_rations'].isna().sum()
+    df['bread_rations'] = df['bread_rations'].fillna(0)
 
-    COLs = ['number_violations', 'type_flour', 'bread_rations']
-    df[COLs] = df[COLs].astype(int, errors='ignore')
-     
-   
-
-    # Convert nid and phone to `str`
-    df['nid'] = df['nid'].apply(lambda x: str(x).zfill(10))
-    df['phone'] = df['phone'].apply(lambda x: str(x).zfill(11))
-
-    df.reset_index(drop=True, inplace=True)
-
+    if number_na_br != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «سهمیه» دارای {number_na_br} ردیف با مقدار «نامشخص» می‌باشد که با مقدار صفر جایگزین شد!")
+    
+    
     gdf = gpd.GeoDataFrame(
         df,
         geometry=gpd.points_from_xy(df['lon'], df['lat'])
     )
 
     gdf = gdf.set_crs('EPSG:4326')
+    gdf_bakhsh = gdf_bakhsh.to_crs('EPSG:4326')
+    gdf_shahr = gdf_shahr.to_crs('EPSG:4326')
     gdf_regions = gdf_regions.to_crs('EPSG:4326')
     gdf_district = gdf_district.to_crs('EPSG:4326')
-
-    COLs = ['first_name', 'last_name', 'nid', 'phone', 'bakery_id',
-        'ownership_status', 'number_violations', 'second_fuel', 'city', 'lat',
-        'lon', 'household_risk', 'bakers_risk', 'type_flour', 'type_bread',
-        'bread_rations']
+    
+    
+    gdf_joined_gdf_bakhsh = gpd.sjoin(gdf, gdf_bakhsh, how='left', predicate='within')
+    gdf_joined_gdf_bakhsh.drop_duplicates(subset=originalCols, inplace=True)
+    
+    gdf_joined_gdf_shahr = gpd.sjoin(gdf, gdf_shahr, how='left', predicate='within')
+    gdf_joined_gdf_shahr.drop_duplicates(subset=originalCols, inplace=True)
+       
     gdf_joined_gdf_regions = gpd.sjoin(gdf, gdf_regions, how='left', predicate='within')
-    gdf_joined_gdf_regions.drop_duplicates(subset=COLs, inplace=True)
+    gdf_joined_gdf_regions.drop_duplicates(subset=originalCols, inplace=True)
+    
     gdf_joined_gdf_district = gpd.sjoin(gdf, gdf_district, how='left', predicate='within')
-    gdf_joined_gdf_district.drop_duplicates(subset=COLs, inplace=True)
+    gdf_joined_gdf_district.drop_duplicates(subset=originalCols, inplace=True)
 
+    df[['ostan', 'shahrestan', 'bakhsh']] = gdf_joined_gdf_bakhsh[['ostan', 'shahrestan', 'bakhsh']]
+    df['shahr'] = gdf_joined_gdf_shahr['shahr']
     df['region'] = gdf_joined_gdf_district['region']
     df['district'] = gdf_joined_gdf_district['district']
-
-    # Drop All NULL Value from Region & Lon District
-    df.dropna(subset=['region', 'district'], inplace=True)
     
-    # df['number_violations'] = df['number_violations'].fillna(0)
-
-    COLs = ['first_name', 'last_name', 'ownership_status', 'second_fuel', 'city', 'household_risk', 'bakers_risk', 'type_bread', 'nid', 'phone', 'bakery_id']
-    df[COLs] = df[COLs].astype(str)
+    df['region'] = pd.to_numeric(df['region'], errors='coerce')
+    df['region'] = df['region'].astype('Int64')
+    df['district'] = pd.to_numeric(df['district'], errors='coerce')
+    df['district'] = df['district'].astype('Int64')
     
-    # Convert nid and phone to `str`
-    df['nid'] = df['nid'].apply(lambda x: str(x).zfill(10))
-    df['phone'] = df['phone'].apply(lambda x: str(x).zfill(11))
-
-    COLs = ['number_violations', 'type_flour', 'bread_rations', 'region', 'district']
-    df[COLs] = df[COLs].astype(int, errors='ignore')
-
-    COLs = ['lat', 'lon']
-    df[COLs] = df[COLs].astype(float)
-
+    # Drop All NULL Value from ostan, shahrestan, bakhsh
+    n = df[['ostan', 'shahrestan', 'bakhsh']].isna().all(axis=1).sum()
+    if n != 0:
+        df.dropna(subset=['ostan', 'shahrestan', 'bakhsh'], inplace=True)
+        emit(warnings=warnings, message=f"⚠️ {n} ردیف به علت نبودن در محدوده شهرستان از فایل ورودی حذف شدند!")
+    
+    
+    df['shahr'] = df['shahr'].apply(lambda x: x if pd.notna(x) else "روستایی")
+    df['region'] = df['region'].apply(lambda x: x if pd.notna(x) else 1)
+    df['district'] = df['district'].apply(lambda x: x if pd.notna(x) else 1)
+    
+    
     # Reset Index
     df.reset_index(drop=True, inplace=True)
-    
+
     return df
     
 
@@ -392,6 +526,10 @@ def upload_csv():
                 ownership_status=row['ownership_status'],
                 number_violations=row['number_violations'],
                 second_fuel=row['second_fuel'],
+                ostan=row['ostan'],
+                shahrestan=row['shahrestan'],
+                bakhsh=row['bakhsh'],
+                shahr=row['shahr'],
                 city=row['city'],
                 region=row['region'],
                 district=row['district'],
@@ -414,6 +552,10 @@ def upload_csv():
                     ownership_status=row['ownership_status'],
                     number_violations=row['number_violations'],
                     second_fuel=row['second_fuel'],
+                    ostan=row['ostan'],
+                    shahrestan=row['shahrestan'],
+                    bakhsh=row['bakhsh'],
+                    shahr=row['shahr'],
                     city=row['city'],
                     region=row['region'],
                     district=row['district'],

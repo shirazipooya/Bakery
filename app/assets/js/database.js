@@ -48,16 +48,19 @@ function loadBakeriesTable() {
                         <td>${bakery.ownership_status}</td>
                         <td>${bakery.number_violations}</td>
                         <td>${bakery.second_fuel}</td>
-                        <td>${bakery.city}</td>
-                        <td>${bakery.region}</td>
-                        <td>${bakery.district}</td>
-                        <td>${bakery.lat}</td>
-                        <td>${bakery.lon}</td>
                         <td>${bakery.household_risk}</td>
                         <td>${bakery.bakers_risk}</td>
                         <td>${bakery.type_flour}</td>
                         <td>${bakery.type_bread}</td>
                         <td>${bakery.bread_rations}</td>
+                        <td>${bakery.ostan}</td>
+                        <td>${bakery.shahrestan}</td>
+                        <td>${bakery.bakhsh}</td>
+                        <td>${bakery.shahr}</td>
+                        <td>${bakery.region}</td>
+                        <td>${bakery.district}</td>
+                        <td>${bakery.lat.toFixed(2)}</td>
+                        <td>${bakery.lon.toFixed(2)}</td>
                     </tr>
                 `);
             });
