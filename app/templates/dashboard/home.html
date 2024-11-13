@@ -1,18 +1,233 @@
 {% extends 'dashboard/base.html' %}
 
 {% block title %}
-داشبورد
+داشبورد مدیریتی
 {% endblock %}
 
 {% block content %}
+
 <div class="container-xxl flex-grow-1 container-p-y">
   <div class="row">
 
-    <div class="col-md-12 mb-2">
-      <div class="divider">
-        <div class="divider-text fs-4">خلاصه پایگاه داده</div>
+    <div class="col-lg-3 col-md-4 col-sm-4 col-12 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="col-12 mb-2">
+            <div class="text-center">
+              <div class="fs-5">انتخاب منطقه</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 mb-4">
+              <label for="selectpickerBasic" class="form-label">استان</label>
+              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
+                <option>خراسان رضوی</option>
+                <option>Pulp Fiction</option>
+                <option>The Godfather</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 mb-4">
+              <label for="selectpickerBasic" class="form-label">شهرستان</label>
+              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
+                <option>مشهد</option>
+                <option>Pulp Fiction</option>
+                <option>The Godfather</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 mb-4">
+              <label for="selectpickerBasic" class="form-label">بخش</label>
+              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
+                <option>مرکزی</option>
+                <option>Pulp Fiction</option>
+                <option>The Godfather</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 mb-4">
+              <label for="selectpickerBasic" class="form-label">شهر / روستایی</label>
+              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
+                <option>مشهد</option>
+                <option>Pulp Fiction</option>
+                <option>The Godfather</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 mb-4">
+              <label for="selectpickerBasic" class="form-label">منطقه</label>
+              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
+                <option>منطقه 1</option>
+                <option>Pulp Fiction</option>
+                <option>The Godfather</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 mb-4">
+              <label for="selectpickerBasic" class="form-label">ناحیه</label>
+              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
+                <option>ناحیه 1</option>
+                <option>Pulp Fiction</option>
+                <option>The Godfather</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+    <div class="col-lg-9 col-md-8 col-sm-8 col-12 mb-4">
+      <div class="row">
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
+          <div class="card">
+            <div class="card-body text-center">
+              <div class="avatar avatar-md mx-auto mb-3">
+                <span class="avatar-initial rounded-circle bg-label-success"><i
+                    class="bx bxs-store-alt fs-3"></i></span>
+              </div>
+              <span class="d-block mb-1 text-nowrap">تعداد نانوایی</span>
+              <h2 class="mb-0 pt-1" id="region_info_number_bakers">-</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
+          <div class="card">
+            <div class="card-body text-center">
+              <div class="avatar avatar-md mx-auto mb-3">
+                <span class="avatar-initial rounded-circle bg-label-primary"><i
+                    class="bx bxs-building-house fs-3"></i></span>
+              </div>
+              <span class="d-block mb-1 text-nowrap">تعداد خانوار</span>
+              <h2 class="mb-0 pt-1" id="region_info_n_households">-</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
+          <div class="card">
+            <div class="card-body text-center">
+              <div class="avatar avatar-md mx-auto mb-3">
+                <span class="avatar-initial rounded-circle bg-label-danger"><i class="bx bx-map-alt fs-3"></i></span>
+              </div>
+
+              <span class="d-block mb-1 text-nowrap">مساحت (هکتار)</span>
+              <h2 class="mb-0 pt-1" id="region_info_area">-</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
+          <div class="card">
+            <div class="card-body text-center">
+              <div class="avatar avatar-md mx-auto mb-3">
+                <span class="avatar-initial rounded-circle bg-label-warning"><i
+                    class="bx bx-male-female fs-3"></i></span>
+              </div>
+              <span class="d-block mb-1 text-nowrap">جمعیت</span>
+              <h2 class="mb-0 pt-1" id="region_info_population">-</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
+          <div class="card">
+            <div class="card-body text-center">
+              <div class="avatar avatar-md mx-auto mb-3">
+                <span class="avatar-initial rounded-circle bg-label-info"><i class="bx bx-male fs-3"></i></span>
+              </div>
+              <span class="d-block mb-1 text-nowrap">جمعیت (مرد)</span>
+              <h2 class="mb-0 pt-1" id="region_info_population_male">-</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
+          <div class="card">
+            <div class="card-body text-center">
+              <div class="avatar avatar-md mx-auto mb-3">
+                <span class="avatar-initial rounded-circle bg-label-danger"><i class="bx bx-female fs-3"></i></span>
+              </div>
+              <span class="d-block mb-1 text-nowrap">جمعیت (زن)</span>
+              <h2 class="mb-0 pt-1" id="region_info_population_female">-</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-4">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+          <div class="card card-border-shadow-primary h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2 pb-1">
+                <div class="avatar me-2">
+                  <span class="avatar-initial rounded bg-label-info"><i class="bx bx-male"></i></span>
+                </div>
+                <h2 class="ms-1 mb-0" id="region_info_population_bakery_1">-</h2>
+              </div>
+              <h5 class="mb-0">
+                <small class="text-muted">به ازای هر </small>
+                <span class="fw-medium me-1" id="region_info_population_bakery_2">-</span>
+                <small class="text-muted">نفر، یک عدد نانوایی</small>
+              </h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+          <div class="card card-border-shadow-success h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2 pb-1">
+                <div class="avatar me-2">
+                  <span class="avatar-initial rounded bg-label-success"><i class="bx bxs-store-alt"></i></span>
+                </div>
+                <h2 class="ms-1 mb-0" id="region_info_households_bakery_1">-</h2>
+              </div>
+              <h5 class="mb-0">
+                <small class="text-muted">به ازای هر </small>
+                <span class="fw-medium me-1" id="region_info_households_bakery_2">-</span>
+                <small class="text-muted">خانواده، یک عدد نانوایی</small>
+              </h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+          <div class="card card-border-shadow-warning h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2 pb-1">
+                <div class="avatar me-2">
+                  <span class="avatar-initial rounded bg-label-danger"><i class="bx bx-map-alt"></i></span>
+                </div>
+                <h2 class="ms-1 mb-0" id="region_info_area_bakery_1">-</h2>
+              </div>
+              <h5 class="mb-0">
+                <small class="text-muted">به ازای هر </small>
+                <span class="fw-medium me-1" id="region_info_area_bakery_2"></span>
+                <small class="text-muted">هکتار، یک عدد نانوایی</small>
+              </h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+          <div class="card card-border-shadow-info h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2 pb-1">
+                <div class="avatar me-2">
+                  <span class="avatar-initial rounded bg-label-info"><i class='bx bx-square-rounded'></i></span>
+                </div>
+                <h2 class="ms-1 mb-0" id="region_info_ration_population_1">-</h2>
+              </div>
+              <h5 class="mb-0">
+                <small class="text-muted">به ازای هر </small>
+                <span class="fw-medium me-1">100</span>
+                <small class="text-muted">نفر،</small>
+                <span class="fw-medium me-1" id="region_info_ration_population_2">-</span>
+                <small class="text-muted">کیسه سهمیه آرد</small>
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
 
     <!-- Top Referrals -->
     <div class="col-md-6 col-xl-4 col-xxl-3 order-3 order-lg-0 mb-4 text-center">
@@ -308,8 +523,6 @@
     <!-- / TypeFlour -->
 
   </div>
-
-
   <div class="row">
     <!-- BakersRisk -->
     <div class="col-md-6 col-lg-6 col-xl-6  order-3 order-lg-0 mb-4">
@@ -343,167 +556,6 @@
     </div>
     <!-- / HouseholdRisk -->
   </div>
-
-  <!-- Cards with badge -->
-  <div class="row">
-    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4 col-6 mb-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <div class="avatar avatar-md mx-auto mb-3">
-            <span class="avatar-initial rounded-circle bg-label-warning"><i class="bx bx-male-female fs-3"></i></span>
-          </div>
-          <span class="d-block mb-1 text-nowrap">جمعیت</span>
-          <h2 class="mb-0 pt-1" id="region_info_population">-</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4 col-6 mb-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <div class="avatar avatar-md mx-auto mb-3">
-            <span class="avatar-initial rounded-circle bg-label-info"
-              ><i class="bx bx-male fs-3"></i
-            ></span>
-          </div>
-          <span class="d-block mb-1 text-nowrap">جمعیت (مرد)</span>
-          <h2 class="mb-0 pt-1" id="region_info_population_male">-</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4 col-6 mb-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <div class="avatar avatar-md mx-auto mb-3">
-            <span class="avatar-initial rounded-circle bg-label-danger"
-              ><i class="bx bx-female fs-3"></i
-            ></span>
-          </div>
-          <span class="d-block mb-1 text-nowrap">جمعیت (زن)</span>
-          <h2 class="mb-0 pt-1" id="region_info_population_female">-</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4 col-6 mb-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <div class="avatar avatar-md mx-auto mb-3">
-            <span class="avatar-initial rounded-circle bg-label-primary"
-              ><i class="bx bxs-building-house fs-3"></i
-            ></span>
-          </div>
-          <span class="d-block mb-1 text-nowrap">تعداد خانوار</span>
-          <h2 class="mb-0 pt-1" id="region_info_n_households">-</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4 col-6 mb-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <div class="avatar avatar-md mx-auto mb-3">
-            <span class="avatar-initial rounded-circle bg-label-success"
-              ><i class="bx bxs-store-alt fs-3"></i
-            ></span>
-          </div>
-          <span class="d-block mb-1 text-nowrap">تعداد نانوایی</span>
-          <h2 class="mb-0 pt-1" id="region_info_number_bakers">-</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4 col-6 mb-4">
-      <div class="card">
-        <div class="card-body text-center">
-          <div class="avatar avatar-md mx-auto mb-3">
-            <span class="avatar-initial rounded-circle bg-label-danger"
-              ><i class="bx bx-map-alt fs-3"></i
-            ></span>
-          </div>
-
-          <span class="d-block mb-1 text-nowrap">مساحت (هکتار)</span>
-          <h2 class="mb-0 pt-1" id="region_info_area">-</h2>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--/ Cards with badge -->
-
-
-  <!-- Card Border Shadow -->
-  <div class="row g-4">
-    <div class="col-sm-6 col-lg-3">
-      <div class="card card-border-shadow-primary h-100">
-        <div class="card-body">
-          <div class="d-flex align-items-center mb-2 pb-1">
-            <div class="avatar me-2">
-              <span class="avatar-initial rounded bg-label-info"><i class="bx bx-male"></i></span>
-            </div>
-            <h4 class="ms-1 mb-0" id="region_info_population_bakery_1">-</h4>
-          </div>
-          <p class="mb-0">
-            <small class="text-muted">به ازای هر </small>
-            <span class="fw-medium me-1" id="region_info_population_bakery_2">-</span>
-            <small class="text-muted">نفر، یک عدد نانوایی</small>
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-      <div class="card card-border-shadow-success h-100">
-        <div class="card-body">
-          <div class="d-flex align-items-center mb-2 pb-1">
-            <div class="avatar me-2">
-              <span class="avatar-initial rounded bg-label-success"
-                ><i class="bx bxs-store-alt"></i
-              ></span>
-            </div>
-            <h4 class="ms-1 mb-0" id="region_info_households_bakery_1">-</h4>
-          </div>
-          <p class="mb-0">
-            <small class="text-muted">به ازای هر </small>
-            <span class="fw-medium me-1" id="region_info_households_bakery_2">-</span>
-            <small class="text-muted">خانواده، یک عدد نانوایی</small>
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-      <div class="card card-border-shadow-warning h-100">
-        <div class="card-body">
-          <div class="d-flex align-items-center mb-2 pb-1">
-            <div class="avatar me-2">
-              <span class="avatar-initial rounded bg-label-danger"><i class="bx bx-map-alt"></i></span>
-            </div>
-            <h4 class="ms-1 mb-0" id="region_info_area_bakery_1">-</h4>
-          </div>
-          <p class="mb-0">
-            <small class="text-muted">به ازای هر </small>
-            <span class="fw-medium me-1" id="region_info_area_bakery_2"></span>
-            <small class="text-muted">هکتار، یک عدد نانوایی</small>
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-      <div class="card card-border-shadow-info h-100">
-        <div class="card-body">
-          <div class="d-flex align-items-center mb-2 pb-1">
-            <div class="avatar me-2">
-              <span class="avatar-initial rounded bg-label-info"><i class='bx bx-square-rounded'></i></span>
-            </div>
-            <h4 class="ms-1 mb-0" id="region_info_ration_population_1">-</h4>
-          </div>
-          <p class="mb-0">
-            <small class="text-muted">به ازای هر </small>
-            <span class="fw-medium me-1">100</span>
-            <small class="text-muted">نفر،</small>
-            <span class="fw-medium me-1" id="region_info_ration_population_2">-</span>
-            <small class="text-muted">کیسه سهمیه آرد</small>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--/ Card Border Shadow -->
-
-
 </div>
+
 {% endblock %}
