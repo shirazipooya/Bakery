@@ -1,7 +1,7 @@
 <nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar">
     <div class="container-xxl">
         <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
-            <a href="index.html" class="app-brand-link gap-2">
+            <a href={{ url_for('dashboard.home' ) }} class="app-brand-link gap-2">
                 <img src="{{ url_for('static', filename='img/HydroCode.png') }}" alt="HydroCode" width="60" />
                 <span class="app-brand-text demo menu-text fw-bold">هیدروکُد</span>
             </a>

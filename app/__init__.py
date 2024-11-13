@@ -3,7 +3,10 @@ from flask import Flask
 
 from app.users.routes import blueprint as users_blueprint
 from app.dashboard.routes import blueprint as dashboard_blueprint
+from app.map.routes import blueprint as map_blueprint
+from app.table.routes import blueprint as table_blueprint
 from app.database.routes import blueprint as database_blueprint
+from app.settings.routes import blueprint as settings_blueprint
 
 from app.extensions import db, migrate, login_manager, bcrypt, cache, socketio
 import app.exceptions as app_exception
@@ -12,7 +15,10 @@ import app.exceptions as app_exception
 def register_blueprint(app):
     app.register_blueprint(blueprint=users_blueprint)
     app.register_blueprint(blueprint=dashboard_blueprint)
+    app.register_blueprint(blueprint=map_blueprint)
+    app.register_blueprint(blueprint=table_blueprint)
     app.register_blueprint(blueprint=database_blueprint)
+    app.register_blueprint(blueprint=settings_blueprint)
 
 
 def register_error_handlers(app):

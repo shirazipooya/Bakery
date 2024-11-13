@@ -1,0 +1,23 @@
+{% extends 'settings/base.html' %}
+
+{% block title %} مدیریت پایگاه داده {% endblock %}
+
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+  <!-- Table -->
+  <div class="row">
+    <!-- Divider -->
+    <div class="col-12 mb-2">
+      <div class="divider">
+        <div class="divider-text fs-4">ویرایش پایگاه داده</div>
+      </div>
+    </div>
+    <!-- / Divider -->
+    <!-- Add Category -->
+    {% include 'database/includes/add_category.html' %}
+    <!-- / Add Category -->
+  </div>
+  <!-- / Table -->
+</div>
+{% endblock %}

@@ -4,7 +4,7 @@
     data-assets-path="../assets/" data-template="horizontal-menu">
 
 <head>
-    {% include 'includes/dashboard_database/meta.html' %}
+    {% include 'includes/meta.html' %}
     {% include 'dashboard/includes/links.html' %}
     <title>
         {% block title %} {% endblock %}
@@ -15,16 +15,16 @@
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-navbar-full layout-horizontal layout-without-menu">
         <div class="layout-container">
-            {% include 'includes/dashboard_database/navbar.html' %}
+            {% include 'includes/navbar.html' %}
             <!-- Layout container -->
             <div class="layout-page">
                 <!-- Content wrapper -->
                 <div class="content-wrapper">
-                    {% include 'includes/dashboard_database/menu.html' %}
+                    {% include 'includes/menu.html' %}
                     <!-- Content -->
                      {% block content %}{% endblock %}
                     <!--/ Content -->
-                    {% include 'includes/dashboard_database/footer.html' %}
+                    {% include 'includes/footer.html' %}
                     <div class="content-backdrop fade"></div>
                 </div>
                 <!--/ Content wrapper -->

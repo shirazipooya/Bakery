@@ -5,7 +5,7 @@
 
 <head>
     {% include 'includes/meta.html' %}
-    {% include 'database/includes/links.html' %}
+    {% include 'table/includes/links.html' %}
     <title>
         {% block title %} {% endblock %}
     </title>
@@ -21,7 +21,7 @@
                 <!-- Content wrapper -->
                 <div class="content-wrapper">
                     {% include 'includes/menu.html' %}
-                    {% include 'database/includes/messages.html' %}
+                    {% include 'table/includes/messages.html' %}
                     <!-- Content -->
                      {% block content %}{% endblock %}
                     <!--/ Content -->
@@ -43,7 +43,7 @@
     <div class="drag-target"></div>
     <!-- / Drag Target Area To SlideIn Menu On Small Screens -->
 
-    {% include 'database/includes/scripts.html' %}
+    {% include 'table/includes/scripts.html' %}
 </body>
 
 </html>

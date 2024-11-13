@@ -1,0 +1,159 @@
+{% extends 'map/base.html' %}
+
+{% block title %}
+داشبورد
+{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <!-- Controler and Map -->
+  <div class="row">
+    <div class="col-12 mb-2">
+      <div class="divider">
+        <div class="divider-text fs-4">نقشه نانوایی‌ها</div>
+      </div>
+    </div>
+    <div class="col-md-4 col-lg-3 col-xl-3 mb-4">
+      <!-- Switches -->
+      <div class="card mb-4">
+        <h5 class="card-header">تنظیمات لایه‌ها</h5>
+        <div class="card-body">
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="showRegion" checked />
+            <label class="form-check-label" for="showRegion">لایه مناطق شهری</label>
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="showDistrict" checked />
+            <label class="form-check-label" for="showDistrict">لایه مناطق و نواحی
+              شهری</label>
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="showRatioRegion" checked />
+            <label class="form-check-label" for="showRatioRegion">نسبت نانوایی‌ها به جمعیت مناطق</label>
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="showRatioDistrict" checked />
+            <label class="form-check-label" for="showRatioDistrict">نسبت نانوایی‌ها به جمعیت نواحی</label>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">فیلتر</h5>
+        </div>
+        <div class="card-body">
+
+          <!-- City -->
+          <div class="mb-3 col ecommerce-select2-dropdown">
+            <label class="form-label mb-1" for="city">
+              شهر
+            </label>
+            <select id="city" class="form-select" data-placeholder="شهر را انتخاب کنید ...">
+              <option value="">شهر را انتخاب کنید ...</option>
+            </select>
+          </div>
+
+          <!-- Region -->
+          <div class="mb-3 col ecommerce-select2-dropdown">
+            <label class="form-label mb-1" for="region">
+              <span>منطقه</span>
+            </label>
+            <select id="region" name="region" class="form-select" data-placeholder="منطقه را انتخاب کنید ...">
+              <option value="">منطقه را انتخاب کنید ...</option>
+            </select>
+          </div>
+
+          <!-- District -->
+          <div class="mb-3 col ecommerce-select2-dropdown">
+            <label class="form-label mb-1" for="district">ناحیه
+            </label>
+            <select id="district" class="form-select" data-placeholder="ناحیه را انتخاب کنید ...">
+              <option value="">ناحیه را انتخاب کنید ...</option>
+            </select>
+          </div>
+
+          <!-- Type Bread -->
+          <div class="mb-3 col ecommerce-select2-dropdown">
+            <label class="form-label mb-1" for="typeBread">نوع نان
+            </label>
+            <select id="typeBread" class="form-select" data-placeholder="نوع نان را انتخاب کنید ...">
+              <option value="">نوع نان را انتخاب کنید ...</option>
+            </select>
+          </div>
+
+          <!-- Type Bread -->
+          <div class="mb-3 col ecommerce-select2-dropdown">
+            <label class="form-label mb-1" for="typeFlour">نوع آرد
+            </label>
+            <select id="typeFlour" class="form-select" data-placeholder="نوع آرد را انتخاب کنید ...">
+              <option value="">نوع آرد را انتخاب کنید ...</option>
+            </select>
+          </div>
+
+          <!-- Type Bread -->
+          <div class="mb-3 col ecommerce-select2-dropdown">
+            <label class="form-label mb-1" for="secondFuel">سوخت دوم
+            </label>
+            <select id="secondFuel" class="form-select" data-placeholder="نوع سوخت دوم را انتخاب کنید ...">
+              <option value="">نوع سوخت دوم را انتخاب کنید ...</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="demo-inline-spacing justify-content-center d-inline-flex">
+              <button type="button" class="btn rounded-pill btn-label-primary" id="apply_filter">
+                <span class="tf-icons bx bx-plus-circle me-1"></span>اعمال فیلتر
+              </button>
+              <button type="button" class="btn rounded-pill btn-label-secondary" id="clear_filter">
+                <span class="tf-icons bx bx-minus-circle me-1"></span>حذف فیلتر
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-8 col-lg-9 col-xl-9 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="leaflet-map w-100" id="map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--/ Cards with badge -->
+
+
+  <div class="row justify-content-center">
+    <div class="col-12 mb-2">
+      <div class="divider">
+        <div class="divider-text fs-4">نمودار اشعه خورشیدی</div>
+      </div>
+    </div>
+    <div class="col-md-12 col-lg-6 col-xl-6  order-3 order-lg-0 mb-4">
+      <div class="ecommerce-select2-dropdow">
+        <select id="selectColumn" class="select2 form-select" data-placeholder="پارامتر را انتخاب کنید ..."
+          onchange="fetchInfo()">
+          <option value="type_bread">نوع پخت</option>
+          <option value="bread_rations">سهمیه (تعداد کیسه)</option>
+          <option value="type_flour">نوع آرد</option>
+          <option value="household_risk">ریسک خانوار</option>
+          <option value="bakers_risk">ریسک نانوا</option>
+          <option value="ownership_status">نوع ملک نانوایی</option>
+          <option value="number_violations">تعداد تخلفات نانوایی</option>
+          <option value="second_fuel">سوخت دوم</option>
+        </select>
+      </div>
+      <div class="card card-sunburst" id="card-sunburst">
+        <div id="sunburst"></div>
+      </div>
+    </div>
+    <!-- <div class="col-md-12 col-lg-6 col-xl-6  order-3 order-lg-0 mb-4">
+      <div class="card">
+      </div>
+    </div> -->
+  </div>
+
+
+</div>
+{% endblock %}
