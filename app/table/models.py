@@ -32,24 +32,6 @@ class Bakery(BaseModel, UserMixin):
         return f'{self.__class__.__name__} ({self.first_name}, {self.last_name}, {self.nid}, {self.type_bread}, {self.bread_rations})'
 
 
-class RegionInformation(BaseModel):
-    region = db.Column(db.Integer, unique=True, nullable=False)
-    area = db.Column(db.Float, unique=False, nullable=False)
-    population = db.Column(db.Integer, unique=False, nullable=False)
-    population_male = db.Column(db.Integer, unique=False, nullable=False)
-    population_female = db.Column(db.Integer, unique=False, nullable=False)
-    n_households = db.Column(db.Integer, unique=False, nullable=False)
-    
-    def __repr__(self):
-        return f'{self.__class__.__name__} ({self.region}, {self.population})'
-
-
-
-
-
-
-
-
 
 class OwnershipStatus(BaseModel):
     name = db.Column(db.String(60), unique=True, nullable=False)

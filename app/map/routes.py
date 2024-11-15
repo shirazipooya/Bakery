@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, jsonify
 from flask_login import current_user, login_required
 import pandas as pd
-from app.database.models import Bakery, RegionInformation
+from app.database.models import Bakery, Amarnameh
 from app.extensions import db, cache
 from sqlalchemy import distinct
 from sqlalchemy import func
@@ -64,7 +64,7 @@ def home():
         
 #         # Second Database
         
-#         query = RegionInformation.query.filter_by(region=int(option))
+#         query = Amarnameh.query.filter_by(region=int(option))
 #         region_info = [
 #             {
 #                 column: getattr(record, column) for column in record.__table__.columns.keys()

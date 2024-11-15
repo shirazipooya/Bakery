@@ -32,8 +32,13 @@ class Bakery(BaseModel, UserMixin):
         return f'{self.__class__.__name__} ({self.first_name}, {self.last_name}, {self.nid}, {self.type_bread}, {self.bread_rations})'
 
 
-class RegionInformation(BaseModel):
-    region = db.Column(db.Integer, unique=True, nullable=False)
+class Amarnameh(BaseModel):
+    ostan = db.Column(db.String(30), unique=False, nullable=False)
+    shahrestan = db.Column(db.String(30), unique=False, nullable=False)
+    bakhsh = db.Column(db.String(30), unique=False, nullable=False)
+    shahr = db.Column(db.String(30), unique=False, nullable=False)
+    region = db.Column(db.Integer, unique=False, nullable=False)
+    district = db.Column(db.Integer, unique=False, nullable=False)
     area = db.Column(db.Float, unique=False, nullable=False)
     population = db.Column(db.Integer, unique=False, nullable=False)
     population_male = db.Column(db.Integer, unique=False, nullable=False)
@@ -41,7 +46,7 @@ class RegionInformation(BaseModel):
     n_households = db.Column(db.Integer, unique=False, nullable=False)
     
     def __repr__(self):
-        return f'{self.__class__.__name__} ({self.region}, {self.population})'
+        return f'{self.__class__.__name__} ({self.ostan}, {self.shahrestan}, {self.bakhsh}, {self.shahr}, {self.region}, {self.district}, {self.population})'
 
 
 

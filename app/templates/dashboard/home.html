@@ -6,80 +6,83 @@
 
 {% block content %}
 
+<!-- ======================================================================= -->
+<!-- Container -->
+<!-- ======================================================================= -->
 <div class="container-xxl flex-grow-1 container-p-y">
   <div class="row">
-
+    <!-- ------------------------------------------------------------------- -->
+    <!-- Form Control -->
+    <!-- ------------------------------------------------------------------- -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-12 mb-4">
       <div class="card h-100">
         <div class="card-body">
+          <!-- Header -->
           <div class="col-12 mb-2">
             <div class="text-center">
               <div class="fs-5">انتخاب منطقه</div>
             </div>
           </div>
+          <!-- Ostan -->
           <div class="row">
             <div class="col-md-12 mb-4">
-              <label for="selectpickerBasic" class="form-label">استان</label>
-              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
-                <option>خراسان رضوی</option>
-                <option>Pulp Fiction</option>
-                <option>The Godfather</option>
+              <label for="ostan" class="form-label">استان</label>
+              <select id="ostan" class="form-select w-100" data-style="btn-default" data-placeholder="انتخاب کنید ...">
+                <option value="">انتخاب کنید ...</option>
               </select>
             </div>
           </div>
+          <!-- Shahrestan -->
           <div class="row">
             <div class="col-md-12 mb-4">
-              <label for="selectpickerBasic" class="form-label">شهرستان</label>
-              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
-                <option>مشهد</option>
-                <option>Pulp Fiction</option>
-                <option>The Godfather</option>
+              <label for="shahrestan" class="form-label">شهرستان</label>
+              <select id="shahrestan" class="form-select w-100" data-style="btn-default" data-placeholder="انتخاب کنید ...">
+                <option value="">انتخاب کنید ...</option>
               </select>
             </div>
           </div>
+          <!-- Bakhsh -->
           <div class="row">
             <div class="col-md-12 mb-4">
-              <label for="selectpickerBasic" class="form-label">بخش</label>
-              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
-                <option>مرکزی</option>
-                <option>Pulp Fiction</option>
-                <option>The Godfather</option>
+              <label for="bakhsh" class="form-label">بخش</label>
+              <select id="bakhsh" class="form-select w-100" data-style="btn-default" data-placeholder="انتخاب کنید ...">
+                <option value="">انتخاب کنید ...</option>
               </select>
             </div>
           </div>
+          <!-- Shahr / Rosta -->
           <div class="row">
             <div class="col-md-12 mb-4">
-              <label for="selectpickerBasic" class="form-label">شهر / روستایی</label>
-              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
-                <option>مشهد</option>
-                <option>Pulp Fiction</option>
-                <option>The Godfather</option>
+              <label for="shahrRosta" class="form-label">شهر / روستایی</label>
+              <select id="shahrRosta" class="form-select w-100" data-style="btn-default" data-placeholder="انتخاب کنید ...">
+                <option value="">انتخاب کنید ...</option>
               </select>
             </div>
           </div>
+          <!-- Mantagheh -->
           <div class="row">
             <div class="col-md-12 mb-4">
-              <label for="selectpickerBasic" class="form-label">منطقه</label>
-              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
-                <option>منطقه 1</option>
-                <option>Pulp Fiction</option>
-                <option>The Godfather</option>
+              <label for="mantagheh" class="form-label">منطقه</label>
+              <select id="mantagheh" class="form-select w-100" data-style="btn-default" data-placeholder="انتخاب کنید ...">
+                <option value="">انتخاب کنید ...</option>
               </select>
             </div>
           </div>
+          <!-- Nahyeh -->
           <div class="row">
             <div class="col-md-12 mb-4">
-              <label for="selectpickerBasic" class="form-label">ناحیه</label>
-              <select id="selectpickerBasic" class="selectpicker w-100" data-style="btn-default">
-                <option>ناحیه 1</option>
-                <option>Pulp Fiction</option>
-                <option>The Godfather</option>
+              <label for="nahyeh" class="form-label">ناحیه</label>
+              <select id="nahyeh" class="form-select w-100" data-style="btn-default" data-placeholder="انتخاب کنید ...">
+                <option value="">انتخاب کنید ...</option>
               </select>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- ------------------------------------------------------------------- -->
+    <!-- /Form Control -->
+    <!-- ------------------------------------------------------------------- -->
     <div class="col-lg-9 col-md-8 col-sm-8 col-12 mb-4">
       <div class="row">
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
@@ -89,8 +92,8 @@
                 <span class="avatar-initial rounded-circle bg-label-success"><i
                     class="bx bxs-store-alt fs-3"></i></span>
               </div>
-              <span class="d-block mb-1 text-nowrap">تعداد نانوایی</span>
-              <h2 class="mb-0 pt-1" id="region_info_number_bakers">-</h2>
+              <span class="d-block mb-1 text-nowrap">تعداد نانوایی‌ها</span>
+              <h2 class="mb-0 pt-1" id="number_of_bakeries">-</h2>
             </div>
           </div>
         </div>
@@ -102,7 +105,7 @@
                     class="bx bxs-building-house fs-3"></i></span>
               </div>
               <span class="d-block mb-1 text-nowrap">تعداد خانوار</span>
-              <h2 class="mb-0 pt-1" id="region_info_n_households">-</h2>
+              <h2 class="mb-0 pt-1" id="number_of_households">-</h2>
             </div>
           </div>
         </div>
@@ -112,9 +115,8 @@
               <div class="avatar avatar-md mx-auto mb-3">
                 <span class="avatar-initial rounded-circle bg-label-danger"><i class="bx bx-map-alt fs-3"></i></span>
               </div>
-
               <span class="d-block mb-1 text-nowrap">مساحت (هکتار)</span>
-              <h2 class="mb-0 pt-1" id="region_info_area">-</h2>
+              <h2 class="mb-0 pt-1" id="area">-</h2>
             </div>
           </div>
         </div>
@@ -126,7 +128,7 @@
                     class="bx bx-male-female fs-3"></i></span>
               </div>
               <span class="d-block mb-1 text-nowrap">جمعیت</span>
-              <h2 class="mb-0 pt-1" id="region_info_population">-</h2>
+              <h2 class="mb-0 pt-1" id="population">-</h2>
             </div>
           </div>
         </div>
@@ -137,7 +139,7 @@
                 <span class="avatar-initial rounded-circle bg-label-info"><i class="bx bx-male fs-3"></i></span>
               </div>
               <span class="d-block mb-1 text-nowrap">جمعیت (مرد)</span>
-              <h2 class="mb-0 pt-1" id="region_info_population_male">-</h2>
+              <h2 class="mb-0 pt-1" id="population_male">-</h2>
             </div>
           </div>
         </div>
@@ -148,7 +150,7 @@
                 <span class="avatar-initial rounded-circle bg-label-danger"><i class="bx bx-female fs-3"></i></span>
               </div>
               <span class="d-block mb-1 text-nowrap">جمعیت (زن)</span>
-              <h2 class="mb-0 pt-1" id="region_info_population_female">-</h2>
+              <h2 class="mb-0 pt-1" id="population_female">-</h2>
             </div>
           </div>
         </div>
@@ -161,12 +163,12 @@
                 <div class="avatar me-2">
                   <span class="avatar-initial rounded bg-label-info"><i class="bx bx-male"></i></span>
                 </div>
-                <h2 class="ms-1 mb-0" id="region_info_population_bakery_1">-</h2>
+                <h2 class="ms-1 mb-0" id="population_number_of_bakeries_1">-</h2>
               </div>
               <h5 class="mb-0">
                 <small class="text-muted">به ازای هر </small>
-                <span class="fw-medium me-1" id="region_info_population_bakery_2">-</span>
-                <small class="text-muted">نفر، یک عدد نانوایی</small>
+                <span class="fw-medium me-1" id="population_number_of_bakeries_2">-</span>
+                <small class="text-muted">نفر، <span class="text-dark fw-medium">یک عدد</span> نانوایی</small>
               </h5>
             </div>
           </div>
@@ -178,12 +180,12 @@
                 <div class="avatar me-2">
                   <span class="avatar-initial rounded bg-label-success"><i class="bx bxs-store-alt"></i></span>
                 </div>
-                <h2 class="ms-1 mb-0" id="region_info_households_bakery_1">-</h2>
+                <h2 class="ms-1 mb-0" id="households_number_of_bakeries_1">-</h2>
               </div>
               <h5 class="mb-0">
                 <small class="text-muted">به ازای هر </small>
-                <span class="fw-medium me-1" id="region_info_households_bakery_2">-</span>
-                <small class="text-muted">خانواده، یک عدد نانوایی</small>
+                <span class="fw-medium me-1" id="households_number_of_bakeries_2">-</span>
+                <small class="text-muted">خانواده، <span class="text-dark fw-medium">یک عدد</span> نانوایی</small>
               </h5>
             </div>
           </div>
@@ -195,12 +197,12 @@
                 <div class="avatar me-2">
                   <span class="avatar-initial rounded bg-label-danger"><i class="bx bx-map-alt"></i></span>
                 </div>
-                <h2 class="ms-1 mb-0" id="region_info_area_bakery_1">-</h2>
+                <h2 class="ms-1 mb-0" id="area_number_of_bakeries_1">-</h2>
               </div>
               <h5 class="mb-0">
                 <small class="text-muted">به ازای هر </small>
-                <span class="fw-medium me-1" id="region_info_area_bakery_2"></span>
-                <small class="text-muted">هکتار، یک عدد نانوایی</small>
+                <span class="fw-medium me-1" id="area_number_of_bakeries_2"></span>
+                <small class="text-muted">هکتار، <span class="text-dark fw-medium">یک عدد</span> نانوایی</small>
               </h5>
             </div>
           </div>
@@ -212,13 +214,13 @@
                 <div class="avatar me-2">
                   <span class="avatar-initial rounded bg-label-info"><i class='bx bx-square-rounded'></i></span>
                 </div>
-                <h2 class="ms-1 mb-0" id="region_info_ration_population_1">-</h2>
+                <h2 class="ms-1 mb-0" id="population_bread_rations_1">-</h2>
               </div>
               <h5 class="mb-0">
                 <small class="text-muted">به ازای هر </small>
                 <span class="fw-medium me-1">100</span>
                 <small class="text-muted">نفر،</small>
-                <span class="fw-medium me-1" id="region_info_ration_population_2">-</span>
+                <span class="fw-medium me-1" id="population_bread_rations_2">-</span>
                 <small class="text-muted">کیسه سهمیه آرد</small>
               </h5>
             </div>
@@ -226,11 +228,8 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="row">
-
     <!-- Top Referrals -->
-    <div class="col-md-6 col-xl-4 col-xxl-3 order-3 order-lg-0 mb-4 text-center">
+    <div class="col-md-6 col-xl-3 col-xxl-3 order-3 order-lg-0 mb-4 text-center">
       <div class="card h-100">
         <div class="card-body justify-content-center align-items-center ">
           <div class="avatar avatar-md mx-auto mb-3">
@@ -264,7 +263,7 @@
     <!--/ Top Referrals -->
 
     <!-- BreadRations -->
-    <div class="col-md-6 col-xl-4 col-xxl-3 order-3 order-lg-0 mb-4">
+    <div class="col-md-6 col-xl-3 col-xxl-3 order-3 order-lg-0 mb-4">
       <div class="card h-100">
         <div class="card-header">
           <h4 class="card-title mb-2">سهمیه (تعداد کیسه)</h4>
@@ -360,7 +359,7 @@
     <!-- / BreadRations -->
 
     <!-- TypeBread -->
-    <div class="col-md-6 col-xl-4 col-xxl-3 order-3 order-lg-0 mb-4">
+    <div class="col-md-6 col-xl-3 col-xxl-3 order-3 order-lg-0 mb-4">
       <div class="card h-100">
         <div class="card-header">
           <h4 class="card-title mb-2">نوع پخت</h4>
@@ -428,7 +427,7 @@
     <!-- / TypeBread -->
 
     <!-- TypeFlour -->
-    <div class="col-md-6 col-xl-4 col-xxl-3 order-3 order-lg-0 mb-4">
+    <div class="col-md-6 col-xl-3 col-xxl-3 order-3 order-lg-0 mb-4">
       <div class="card h-100">
         <div class="card-header">
           <h4 class="card-title mb-2">نوع آرد</h4>
@@ -522,10 +521,8 @@
     </div>
     <!-- / TypeFlour -->
 
-  </div>
-  <div class="row">
     <!-- BakersRisk -->
-    <div class="col-md-6 col-lg-6 col-xl-6  order-3 order-lg-0 mb-4">
+    <div class="col-md-12 col-lg-6 col-xl-6  order-3 order-lg-0 mb-4">
       <div class="card h-100">
         <div class="card-header d-flex align-items-center justify-content-between">
           <div class="card-title mb-0">
@@ -541,7 +538,7 @@
     <!-- / BakersRisk -->
 
     <!-- HouseholdRisk -->
-    <div class="col-md-6 col-lg-6 col-xl-6  order-3 order-lg-0 mb-4">
+    <div class="col-md-12 col-lg-6 col-xl-6  order-3 order-lg-0 mb-4">
       <div class="card h-100">
         <div class="card-header d-flex align-items-center justify-content-between">
           <div class="card-title mb-0">
@@ -557,5 +554,8 @@
     <!-- / HouseholdRisk -->
   </div>
 </div>
+<!-- ======================================================================= -->
+<!-- /Container -->
+<!-- ======================================================================= -->
 
 {% endblock %}

@@ -41,7 +41,7 @@ db.init_app(app)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 from app.users.models import User
-from app.database.models import Bakery, RegionInformation, OwnershipStatus, SecondFuel, HouseholdRisk, BakersRisk, TypeFlour, TypeBread
+from app.database.models import Bakery, Amarnameh, OwnershipStatus, SecondFuel, HouseholdRisk, BakersRisk, TypeFlour, TypeBread
 migrate.init_app(app=app, db=db)
 login_manager.init_app(app=app)
 bcrypt.init_app(app=app)
