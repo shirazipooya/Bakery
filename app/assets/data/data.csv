@@ -1,4 +1,4 @@
-﻿first_name,last_name,nid,phone,bakery_id,ownership_status,number_violations,second_fuel,city,lat,lon,household_risk,bakers_risk,type_flour,type_bread,bread_rations
+﻿first_name,last_name,nid,phone,bakery_id,ownership_status,number_violations,second_fuel,city,lat,lon,household_risk,bakers_risk,flour_types,bread_types,bread_rations
 نرگس,رحيمي,930807847,,,,,,مشهد,25.25,35.35,خیلی پرریسک,خیلی پرریسک,1,بربری,69
 مريم,کلات ملايي,69539081,,,,,,مشهد,,,پرریسک,پرریسک,2,سنگک,119
 مجتبي,پيري ديسفاني,83093079,,,,,,مشهد,36.39610757,59.6739866,ریسک متوسط,ریسک متوسط,3,لواش,225

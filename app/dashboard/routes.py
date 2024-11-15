@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, jsonify
 from flask_login import current_user, login_required
 import pandas as pd
-from app.database.models import Bakery, Amarnameh
+from app.database.models import Bakery, Amarnameh, TypeBread, TypeFlour, SecondFuel
 from app.extensions import db, cache
 from sqlalchemy import distinct
 from sqlalchemy import func
@@ -18,13 +18,73 @@ blueprint = Blueprint(
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
+# Utils
+# ------------------------------------------------------------------------------
+bread_types_data_init = None
+flour_types_data_init = None
+second_fuel_data_init = None
+
+
+# ------------------------------------------------------------------------------
 # Home Page
 # ------------------------------------------------------------------------------
 @blueprint.route('/')
 @login_required
 def home():
-    return render_template(template_name_or_list='dashboard/home.html')
-
+    colors = ["#FF0000", "#0AFF99", "#FF8700", "#0AEFFF", "#FFD300", "#147DF5", "#DEFF0A", "#580AFF", "#A1FF0A", "#BE0AFF", "#0b3954", "#087e8b", "#ff6f02", "#bfd7ea", "#d90368"]
+    
+    # Bread Types
+    unique_bread_types = db.session.query(TypeBread.name).distinct().all()
+    bread_types_names = [bread[0] for bread in unique_bread_types]
+    global bread_types_data_init 
+    bread_types_data_init = [
+        {
+            "name": bread_types_name,
+            "code": chr(65 + index),
+            "color": colors[index % len(colors)],
+            "count": 0,
+            "percent": 0
+        }
+        for index, bread_types_name in enumerate(bread_types_names)
+    ]
+    
+    # Flour Types
+    unique_flour_types = db.session.query(TypeFlour.name).distinct().all()
+    flour_types_names = [bread[0] for bread in unique_flour_types]
+    global flour_types_data_init 
+    flour_types_data_init = [
+        {
+            "name": flour_types_name,
+            "code": chr(65 + index),
+            "color": colors[index % len(colors)],
+            "count": 0,
+            "percent": 0
+        }
+        for index, flour_types_name in enumerate(flour_types_names)
+    ]
+    
+    
+    # Second Fuel
+    unique_second_fuel = db.session.query(SecondFuel.name).distinct().all()
+    second_fuel_names = [bread[0] for bread in unique_second_fuel]
+    global second_fuel_data_init 
+    second_fuel_data_init = [
+        {
+            "name": second_fuel_name,
+            "code": chr(65 + index),
+            "color": colors[index % len(colors)],
+            "count": 0,
+            "percent": 0
+        }
+        for index, second_fuel_name in enumerate(second_fuel_names)
+    ]
+    
+    return render_template(
+        template_name_or_list='dashboard/home.html',
+        bread_types=bread_types_data_init,
+        flour_types=flour_types_data_init,
+        second_fuel=second_fuel_data_init
+    )
 
 # ==============================================================================
 # API
@@ -156,18 +216,117 @@ def load_dashboard_data(ostan, shahrestan, bakhsh, shahrRosta, mantagheh, nahyeh
     population_number_of_bakeries = round(number=population / number_of_bakeries, ndigits=0) if number_of_bakeries > 0 else "-"
     households_number_of_bakeries = round(number=number_of_households / number_of_bakeries, ndigits=0) if number_of_bakeries > 0 else "-"
     area_number_of_bakeries = round(number=area / number_of_bakeries, ndigits=0) if number_of_bakeries > 0 and area != 0 else "-"
-    population_bread_rations = round(number=(query_bakery.with_entities(func.sum(Bakery.bread_rations)).scalar() * 100) / population, ndigits=0) or 0
+    try:
+        population_bread_rations = round(number=(query_bakery.with_entities(func.sum(Bakery.bread_rations)).scalar() * 100) / population, ndigits=0)
+    except:
+        population_bread_rations = 0
+    
+    # --------------------------------------------------------------------------
+    # Bread Types Data
+    # --------------------------------------------------------------------------
+    global bread_types_data_init
+    bread_types_data_updated = bread_types_data_init.copy()
+        
+    bread_types_cat = (
+        query_bakery
+        .with_entities(Bakery.bread_types, func.count(Bakery.bread_types))
+        .group_by(Bakery.bread_types)
+        .all()
+    )
+     
+    bread_types_cat_dic = [
+        {
+            "name": bread_type,
+            "count": int(count),
+            "percent": round(count * 100 / number_of_bakeries, 1)
+        } for bread_type, count in bread_types_cat
+    ]
+    
+    for item2 in bread_types_data_updated:
+        match = next((item1 for item1 in bread_types_cat_dic if item1['name'] == item2['name']), None)
+        if match:
+            item2['count'] = match['count']
+            item2['percent'] = match['percent']
+        else:
+            item2['count'] = 0
+            item2['percent'] = 0
+                
+    
+    # --------------------------------------------------------------------------
+    # Flour Types Data
+    # --------------------------------------------------------------------------
+    global flour_types_data_init
+    flour_types_data_updated = flour_types_data_init.copy()
+        
+    flour_types_cat = (
+        query_bakery
+        .with_entities(Bakery.flour_types, func.count(Bakery.flour_types))
+        .group_by(Bakery.flour_types)
+        .all()
+    )
+     
+    flour_types_cat_dic = [
+        {
+            "name": flour_type,
+            "count": int(count),
+            "percent": round(count * 100 / number_of_bakeries, 1)
+        } for flour_type, count in flour_types_cat
+    ]
+    
+    for item2 in flour_types_data_updated:
+        match = next((item1 for item1 in flour_types_cat_dic if item1['name'] == item2['name']), None)
+        if match:
+            item2['count'] = match['count']
+            item2['percent'] = match['percent']
+        else:
+            item2['count'] = 0
+            item2['percent'] = 0
+    
+    # --------------------------------------------------------------------------
+    # Second Fuel Data
+    # --------------------------------------------------------------------------
+    global second_fuel_data_init
+    second_fuel_data_updated = second_fuel_data_init.copy()
+        
+    second_fuel_cat = (
+        query_bakery
+        .with_entities(Bakery.second_fuel, func.count(Bakery.second_fuel))
+        .group_by(Bakery.second_fuel)
+        .all()
+    )
+     
+    second_fuel_cat_dic = [
+        {
+            "name": second_fuel,
+            "count": int(count),
+            "percent": round(count * 100 / number_of_bakeries, 1)
+        } for second_fuel, count in second_fuel_cat
+    ]
+    
+    for item2 in second_fuel_data_updated:
+        match = next((item1 for item1 in second_fuel_cat_dic if item1['name'] == item2['name']), None)
+        if match:
+            item2['count'] = match['count']
+            item2['percent'] = match['percent']
+        else:
+            item2['count'] = 0
+            item2['percent'] = 0
+
+    
     response = {
-        'number_of_bakeries': number_of_bakeries,
-        'number_of_households': number_of_households ,
+        'number_of_bakeries': number_of_bakeries if number_of_bakeries != 0 else "-",
+        'number_of_households': number_of_households if number_of_households != 0 else "-" ,
         'area': area if area != 0 else "-" ,
-        'population': population ,
-        'population_male': population_male ,
-        'population_female': population_female ,
-        'population_number_of_bakeries': population_number_of_bakeries,
-        'households_number_of_bakeries': households_number_of_bakeries,
-        'area_number_of_bakeries': area_number_of_bakeries,
-        'population_bread_rations': population_bread_rations,
+        'population': population if population != 0 else "-" ,
+        'population_male': population_male if population_male != 0 else "-" ,
+        'population_female': population_female if population_female != 0 else "-" ,
+        'population_number_of_bakeries': population_number_of_bakeries if population_number_of_bakeries != 0 else "-",
+        'households_number_of_bakeries': households_number_of_bakeries if households_number_of_bakeries != 0 else "-",
+        'area_number_of_bakeries': area_number_of_bakeries if area_number_of_bakeries != 0 else "-",
+        'population_bread_rations': population_bread_rations if population_bread_rations != 0 else "-",
+        'bread_types_data_updated': bread_types_data_updated,
+        'flour_types_data_updated': flour_types_data_updated,
+        'second_fuel_data_updated': second_fuel_data_updated,
     }
     
     return jsonify(response)
@@ -208,11 +367,11 @@ def load_dashboard_data(ostan, shahrestan, bakhsh, shahrRosta, mantagheh, nahyeh
         
 #         df = pd.DataFrame(data)
         
-#         type_bread_cat = df.groupby("type_bread")["type_bread"].count().to_dict()
-#         type_bread_cat = {k: int(v) for k, v in type_bread_cat.items()}
+#         bread_types_cat = df.groupby("bread_types")["bread_types"].count().to_dict()
+#         bread_types_cat = {k: int(v) for k, v in bread_types_cat.items()}
         
-#         type_flour_cat = df.groupby("type_flour")["type_flour"].count().to_dict()
-#         type_flour_cat = {k: int(v) for k, v in type_flour_cat.items()}
+#         flour_types_cat = df.groupby("flour_types")["flour_types"].count().to_dict()
+#         flour_types_cat = {k: int(v) for k, v in flour_types_cat.items()}
         
 #         bakers_risk_cat = df.groupby("bakers_risk")["bakers_risk"].count().to_dict()
 #         bakers_risk_cat = {k: int(v) for k, v in bakers_risk_cat.items()}
@@ -240,8 +399,8 @@ def load_dashboard_data(ostan, shahrestan, bakhsh, shahrRosta, mantagheh, nahyeh
 #         response = {
 #             'data': data,
 #             'number_of_row': len(data),
-#             'type_bread_cat': type_bread_cat,
-#             'type_flour_cat': type_flour_cat,
+#             'bread_types_cat': bread_types_cat,
+#             'flour_types_cat': flour_types_cat,
 #             'bakers_risk_cat': bakers_risk_cat,
 #             'household_risk_cat': household_risk_cat,
 #             'bread_rations_cat': bread_rations_cat,
@@ -317,10 +476,10 @@ def load_dashboard_data(ostan, shahrestan, bakhsh, shahrRosta, mantagheh, nahyeh
 #         filters.append(Bakery.district == district)
 
 #     if typebread != "999":
-#         filters.append(Bakery.type_bread == typebread)
+#         filters.append(Bakery.bread_types == typebread)
 
 #     if typeflour != "999":
-#         filters.append(Bakery.type_flour == typeflour)
+#         filters.append(Bakery.flour_types == typeflour)
 
 #     if secondfuel != "999":
 #         filters.append(Bakery.second_fuel == secondfuel)
@@ -344,20 +503,20 @@ def load_dashboard_data(ostan, shahrestan, bakhsh, shahrRosta, mantagheh, nahyeh
 #     return jsonify(response)
 
 
-# @blueprint.route(rule='/api/dashboard/type_bread', methods=['GET'])
+# @blueprint.route(rule='/api/dashboard/bread_types', methods=['GET'])
 # @login_required
-# def type_bread_data():
-#     query = Bakery.query.with_entities(Bakery.type_bread).distinct()
-#     type_bread = query.all()
-#     data = sorted([tb[0] for tb in type_bread])
+# def bread_types_data():
+#     query = Bakery.query.with_entities(Bakery.bread_types).distinct()
+#     bread_types = query.all()
+#     data = sorted([tb[0] for tb in bread_types])
 #     return jsonify(data)
 
-# @blueprint.route(rule='/api/dashboard/type_flour', methods=['GET'])
+# @blueprint.route(rule='/api/dashboard/flour_types', methods=['GET'])
 # @login_required
-# def type_flour_data():
-#     query = Bakery.query.with_entities(Bakery.type_flour).distinct()
-#     type_flour = query.all()
-#     data = sorted([tb[0] for tb in type_flour])
+# def flour_types_data():
+#     query = Bakery.query.with_entities(Bakery.flour_types).distinct()
+#     flour_types = query.all()
+#     data = sorted([tb[0] for tb in flour_types])
 #     return jsonify(data)
 
 # @blueprint.route(rule='/api/dashboard/second_fuel', methods=['GET'])

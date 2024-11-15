@@ -41,8 +41,8 @@ def home():
             lon = form.lon.data,
             household_risk = form.household_risk.data,
             bakers_risk = form.bakers_risk.data,
-            type_flour = int(form.type_flour.data),
-            type_bread = form.type_bread.data,
+            flour_types = int(form.flour_types.data),
+            bread_types = form.bread_types.data,
             bread_rations = form.bread_rations.data,
         )
         db.session.add(bakery)
@@ -136,8 +136,8 @@ def update_record(id):
         bakery.lon = data.get('lon')
         bakery.household_risk = data.get('household_risk')
         bakery.bakers_risk = data.get('bakers_risk')
-        bakery.type_flour = data.get('type_flour')
-        bakery.type_bread = data.get('type_bread')
+        bakery.flour_types = data.get('flour_types')
+        bakery.bread_types = data.get('bread_types')
         bakery.bread_rations = data.get('bread_rations')
         db.session.commit()
         return jsonify({'message': 'Bakery Updated Successfully'})

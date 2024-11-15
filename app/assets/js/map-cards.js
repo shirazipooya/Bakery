@@ -304,7 +304,7 @@
                                 </tr>
                                 <tr>
                                     <th>نوع آرد</th>
-                                    <td>${row.type_flour}</td>
+                                    <td>${row.flour_types}</td>
                                 </tr>
                                  <tr>
                                     <th>تعداد تخلفات نانوایی</th>
@@ -320,7 +320,7 @@
                                 </tr>
                                 <tr>
                                     <th>نوع پخت</th>
-                                    <td>${row.type_bread}</td>
+                                    <td>${row.bread_types}</td>
                                 </tr>
                                 <tr>
                                     <th>سهمیه (تعداد کیسه)</th>

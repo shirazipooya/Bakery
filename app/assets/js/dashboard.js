@@ -99,12 +99,53 @@
         area_number_of_bakeries_2.innerHTML = numberWithCommas(data.area_number_of_bakeries);
         population_bread_rations_1.innerHTML = numberWithCommas(data.population_bread_rations);
         population_bread_rations_2.innerHTML = numberWithCommas(data.population_bread_rations);
+
+        breadTypesCard(data);
+        flourTypesCard(data);
+        secondFuelCard(data);
     };
 
+    // -------------------------------------------------------------------------
+    // Bread Types Card
+    // -------------------------------------------------------------------------
+    function breadTypesCard(data) {            
+        data.bread_types_data_updated.forEach((item) => {
+            const count = item.count || 0;
+            const percent = item.percent.toFixed(0);
+            document.getElementById(`BreadType_${item.code}_Count`).innerHTML = count;
+            document.getElementById(`BreadType_${item.code}_Percent`).innerHTML = `(${percent}%)`;
+            document.getElementById(`BreadType_${item.code}_Bar`).style.width = `${percent}%`;
+        });
+    }
 
 
+    // -------------------------------------------------------------------------
+    // Flour Types Card
+    // -------------------------------------------------------------------------
+    function flourTypesCard(data) {            
+        data.flour_types_data_updated.forEach((item) => {
+            const count = item.count || 0;
+            const percent = item.percent.toFixed(0);
+            document.getElementById(`FlourType_${item.code}_Count`).innerHTML = count;
+            document.getElementById(`FlourType_${item.code}_Percent`).innerHTML = `(${percent}%)`;
+            document.getElementById(`FlourType_${item.code}_Bar`).style.width = `${percent}%`;
+        });
+    }
 
 
+    // -------------------------------------------------------------------------
+    // Seconf Fuel
+    // -------------------------------------------------------------------------
+    function secondFuelCard(data) {            
+        data.second_fuel_data_updated.forEach((item) => {
+            const count = item.count || 0;
+            const percent = item.percent.toFixed(0);
+            document.getElementById(`SecondFuel_${item.code}_Count`).innerHTML = count;
+            document.getElementById(`SecondFuel_${item.code}_Percent`).innerHTML = `(${percent}%)`;
+            document.getElementById(`SecondFuel_${item.code}_Bar`).style.width = `${percent}%`;
+        });
+    }
+    
 
     // =========================================================================
     // Form Control
@@ -412,7 +453,7 @@
     // function updateTypeBread(data) {
     //     const breadTypes = ["سنگک", "بربری", "تافتون", "لواش"];
     //     breadTypes.forEach((type, index) => {
-    //         const count = data.type_bread_cat[type] || 0;
+    //         const count = data.bread_types_cat[type] || 0;
     //         const tmp = ((count * 100) / (data.number_of_row || 1)).toFixed(0); // avoid division by zero
     //         document.getElementById(
     //             `TypeBread_${String.fromCharCode(65 + index)}_Count`
@@ -429,7 +470,7 @@
     // function updateTypeFlour(data) {
     //     const flourTypes = ["1", "2", "3", "4", "5", "6"];
     //     flourTypes.forEach((type, index) => {
-    //         const count = data.type_flour_cat[type] || 0;
+    //         const count = data.flour_types_cat[type] || 0;
     //         const tmp = ((count * 100) / (data.number_of_row || 1)).toFixed(0);
     //         document.getElementById(
     //             `TypeFlour_${String.fromCharCode(65 + index)}_Count`

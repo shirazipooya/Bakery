@@ -218,7 +218,7 @@ class BakeryForm(FlaskForm):
     )
 
     
-    type_bread = SelectField(
+    bread_types = SelectField(
         label='نوع پخت',
         validators=[
             # DataRequired(),
@@ -233,7 +233,7 @@ class BakeryForm(FlaskForm):
     )
     
       
-    type_flour = SelectField(
+    flour_types = SelectField(
         label='نوع آرد',
         validators=[
             # DataRequired(),

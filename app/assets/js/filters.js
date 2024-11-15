@@ -60,7 +60,7 @@
 //     });
 
 //     async function get_typeBread() {
-//         const response = await fetch('/api/dashboard/type_bread');
+//         const response = await fetch('/api/dashboard/bread_types');
 //         const data = await response.json();
 //         data.forEach(typeBread => {
 //             let option = document.createElement('option');
@@ -71,7 +71,7 @@
 //     };
 
 //     async function get_typeFlour() {
-//         const response = await fetch('/api/dashboard/type_flour');
+//         const response = await fetch('/api/dashboard/flour_types');
 //         const data = await response.json();
 //         data.forEach(typeFlour => {
 //             let option = document.createElement('option');

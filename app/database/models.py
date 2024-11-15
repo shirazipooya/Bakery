@@ -24,12 +24,12 @@ class Bakery(BaseModel, UserMixin):
     lon = db.Column(db.Float, unique=False, nullable=False)
     household_risk = db.Column(db.String(30), unique=False, nullable=True)
     bakers_risk = db.Column(db.String(30), unique=False, nullable=True)
-    type_flour = db.Column(db.String(30), unique=False, nullable=True)
-    type_bread = db.Column(db.String(30), unique=False, nullable=True)
+    flour_types = db.Column(db.String(30), unique=False, nullable=True)
+    bread_types = db.Column(db.String(30), unique=False, nullable=True)
     bread_rations = db.Column(db.Integer, unique=False, nullable=True)    
     
     def __repr__(self):
-        return f'{self.__class__.__name__} ({self.first_name}, {self.last_name}, {self.nid}, {self.type_bread}, {self.bread_rations})'
+        return f'{self.__class__.__name__} ({self.first_name}, {self.last_name}, {self.nid}, {self.bread_types}, {self.bread_rations})'
 
 
 class Amarnameh(BaseModel):

@@ -51,10 +51,10 @@ def all_items():
     if column == "bakers_risk":
         items = sorted([x[0] for x in db.session.query(BakersRisk.name).all()])
         return jsonify(items)
-    if column == "type_flour":
+    if column == "flour_types":
         items = sorted([x[0] for x in db.session.query(TypeFlour.name).all()])
         return jsonify(items)
-    if column == "type_bread":
+    if column == "bread_types":
         items = sorted([x[0] for x in db.session.query(TypeBread.name).all()])
         return jsonify(items)
 
@@ -106,7 +106,7 @@ def add_category():
         else:
             return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
     
-    if column == "type_flour":
+    if column == "flour_types":
         items = [x[0] for x in db.session.query(TypeFlour.name).all()]
         if new_category not in items:               
             item = TypeFlour(name=new_category)
@@ -116,7 +116,7 @@ def add_category():
         else:
             return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
     
-    if column == "type_bread":
+    if column == "bread_types":
         items = [x[0] for x in db.session.query(TypeBread.name).all()]
         if new_category not in items:               
             item = TypeBread(name=new_category)

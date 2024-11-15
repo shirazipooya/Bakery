@@ -43,11 +43,11 @@ def home():
         
 #         df = pd.DataFrame(data)
         
-#         type_bread_cat = df.groupby("type_bread")["type_bread"].count().to_dict()
-#         type_bread_cat = {k: int(v) for k, v in type_bread_cat.items()}
+#         bread_types_cat = df.groupby("bread_types")["bread_types"].count().to_dict()
+#         bread_types_cat = {k: int(v) for k, v in bread_types_cat.items()}
         
-#         type_flour_cat = df.groupby("type_flour")["type_flour"].count().to_dict()
-#         type_flour_cat = {k: int(v) for k, v in type_flour_cat.items()}
+#         flour_types_cat = df.groupby("flour_types")["flour_types"].count().to_dict()
+#         flour_types_cat = {k: int(v) for k, v in flour_types_cat.items()}
         
 #         bakers_risk_cat = df.groupby("bakers_risk")["bakers_risk"].count().to_dict()
 #         bakers_risk_cat = {k: int(v) for k, v in bakers_risk_cat.items()}
@@ -75,8 +75,8 @@ def home():
 #         response = {
 #             'data': data,
 #             'number_of_row': len(data),
-#             'type_bread_cat': type_bread_cat,
-#             'type_flour_cat': type_flour_cat,
+#             'bread_types_cat': bread_types_cat,
+#             'flour_types_cat': flour_types_cat,
 #             'bakers_risk_cat': bakers_risk_cat,
 #             'household_risk_cat': household_risk_cat,
 #             'bread_rations_cat': bread_rations_cat,
@@ -191,10 +191,10 @@ def home():
 #         filters.append(Bakery.district == district)
 
 #     if typebread != "999":
-#         filters.append(Bakery.type_bread == typebread)
+#         filters.append(Bakery.bread_types == typebread)
 
 #     if typeflour != "999":
-#         filters.append(Bakery.type_flour == typeflour)
+#         filters.append(Bakery.flour_types == typeflour)
 
 #     if secondfuel != "999":
 #         filters.append(Bakery.second_fuel == secondfuel)
@@ -218,20 +218,20 @@ def home():
 #     return jsonify(response)
 
 
-# @blueprint.route(rule='/api/dashboard/type_bread', methods=['GET'])
+# @blueprint.route(rule='/api/dashboard/bread_types', methods=['GET'])
 # @login_required
-# def type_bread_data():
-#     query = Bakery.query.with_entities(Bakery.type_bread).distinct()
-#     type_bread = query.all()
-#     data = sorted([tb[0] for tb in type_bread])
+# def bread_types_data():
+#     query = Bakery.query.with_entities(Bakery.bread_types).distinct()
+#     bread_types = query.all()
+#     data = sorted([tb[0] for tb in bread_types])
 #     return jsonify(data)
 
-# @blueprint.route(rule='/api/dashboard/type_flour', methods=['GET'])
+# @blueprint.route(rule='/api/dashboard/flour_types', methods=['GET'])
 # @login_required
-# def type_flour_data():
-#     query = Bakery.query.with_entities(Bakery.type_flour).distinct()
-#     type_flour = query.all()
-#     data = sorted([tb[0] for tb in type_flour])
+# def flour_types_data():
+#     query = Bakery.query.with_entities(Bakery.flour_types).distinct()
+#     flour_types = query.all()
+#     data = sorted([tb[0] for tb in flour_types])
 #     return jsonify(data)
 
 # @blueprint.route(rule='/api/dashboard/second_fuel', methods=['GET'])

@@ -50,8 +50,8 @@ function loadBakeriesTable() {
                         <td>${bakery.second_fuel}</td>
                         <td>${bakery.household_risk}</td>
                         <td>${bakery.bakers_risk}</td>
-                        <td>${bakery.type_flour}</td>
-                        <td>${bakery.type_bread}</td>
+                        <td>${bakery.flour_types}</td>
+                        <td>${bakery.bread_types}</td>
                         <td>${bakery.bread_rations}</td>
                         <td>${bakery.ostan}</td>
                         <td>${bakery.shahrestan}</td>
@@ -130,8 +130,8 @@ function showEditModal(id) {
         $('#editLon').val(bakery.lon);
         $('#editHouseholdRisk').val(bakery.household_risk).change();
         $('#editBakersRisk').val(bakery.bakers_risk).change();
-        $('#editTypeFlour').val(bakery.type_flour).change();
-        $('#editTypeBread').val(bakery.type_bread).change();
+        $('#editTypeFlour').val(bakery.flour_types).change();
+        $('#editTypeBread').val(bakery.bread_types).change();
         $('#editBreadRations').val(bakery.bread_rations);
         $('#editModal').modal('show');
     });
@@ -156,8 +156,8 @@ $('#editForm').on('submit', function(event) {
         lon: $('#editLon').val(),
         household_risk: $('#editHouseholdRisk').val(),
         bakers_risk: $('#editBakersRisk').val(),
-        type_flour: $('#editTypeFlour').val(),
-        type_bread: $('#editTypeBread').val(),
+        flour_types: $('#editTypeFlour').val(),
+        bread_types: $('#editTypeBread').val(),
         bread_rations: $('#editBreadRations').val(),
     };
 

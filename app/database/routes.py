@@ -118,8 +118,8 @@ def clean_csv_file(df):
         'lon', #Done
         'household_risk', #Done
         'bakers_risk', #Done
-        'type_flour', #Done
-        'type_bread', #Done
+        'flour_types', #Done
+        'bread_types', #Done
         'number_violations', #Done
         'bread_rations' #Done
     ]
@@ -292,13 +292,13 @@ def clean_csv_file(df):
         emit(warnings=warnings, message=f"⚠️ ستون «ریسک نانوا» دارای {df['bakers_risk'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
     
     
-    # type_flour:
-    df['type_flour'] = df['type_flour'].fillna('نامشخص')
-    df['type_flour'] = df['type_flour'].replace("0", 'نامشخص')
-    df['type_flour'] = df['type_flour'].astype(str)
-    df = virastar(df=df, columns=['type_flour'])
+    # flour_types:
+    df['flour_types'] = df['flour_types'].fillna('نامشخص')
+    df['flour_types'] = df['flour_types'].replace("0", 'نامشخص')
+    df['flour_types'] = df['flour_types'].astype(str)
+    df = virastar(df=df, columns=['flour_types'])
     
-    tf_df_unique = df['type_flour'].unique()   
+    tf_df_unique = df['flour_types'].unique()   
     tf_items = [x[0] for x in db.session.query(TypeFlour.name).all()]
     
     if not set(tf_df_unique).issubset(set(tf_items)):
@@ -308,17 +308,17 @@ def clean_csv_file(df):
         )
         return None
     
-    if df['type_flour'].value_counts().get('نامشخص', 0) != 0:
-        emit(warnings=warnings, message=f"⚠️ ستون «نوع آرد» دارای {df['type_flour'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+    if df['flour_types'].value_counts().get('نامشخص', 0) != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «نوع آرد» دارای {df['flour_types'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
     
     
-    # type_bread:
-    df['type_bread'] = df['type_bread'].fillna('نامشخص')
-    df['type_bread'] = df['type_bread'].replace("0", 'نامشخص')
-    df['type_bread'] = df['type_bread'].astype(str)
-    df = virastar(df=df, columns=['type_bread'])
+    # bread_types:
+    df['bread_types'] = df['bread_types'].fillna('نامشخص')
+    df['bread_types'] = df['bread_types'].replace("0", 'نامشخص')
+    df['bread_types'] = df['bread_types'].astype(str)
+    df = virastar(df=df, columns=['bread_types'])
     
-    tb_df_unique = df['type_bread'].unique()   
+    tb_df_unique = df['bread_types'].unique()   
     tb_items = [x[0] for x in db.session.query(TypeBread.name).all()]
     
     if not set(tb_df_unique).issubset(set(tb_items)):
@@ -328,8 +328,8 @@ def clean_csv_file(df):
         )
         return None
     
-    if df['type_bread'].value_counts().get('نامشخص', 0) != 0:
-        emit(warnings=warnings, message=f"⚠️ ستون «نوع پخت» دارای {df['type_bread'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+    if df['bread_types'].value_counts().get('نامشخص', 0) != 0:
+        emit(warnings=warnings, message=f"⚠️ ستون «نوع پخت» دارای {df['bread_types'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
     
     # city:
     df['city'] = df['city'].fillna('نامشخص')
@@ -437,8 +437,8 @@ def home():
             lon = form.lon.data,
             household_risk = form.household_risk.data,
             bakers_risk = form.bakers_risk.data,
-            type_flour = int(form.type_flour.data),
-            type_bread = form.type_bread.data,
+            flour_types = int(form.flour_types.data),
+            bread_types = form.bread_types.data,
             bread_rations = form.bread_rations.data,
         )
         db.session.add(bakery)
@@ -537,8 +537,8 @@ def upload_csv():
                 lon=row['lon'],
                 household_risk=row['household_risk'],
                 bakers_risk=row['bakers_risk'],
-                type_flour=row['type_flour'],
-                type_bread=row['type_bread'],
+                flour_types=row['flour_types'],
+                bread_types=row['bread_types'],
                 bread_rations=row['bread_rations'],
             ).first()
             
@@ -563,8 +563,8 @@ def upload_csv():
                     lon=row['lon'],
                     household_risk=row['household_risk'],
                     bakers_risk=row['bakers_risk'],
-                    type_flour=row['type_flour'],
-                    type_bread=row['type_bread'],
+                    flour_types=row['flour_types'],
+                    bread_types=row['bread_types'],
                     bread_rations=row['bread_rations'],
                 )
                 records_to_insert.append(record)
@@ -631,8 +631,8 @@ def update_record(id):
         bakery.lon = data.get('lon')
         bakery.household_risk = data.get('household_risk')
         bakery.bakers_risk = data.get('bakers_risk')
-        bakery.type_flour = data.get('type_flour')
-        bakery.type_bread = data.get('type_bread')
+        bakery.flour_types = data.get('flour_types')
+        bakery.bread_types = data.get('bread_types')
         bakery.bread_rations = data.get('bread_rations')
         db.session.commit()
         return jsonify({'message': 'Bakery Updated Successfully'})
@@ -654,10 +654,10 @@ def all_items():
     if column == "bakers_risk":
         items = sorted([x[0] for x in db.session.query(BakersRisk.name).all()])
         return jsonify(items)
-    if column == "type_flour":
+    if column == "flour_types":
         items = sorted([x[0] for x in db.session.query(TypeFlour.name).all()])
         return jsonify(items)
-    if column == "type_bread":
+    if column == "bread_types":
         items = sorted([x[0] for x in db.session.query(TypeBread.name).all()])
         return jsonify(items)
 
@@ -709,7 +709,7 @@ def add_category():
         else:
             return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
     
-    if column == "type_flour":
+    if column == "flour_types":
         items = [x[0] for x in db.session.query(TypeFlour.name).all()]
         if new_category not in items:               
             item = TypeFlour(name=new_category)
@@ -719,7 +719,7 @@ def add_category():
         else:
             return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
     
-    if column == "type_bread":
+    if column == "bread_types":
         items = [x[0] for x in db.session.query(TypeBread.name).all()]
         if new_category not in items:               
             item = TypeBread(name=new_category)
