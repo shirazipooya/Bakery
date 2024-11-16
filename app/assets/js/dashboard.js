@@ -8,6 +8,101 @@
     function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
+    
+    const order = ['کم ریسک', 'ریسک متوسط', 'پر ریسک', 'خیلی پر ریسک', 'نامشخص'];
+
+    const orderColors = {
+        'کم ریسک': config.colors.success,
+        'ریسک متوسط': config.colors_label.primary,
+        'پر ریسک': config.colors_label.warning,
+        'خیلی پر ریسک': config.colors.danger,
+        'نامشخص': config.colors.secondary,
+    };
+    
+    let ChartConfig = {
+        chart: {
+            height: 200,
+            type: "bar",
+            toolbar: {
+                show: false,
+            },
+        },
+        plotOptions: {
+            bar: {
+                barHeight: "60%",
+                columnWidth: "60%",
+                startingShape: "rounded",
+                endingShape: "rounded",
+                borderRadius: 4,
+                distributed: true,
+            },
+        },
+        grid: {
+            show: false,
+            padding: {
+                top: -20,
+                bottom: 0,
+                left: -10,
+                right: -10,
+            },
+        },
+        colors: [
+            // config.colors.success,
+            // config.colors_label.primary,
+            // config.colors_label.warning,
+            // config.colors.danger,
+            // config.colors.secondary,
+            // config.colors.info,
+        ],
+        dataLabels: {
+            enabled: false,
+        },
+        series: [
+            {
+                name: "",
+                data: [],
+            },
+        ],
+        legend: {
+            show: false,
+        },
+        xaxis: {
+            categories: [],
+            axisBorder: {
+                show: false,
+            },
+            axisTicks: {
+                show: false,
+            },
+            labels: {
+                style: {
+                    colors: config.colors.dark,
+                    fontSize: "13px",
+                    fontFamily: "iranyekan",
+                },
+            },
+        },
+        yaxis: {
+            labels: {
+                show: false,
+            },
+        },
+        tooltip: {
+            enabled: false,
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: function (val) {
+                return val;
+            },
+            offsetY: 0,
+            style: {
+                fontSize: "16px",
+                fontFamily: "iranyekan",
+                colors: ["#000"],
+            },
+        },
+    };
 
 
     // =========================================================================
@@ -103,6 +198,9 @@
         breadTypesCard(data);
         flourTypesCard(data);
         secondFuelCard(data);
+        breadRationsCard(data);
+        updateBakersRiskChart(data);
+        updateHouseholdRiskChart(data);
     };
 
     // -------------------------------------------------------------------------
@@ -143,6 +241,103 @@
             document.getElementById(`SecondFuel_${item.code}_Count`).innerHTML = count;
             document.getElementById(`SecondFuel_${item.code}_Percent`).innerHTML = `(${percent}%)`;
             document.getElementById(`SecondFuel_${item.code}_Bar`).style.width = `${percent}%`;
+        });
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Bread Rations
+    // -------------------------------------------------------------------------
+    function breadRationsCard(data) {            
+        data.bread_rations_data_updated.forEach((item) => {
+            const count = item.count || 0;
+            const percent = item.percent.toFixed(0);
+            document.getElementById(`BreadRations_${item.code}_Count`).innerHTML = count;
+            document.getElementById(`BreadRations_${item.code}_Percent`).innerHTML = `(${percent}%)`;
+            document.getElementById(`BreadRations_${item.code}_Bar`).style.width = `${percent}%`;
+        });
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Bakers Risk
+    // -------------------------------------------------------------------------   
+    let bakersRiskBarChart;
+
+    initBakersRiskChart();
+
+    function initBakersRiskChart() {
+        bakersRiskBarChart = new ApexCharts(
+              document.querySelector("#bakersRiskBarChart"),
+              ChartConfig
+          );
+          bakersRiskBarChart.render();
+    }
+
+    function updateBakersRiskChart(data) {
+        const sortedDataBakersRisk = Object.entries(data.bakers_risk_cat).sort(
+            ([keyA], [keyB]) => {
+                return order.indexOf(keyA) - order.indexOf(keyB);
+            }
+        );
+
+        const categories = sortedDataBakersRisk.map((item) => item[0]);
+        const values = sortedDataBakersRisk.map((item) => item[1]);
+        const colors = categories.map((category) => orderColors[category]);
+
+        bakersRiskBarChart.updateOptions({
+            series: [
+                {
+                    name: "ریسک نانوا",
+                    data: values,
+                },
+            ],
+            xaxis: {
+                categories: categories,
+            },
+            colors: colors,
+        });
+    }
+
+    // -------------------------------------------------------------------------
+    // Household Risk
+    // -------------------------------------------------------------------------   
+    let householdRiskBarChart;
+
+    initHouseholdRiskChart();
+
+    function initHouseholdRiskChart() {
+        householdRiskBarChart = new ApexCharts(
+            document.querySelector("#householdRiskBarChart"),
+            ChartConfig
+        );
+        householdRiskBarChart.render();
+    }
+
+    function updateHouseholdRiskChart(data) {
+        const sortedDataHouseholdRisk = Object.entries(
+            data.household_risk_cat
+        ).sort(
+            ([keyA], [keyB]) => {
+                return order.indexOf(keyA) - order.indexOf(keyB);
+            }
+        );
+
+        const categories = sortedDataHouseholdRisk.map((item) => item[0]);
+        const values = sortedDataHouseholdRisk.map((item) => item[1]);
+        const colors = categories.map((category) => orderColors[category]);
+
+        householdRiskBarChart.updateOptions({
+            series: [
+                {
+                    name: "ریسک خانوار",
+                    data: values,
+                },
+            ],
+            xaxis: {
+                categories: categories,
+            },
+            colors: colors,
         });
     }
     
@@ -355,292 +550,6 @@
     // =========================================================================
     // /Form Control
     // =========================================================================
-
-    // document.getElementById('apply_filter').addEventListener('click', function () {
-    //     let citySelect = document.getElementById('city').value;
-    //     let regionSelect = document.getElementById('region').value;
-    //     let districtSelect = document.getElementById('district').value;
-    //     let typeBreadSelect = document.getElementById('typeBread').value;
-    //     let typeFlourSelect = document.getElementById('typeFlour').value;
-    //     let secondFuelSelect = document.getElementById('secondFuel').value;
-
-    //     if (!citySelect) {
-    //         citySelect = "999";
-    //     }
-    //     if (!regionSelect) {
-    //         regionSelect = "999";
-    //     }
-    //     if (!districtSelect) {
-    //         districtSelect = "999";
-    //     }
-    //     if (!typeBreadSelect) {
-    //         typeBreadSelect = "999";
-    //     }
-    //     if (!typeFlourSelect) {
-    //         typeFlourSelect = "999";
-    //     }
-    //     if (!secondFuelSelect) {
-    //         secondFuelSelect = "999";
-    //     }
-
-    //     fetch(`/api/dashboard/map/filter/${citySelect}/${regionSelect}/${districtSelect}/${typeBreadSelect}/${typeFlourSelect}/${secondFuelSelect}`)
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         addMarkers(data.data);
-    //     });
-    // });
-
-    // document.getElementById('clear_filter').addEventListener('click', function () {
-    //     document.getElementById('region').innerHTML = '<option value="">منطقه را انتخاب کنید ...</option>';
-    //     document.getElementById('district').innerHTML = '<option value="">ناحیه را انتخاب کنید ...</option>';
-    //     get_all_data();
-    // });
-
-    // load_data();
-
-    // async function load_data() {
-    //     const selectedRegion = document.getElementById("selectedRegion").value;
-    //     const response = await fetch("/api/dashboard/data/" + selectedRegion);
-    //     const data = await response.json();
-
-    //     updateUI(data);
-    // }
-
-    // function updateUI(data) {
-    //     // Number of Bakers
-    //     if (data.number_of_row && data.number_of_row !== undefined) {
-    //         document.getElementById("numberBakers").innerHTML =
-    //         numberWithCommas(data.number_of_row);
-    //     } else {
-    //         document.getElementById("numberBakers").innerHTML = "-";
-    //     }
-
-    //     // TypeBread
-    //     updateTypeBread(data);
-    //     // TypeFlour
-    //     updateTypeFlour(data);
-    //     // BreadRations
-    //     updateBreadRations(data);
-    //     // BakersRisk
-    //     updateBakersRiskChart(data);
-    //     // HouseholdRisk
-    //     updateHouseholdRiskChart(data);
-    //     // RegionInformation
-    //     updateRegionInformation(data);
-    // }
-
-    // function numberWithCommas(x) {
-    //     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    // }
-
-    // function updateRegionInformation(data) {
-    //     document.getElementById('region_info_population').innerHTML = numberWithCommas(data.region_info[0].population);
-    //     document.getElementById('region_info_population_male').innerHTML = numberWithCommas(data.region_info[0].population_male);
-    //     document.getElementById('region_info_population_female').innerHTML = numberWithCommas(data.region_info[0].population_female);
-    //     document.getElementById('region_info_n_households').innerHTML = numberWithCommas(data.region_info[0].n_households);
-    //     document.getElementById('region_info_number_bakers').innerHTML = numberWithCommas(data.number_of_row);
-    //     document.getElementById('region_info_area').innerHTML = numberWithCommas(data.region_info[0].area);
-    //     document.getElementById('region_info_population_bakery_1').innerHTML = numberWithCommas(Math.floor(data.region_info[0].population / data.number_of_row));
-    //     document.getElementById('region_info_population_bakery_2').innerHTML = numberWithCommas(Math.floor(data.region_info[0].population / data.number_of_row));
-    //     document.getElementById('region_info_area_bakery_1').innerHTML = numberWithCommas(Math.floor(data.region_info[0].area / data.number_of_row));
-    //     document.getElementById('region_info_area_bakery_2').innerHTML = numberWithCommas(Math.floor(data.region_info[0].area / data.number_of_row));
-    //     document.getElementById('region_info_households_bakery_1').innerHTML = numberWithCommas(Math.floor(data.region_info[0].n_households / data.number_of_row));
-    //     document.getElementById('region_info_households_bakery_2').innerHTML = numberWithCommas(Math.floor(data.region_info[0].n_households / data.number_of_row));
-    //     document.getElementById('region_info_ration_population_1').innerHTML = numberWithCommas(Math.floor(100 * data.region_bread_rations / data.region_info[0].population));
-    //     document.getElementById('region_info_ration_population_2').innerHTML = numberWithCommas(Math.floor(100 * data.region_bread_rations / data.region_info[0].population));
-    // }
-
-    // function updateTypeBread(data) {
-    //     const breadTypes = ["سنگک", "بربری", "تافتون", "لواش"];
-    //     breadTypes.forEach((type, index) => {
-    //         const count = data.bread_types_cat[type] || 0;
-    //         const tmp = ((count * 100) / (data.number_of_row || 1)).toFixed(0); // avoid division by zero
-    //         document.getElementById(
-    //             `TypeBread_${String.fromCharCode(65 + index)}_Count`
-    //         ).innerHTML = count;
-    //         document.getElementById(
-    //             `TypeBread_${String.fromCharCode(65 + index)}_Percent`
-    //         ).innerHTML = `(${tmp}%)`;
-    //         document.getElementById(
-    //             `TypeBread_${String.fromCharCode(65 + index)}_Bar`
-    //         ).style.width = `${tmp}%`;
-    //     });
-    // }
-
-    // function updateTypeFlour(data) {
-    //     const flourTypes = ["1", "2", "3", "4", "5", "6"];
-    //     flourTypes.forEach((type, index) => {
-    //         const count = data.flour_types_cat[type] || 0;
-    //         const tmp = ((count * 100) / (data.number_of_row || 1)).toFixed(0);
-    //         document.getElementById(
-    //             `TypeFlour_${String.fromCharCode(65 + index)}_Count`
-    //         ).innerHTML = count;
-    //         document.getElementById(
-    //             `TypeFlour_${String.fromCharCode(65 + index)}_Percent`
-    //         ).innerHTML = `(${tmp}%)`;
-    //         document.getElementById(
-    //             `TypeFlour_${String.fromCharCode(65 + index)}_Bar`
-    //         ).style.width = `${tmp}%`;
-    //     });
-    // }
-
-    // function updateBreadRations(data) {
-    //     const rations = ["0", "1", "2", "3", "4", "5"];
-    //     rations.forEach((ration, index) => {
-    //         const count = data.bread_rations_cat[ration] || 0;
-    //         const tmp = ((count * 100) / (data.number_of_row || 1)).toFixed(0);
-    //         document.getElementById(
-    //             `BreadRations_${String.fromCharCode(65 + index)}_Count`
-    //         ).innerHTML = count;
-    //         document.getElementById(
-    //             `BreadRations_${String.fromCharCode(65 + index)}_Percent`
-    //         ).innerHTML = `(${tmp}%)`;
-    //         document.getElementById(
-    //             `BreadRations_${String.fromCharCode(65 + index)}_Bar`
-    //         ).style.width = `${tmp}%`;
-    //     });
-    // }
-
-    // let bakersRiskChart;
-    // let householdRiskBarChart;
-
-    // let ChartConfig = {
-    //     chart: {
-    //         height: 200,
-    //         type: "bar",
-    //         toolbar: {
-    //             show: false,
-    //         },
-    //     },
-    //     plotOptions: {
-    //         bar: {
-    //             barHeight: "60%",
-    //             columnWidth: "60%",
-    //             startingShape: "rounded",
-    //             endingShape: "rounded",
-    //             borderRadius: 4,
-    //             distributed: true,
-    //         },
-    //     },
-    //     grid: {
-    //         show: false,
-    //         padding: {
-    //             top: -20,
-    //             bottom: 0,
-    //             left: -10,
-    //             right: -10,
-    //         },
-    //     },
-    //     colors: [
-    //         config.colors.danger,
-    //         config.colors_label.primary,
-    //         config.colors_label.primary,
-    //         config.colors.success,
-    //     ],
-    //     dataLabels: {
-    //         enabled: false,
-    //     },
-    //     series: [
-    //         {
-    //             name: "",
-    //             data: [],
-    //         },
-    //     ],
-    //     legend: {
-    //         show: false,
-    //     },
-    //     xaxis: {
-    //         categories: [],
-    //         axisBorder: {
-    //             show: false,
-    //         },
-    //         axisTicks: {
-    //             show: false,
-    //         },
-    //         labels: {
-    //             style: {
-    //                 colors: config.colors.dark,
-    //                 fontSize: "13px",
-    //                 fontFamily: "iranyekan",
-    //             },
-    //         },
-    //     },
-    //     yaxis: {
-    //         labels: {
-    //             show: false,
-    //         },
-    //     },
-    //     tooltip: {
-    //         enabled: false,
-    //     },
-    //     dataLabels: {
-    //         enabled: true,
-    //         formatter: function (val) {
-    //             return val;
-    //         },
-    //         offsetY: 0,
-    //         style: {
-    //             fontSize: "16px",
-    //             fontFamily: "iranyekan",
-    //             colors: ["#000"],
-    //         },
-    //     },
-    // };
-
-    // function initBakersRiskChart() {
-    //   bakersRiskChart = new ApexCharts(
-    //         document.querySelector("#bakersRiskBarChart"),
-    //         ChartConfig
-    //     );
-    //     bakersRiskChart.render();
-    // }
-
-    // function initHouseholdRiskChart() {
-    //     householdRiskBarChart = new ApexCharts(
-    //         document.querySelector("#householdRiskBarChart"),
-    //         ChartConfig
-    //     );
-    //     householdRiskBarChart.render();
-    // }
-
-    // function updateBakersRiskChart(data) {
-    //     const sortedDataBakersRisk = Object.entries(data.bakers_risk_cat).sort(
-    //         (a, b) => b[1] - a[1]
-    //     );
-
-    //     bakersRiskChart.updateOptions({
-    //         series: [
-    //             {
-    //                 name: "ریسک نانوا",
-    //                 data: sortedDataBakersRisk.map((item) => item[1]),
-    //             },
-    //         ],
-    //         xaxis: {
-    //             categories: sortedDataBakersRisk.map((item) => item[0]),
-    //         },
-    //     });
-    // }
-
-    // function updateHouseholdRiskChart(data) {
-    //     const sortedDataHouseholdRisk = Object.entries(
-    //         data.household_risk_cat
-    //     ).sort((a, b) => b[1] - a[1]);
-
-    //     householdRiskBarChart.updateOptions({
-    //         series: [
-    //             {
-    //                 name: "ریسک خانوار",
-    //                 data: sortedDataHouseholdRisk.map((item) => item[1]),
-    //             },
-    //         ],
-    //         xaxis: {
-    //             categories: sortedDataHouseholdRisk.map((item) => item[0]),
-    //         },
-    //     });
-    // }
-
-    // initBakersRiskChart();
-    // initHouseholdRiskChart();
 
 
 })();

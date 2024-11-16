@@ -382,7 +382,9 @@
     <!-- ------------------------------------------------------------------- -->
 
 
-    <!-- BreadRations -->
+    <!-- ------------------------------------------------------------------- -->
+    <!-- Bread Rations -->
+    <!-- ------------------------------------------------------------------- -->
     <div class="col-md-6 col-xl-3 col-xxl-3 order-3 order-lg-0 mb-4">
       <div class="card h-100">
         <div class="card-header">
@@ -391,95 +393,39 @@
         </div>
         <div class="card-body">
           <div class="progress progress-stacked mb-3" style="height: 8px">
-            <div id="BreadRations_A_Bar" class="progress-bar bg-success m-0" role="progressbar" style="width: 16.667%"
-              aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_B_Bar" class="progress-bar bg-danger m-0" role="progressbar" style="width: 16.667%"
-              aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_C_Bar" class="progress-bar bg-warning m-0" role="progressbar" style="width: 16.667%"
-              aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_D_Bar" class="progress-bar bg-primary m-0" role="progressbar" style="width: 16.667%"
-              aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_E_Bar" class="progress-bar bg-dark m-0" role="progressbar" style="width: 16.667%"
-              aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
-            <div id="BreadRations_F_Bar" class="progress-bar bg-info m-0" role="progressbar" style="width: 16.667%"
-              aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100"></div>
+            {% for bread_ration in bread_rations %}
+              <div 
+                id="BreadRations_{{ bread_ration.code }}_Bar"
+                class="progress-bar m-0"
+                role="progressbar"
+                style="width: {{ bread_ration.percent }}%; background-color: {{ bread_ration.color }};"
+                aria-valuenow="{{ bread_ration.percent }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+              </div>
+            {% endfor %}
           </div>
-
           <ul class="p-0 m-0">
-            <li class="mb-2 d-flex justify-content-between">
-              <div class="d-flex align-items-center lh-1 me-3">
-                <span class="badge badge-dot bg-success me-2"></span>
-                <span id="BreadRations_A_Name">0-100 کیسه</span>
-              </div>
-              <div class="d-flex gap-1">
-                <span id="BreadRations_A_Percent" class="text-muted">(-)</span>
-                <span class="fw-semibold" id="BreadRations_A_Count">-</span>
-              </div>
-            </li>
-
-            <li class="mb-2 d-flex justify-content-between">
-              <div class="d-flex align-items-center lh-1 me-3">
-                <span class="badge badge-dot bg-danger me-2"></span>
-                <span id="BreadRations_B_Name">100-200 کیسه</span>
-              </div>
-              <div class="d-flex gap-1">
-                <span id="BreadRations_B_Percent" class="text-muted">(-)</span>
-                <span class="fw-semibold" id="BreadRations_B_Count">-</span>
-              </div>
-            </li>
-
-            <li class="mb-2 d-flex justify-content-between">
-              <div class="d-flex align-items-center lh-1 me-3">
-                <span class="badge badge-dot bg-warning me-2"></span>
-                <span id="BreadRations_C_Name">200-300 کیسه</span>
-              </div>
-              <div class="d-flex gap-1">
-                <span id="BreadRations_C_Percent" class="text-muted">(-)</span>
-                <span class="fw-semibold" id="BreadRations_C_Count">-</span>
-              </div>
-            </li>
-
-            <li class="mb-2 d-flex justify-content-between">
-              <div class="d-flex align-items-center lh-1 me-3">
-                <span class="badge badge-dot bg-primary me-2"></span>
-                <span id="BreadRations_D_Name">300-400 کیسه</span>
-              </div>
-              <div class="d-flex gap-1">
-                <span id="BreadRations_D_Percent" class="text-muted">(-)</span>
-                <span class="fw-semibold" id="BreadRations_D_Count">-</span>
-              </div>
-            </li>
-
-            <li class="mb-2 d-flex justify-content-between">
-              <div class="d-flex align-items-center lh-1 me-3">
-                <span class="badge badge-dot bg-dark me-2"></span>
-                <span id="BreadRations_E_Name">400-500 کیسه</span>
-              </div>
-              <div class="d-flex gap-1">
-                <span id="BreadRations_E_Percent" class="text-muted">(-)</span>
-                <span class="fw-semibold" id="BreadRations_E_Count">-</span>
-              </div>
-            </li>
-
-            <li class="mb-2 d-flex justify-content-between">
-              <div class="d-flex align-items-center lh-1 me-3">
-                <span class="badge badge-dot bg-info me-2"></span>
-                <span id="BreadRations_F_Name">500-600 کیسه</span>
-              </div>
-              <div class="d-flex gap-1">
-                <span id="BreadRations_F_Percent" class="text-muted">(-)</span>
-                <span class="fw-semibold" id="BreadRations_F_Count">-</span>
-              </div>
-            </li>
-
+            {% for bread_ration in bread_rations %}
+              <li class="mb-2 d-flex justify-content-between">
+                <div class="d-flex align-items-center lh-1 me-3">
+                  <span class="badge badge-dot me-2" style="background-color: {{ bread_ration.color }};"></span>
+                  <span id="BreadRations_{{ bread_ration.code }}_Name">{{ bread_ration.name }} کیسه</span>
+                </div>
+                <div class="d-flex gap-1">
+                  <span id="BreadRations_{{ bread_ration.code }}_Percent" class="text-muted">(-)</span>
+                  <span class="fw-semibold" id="BreadRations_{{ bread_ration.code }}_Count">-</span>
+                </div>
+              </li>
+            {% endfor %}
           </ul>
         </div>
       </div>
     </div>
-    <!-- /BreadRations -->
-
-
-
+    <!-- ------------------------------------------------------------------- -->
+    <!-- / Bread Rations -->
+    <!-- ------------------------------------------------------------------- -->
 
 
     <!-- BakersRisk -->

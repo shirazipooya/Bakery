@@ -4,7 +4,7 @@ import pandas as pd
 from app.database.models import Bakery, Amarnameh, TypeBread, TypeFlour, SecondFuel
 from app.extensions import db, cache
 from sqlalchemy import distinct
-from sqlalchemy import func
+from sqlalchemy import func, case
 from sqlalchemy.orm import aliased
 
 
@@ -23,6 +23,7 @@ blueprint = Blueprint(
 bread_types_data_init = None
 flour_types_data_init = None
 second_fuel_data_init = None
+bread_rations_data_init = None
 
 
 # ------------------------------------------------------------------------------
@@ -79,11 +80,27 @@ def home():
         for index, second_fuel_name in enumerate(second_fuel_names)
     ]
     
+    
+    # Bread Rations
+    label = ["0-100", "101-200", "201-300", "301-400", "401-500", "501-600", ">600"]
+    global bread_rations_data_init 
+    bread_rations_data_init = [
+        {
+            "name": cat,
+            "code": chr(65 + index),
+            "color": colors[index % len(colors)],
+            "count": 0,
+            "percent": 0
+        }
+        for index, cat in enumerate(label)
+    ]
+    
     return render_template(
         template_name_or_list='dashboard/home.html',
         bread_types=bread_types_data_init,
         flour_types=flour_types_data_init,
-        second_fuel=second_fuel_data_init
+        second_fuel=second_fuel_data_init,
+        bread_rations=bread_rations_data_init,
     )
 
 # ==============================================================================
@@ -313,6 +330,79 @@ def load_dashboard_data(ostan, shahrestan, bakhsh, shahrRosta, mantagheh, nahyeh
             item2['percent'] = 0
 
     
+    # --------------------------------------------------------------------------
+    # Bread Rations Data
+    # --------------------------------------------------------------------------
+    global bread_rations_data_init
+    bread_rations_data_updated = bread_rations_data_init.copy()
+    
+    bread_rations_cat = (
+        query_bakery
+        .with_entities(
+            case(
+                    (Bakery.bread_rations <= 100, '0-100'),
+                    (Bakery.bread_rations.between(101, 200), '101-200'),
+                    (Bakery.bread_rations.between(201, 300), '201-300'),
+                    (Bakery.bread_rations.between(301, 400), '301-400'),
+                    (Bakery.bread_rations.between(401, 500), '401-500'),
+                    (Bakery.bread_rations.between(501, 600), '501-600'),
+                    (Bakery.bread_rations >= 600, '>600'),
+                else_=None
+            ).label('category'),
+            func.count(Bakery.id).label('count')
+        )
+        .group_by('category')
+        .all()
+    )
+    
+    bread_rations_cat_dic = [
+        {
+            "name": bread_rations,
+            "count": int(count),
+            "percent": round(count * 100 / number_of_bakeries, 1)
+        } for bread_rations, count in bread_rations_cat
+    ]
+    
+    for item2 in bread_rations_data_updated:
+        match = next((item1 for item1 in bread_rations_cat_dic if item1['name'] == item2['name']), None)
+        if match:
+            item2['count'] = match['count']
+            item2['percent'] = match['percent']
+        else:
+            item2['count'] = 0
+            item2['percent'] = 0
+
+
+    # --------------------------------------------------------------------------
+    # Bakers Risk Data
+    # --------------------------------------------------------------------------    
+    bakers_risk_cat = (
+        query_bakery
+        .with_entities(Bakery.bakers_risk, func.count(Bakery.bakers_risk))
+        .group_by(Bakery.bakers_risk)
+        .all()
+    )
+    
+    bakers_risk_cat_dic = {
+        cat: int(count) for cat, count in bakers_risk_cat
+    }
+
+
+    # --------------------------------------------------------------------------
+    # Household Risk Data
+    # --------------------------------------------------------------------------    
+    household_risk_cat = (
+        query_bakery
+        .with_entities(Bakery.household_risk, func.count(Bakery.household_risk))
+        .group_by(Bakery.household_risk)
+        .all()
+    )
+    
+    household_risk_cat_dic = {
+        cat: int(count) for cat, count in household_risk_cat
+    }
+    
+    
     response = {
         'number_of_bakeries': number_of_bakeries if number_of_bakeries != 0 else "-",
         'number_of_households': number_of_households if number_of_households != 0 else "-" ,
@@ -327,6 +417,9 @@ def load_dashboard_data(ostan, shahrestan, bakhsh, shahrRosta, mantagheh, nahyeh
         'bread_types_data_updated': bread_types_data_updated,
         'flour_types_data_updated': flour_types_data_updated,
         'second_fuel_data_updated': second_fuel_data_updated,
+        'bread_rations_data_updated': bread_rations_data_updated,
+        'bakers_risk_cat': bakers_risk_cat_dic,
+        'household_risk_cat': household_risk_cat_dic,
     }
     
     return jsonify(response)
