@@ -46,14 +46,7 @@
                 right: -10,
             },
         },
-        colors: [
-            // config.colors.success,
-            // config.colors_label.primary,
-            // config.colors_label.warning,
-            // config.colors.danger,
-            // config.colors.secondary,
-            // config.colors.info,
-        ],
+        colors: [],
         dataLabels: {
             enabled: false,
         },
