@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, jsonify
 from flask_login import current_user, login_required
 import pandas as pd
-from app.database.models import Bakery, Amarnameh
+from app.database.models import Bakery, Amarnameh, TypeBread, TypeFlour, SecondFuel, BakersRisk, HouseholdRisk, OwnershipStatus
 from app.extensions import db, cache
 from sqlalchemy import distinct
 from sqlalchemy import func
+from sqlalchemy.orm import aliased
 
 
 blueprint = Blueprint(
@@ -13,10 +14,249 @@ blueprint = Blueprint(
 )
 
 
+# ==============================================================================
+# Load Page
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Home Page
+# ------------------------------------------------------------------------------
 @blueprint.route('/home')
 @login_required
 def home():
     return render_template(template_name_or_list='map/home.html')
+
+
+
+# ==============================================================================
+# API
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Get Ostan Options
+# ------------------------------------------------------------------------------
+@blueprint.route(rule='/api/map/ostan', methods=['GET'])
+@login_required
+def get_ostan_options():
+    query = Bakery.query.with_entities(Bakery.ostan).distinct()
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Shahrestan Options
+# ------------------------------------------------------------------------------
+@blueprint.route('/api/map/shahrestan/<ostan>', methods=["GET"])
+@login_required
+def get_shahrestan_options(ostan):
+    query = Bakery.query.with_entities(distinct(Bakery.shahrestan)).filter(Bakery.ostan == ostan)
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Bakhsh Options
+# ------------------------------------------------------------------------------
+@blueprint.route('/api/map/bakhsh/<shahrestan>/<ostan>', methods=["GET"])
+@login_required
+def get_bakhsh_options(shahrestan, ostan):
+    query = Bakery.query.with_entities(distinct(Bakery.bakhsh)).filter(Bakery.ostan == ostan, Bakery.shahrestan == shahrestan)
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Shahr Options
+# ------------------------------------------------------------------------------
+@blueprint.route('/api/map/shahr/<bakhsh>/<shahrestan>/<ostan>', methods=["GET"])
+@login_required
+def get_shahr_options(bakhsh, shahrestan, ostan):
+    query = Bakery.query.with_entities(distinct(Bakery.shahr)).filter(Bakery.ostan == ostan, Bakery.shahrestan == shahrestan, Bakery.bakhsh == bakhsh)
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Region Options
+# ------------------------------------------------------------------------------
+@blueprint.route('/api/map/region/<shahr>/<bakhsh>/<shahrestan>/<ostan>', methods=["GET"])
+@login_required
+def get_region_options(shahr, bakhsh, shahrestan, ostan):
+    query = Bakery.query.with_entities(distinct(Bakery.region)).filter(Bakery.ostan == ostan, Bakery.shahrestan == shahrestan, Bakery.bakhsh == bakhsh, Bakery.shahr == shahr)
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get District Options
+# ------------------------------------------------------------------------------
+@blueprint.route('/api/map/district/<region>/<shahr>/<bakhsh>/<shahrestan>/<ostan>', methods=["GET"])
+@login_required
+def get_district_options(region, shahr, bakhsh, shahrestan, ostan):
+    query = Bakery.query.with_entities(distinct(Bakery.district)).filter(Bakery.ostan == ostan, Bakery.shahrestan == shahrestan, Bakery.bakhsh == bakhsh, Bakery.shahr == shahr, Bakery.region == region)
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Bread Types Options
+# ------------------------------------------------------------------------------
+@blueprint.route(rule='/api/map/bread_types', methods=['GET'])
+@login_required
+def get_bread_types_options():
+    query = TypeBread.query.with_entities(TypeBread.name).distinct()
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Flour Types Options
+# ------------------------------------------------------------------------------
+@blueprint.route(rule='/api/map/flour_types', methods=['GET'])
+@login_required
+def get_flour_types_options():
+    query = TypeFlour.query.with_entities(TypeFlour.name).distinct()
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Second Fuel Options
+# ------------------------------------------------------------------------------
+@blueprint.route(rule='/api/map/second_fuel', methods=['GET'])
+@login_required
+def get_second_fuel_options():
+    query = SecondFuel.query.with_entities(SecondFuel.name).distinct()
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Bakers Risk Options
+# ------------------------------------------------------------------------------
+@blueprint.route(rule='/api/map/bakers_risk', methods=['GET'])
+@login_required
+def get_bakers_risk_options():
+    query = BakersRisk.query.with_entities(BakersRisk.name).distinct()
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Household Risk Options
+# ------------------------------------------------------------------------------
+@blueprint.route(rule='/api/map/household_risk', methods=['GET'])
+@login_required
+def get_household_risk_options():
+    query = HouseholdRisk.query.with_entities(HouseholdRisk.name).distinct()
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Get Ownership Status Options
+# ------------------------------------------------------------------------------
+@blueprint.route(rule='/api/map/ownership_status', methods=['GET'])
+@login_required
+def get_ownership_status_options():
+    query = OwnershipStatus.query.with_entities(OwnershipStatus.name).distinct()
+    items = query.all()
+    data = sorted([item[0] for item in items])
+    return jsonify(data)
+
+# ------------------------------------------------------------------------------
+# Load Map Data
+# ------------------------------------------------------------------------------
+@blueprint.route(rule='/api/map/data/<ostan>/<shahrestan>/<bakhsh>/<shahr>/<region>/<district>/<bread_types>/<flour_types>/<second_fuel>/<bakers_risk>/<household_risk>/<ownership_status>', methods=["GET"])
+@login_required
+def load_map_data(ostan, shahrestan, bakhsh, shahr, region, district, bread_types, flour_types, second_fuel, bakers_risk, household_risk, ownership_status):
+    
+    # --------------------------------------------------------------------------
+    # Filter Database
+    # --------------------------------------------------------------------------
+    query_bakery = Bakery.query
+    
+    filters_bakery = []
+       
+    if ostan != "999":
+        filters_bakery.append(Bakery.ostan == ostan)
+    if shahrestan != "999":
+        filters_bakery.append(Bakery.shahrestan == shahrestan)
+    if bakhsh != "999":
+        filters_bakery.append(Bakery.bakhsh == bakhsh)
+    if shahr != "999":
+        filters_bakery.append(Bakery.shahr == shahr)
+    if region != "999":
+        filters_bakery.append(Bakery.region == region)
+    if district != "999":
+        filters_bakery.append(Bakery.district == district)    
+    if bread_types != "999":
+        filters_bakery.append(Bakery.bread_types == bread_types)
+    if flour_types != "999":
+        filters_bakery.append(Bakery.flour_types == flour_types)
+    if second_fuel != "999":
+        filters_bakery.append(Bakery.second_fuel == second_fuel)
+    if bakers_risk != "999":
+        filters_bakery.append(Bakery.bakers_risk == bakers_risk)
+    if household_risk != "999":
+        filters_bakery.append(Bakery.household_risk == household_risk)
+    if ownership_status != "999":
+        filters_bakery.append(Bakery.ownership_status == ownership_status)
+           
+    if filters_bakery:
+        query_bakery = query_bakery.filter(*filters_bakery)
+    
+    # --------------------------------------------------------------------------
+    # Filter Amarnameh
+    # --------------------------------------------------------------------------
+    unique_bakery_combinations = query_bakery.with_entities(
+        Bakery.ostan,
+        Bakery.shahrestan,
+        Bakery.bakhsh,
+        Bakery.shahr,
+        Bakery.region,
+        Bakery.district
+    ).distinct().subquery()
+    
+    unique_alias = aliased(unique_bakery_combinations)
+    
+    query_amarnameh = Amarnameh.query.filter(
+        Amarnameh.ostan == unique_alias.c.ostan,
+        Amarnameh.shahrestan == unique_alias.c.shahrestan,
+        Amarnameh.bakhsh == unique_alias.c.bakhsh,
+        Amarnameh.shahr == unique_alias.c.shahr,
+        Amarnameh.region == unique_alias.c.region,
+        Amarnameh.district == unique_alias.c.district
+    )
+    
+    # --------------------------------------------------------------------------
+    # Return
+    # --------------------------------------------------------------------------  
+    data = [
+        {column: getattr(record, column) for column in record.__table__.columns.keys()}
+        for record in query_bakery.all()
+    ]
+    
+    number_of_bakeries = query_bakery.count()    
+    
+    response = {
+        'data': data,
+        'number_of_bakeries': number_of_bakeries,
+    }
+    
+    return jsonify(response)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # @blueprint.route('/api/dashboard/data/<option>', methods=["GET"])

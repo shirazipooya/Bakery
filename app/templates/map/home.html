@@ -1,154 +1,246 @@
 {% extends 'map/base.html' %}
 
 {% block title %}
-داشبورد
+نقشه‌ها
 {% endblock %}
 
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
   <!-- Controler and Map -->
   <div class="row">
-    <div class="col-md-4 col-lg-3 col-xl-3 mb-4">
-      <!-- Switches -->
-      <div class="card mb-4">
-        <h5 class="card-header">تنظیمات لایه‌ها</h5>
-        <div class="card-body">
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" id="showRegion" checked />
-            <label class="form-check-label" for="showRegion">لایه مناطق شهری</label>
-          </div>
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" id="showDistrict" checked />
-            <label class="form-check-label" for="showDistrict">لایه مناطق و نواحی
-              شهری</label>
-          </div>
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" id="showRatioRegion" checked />
-            <label class="form-check-label" for="showRatioRegion">نسبت نانوایی‌ها به جمعیت مناطق</label>
-          </div>
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" id="showRatioDistrict" checked />
-            <label class="form-check-label" for="showRatioDistrict">نسبت نانوایی‌ها به جمعیت نواحی</label>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title mb-0">فیلتر</h5>
-        </div>
-        <div class="card-body">
 
-          <!-- City -->
-          <div class="mb-3 col ecommerce-select2-dropdown">
-            <label class="form-label mb-1" for="city">
-              شهر
-            </label>
-            <select id="city" class="form-select" data-placeholder="شهر را انتخاب کنید ...">
-              <option value="">شهر را انتخاب کنید ...</option>
-            </select>
-          </div>
+    <!-- ------------------------------------------------------------------- -->
+    <!-- Form Control -->
+    <!-- ------------------------------------------------------------------- -->
+    <div class="col-lg-3 col-md-5 col-sm-12 mb-4">
+      <div class="accordion accordion-header-primary" id="accordionStyle1">
 
-          <!-- Region -->
-          <div class="mb-3 col ecommerce-select2-dropdown">
-            <label class="form-label mb-1" for="region">
-              <span>منطقه</span>
-            </label>
-            <select id="region" name="region" class="form-select" data-placeholder="منطقه را انتخاب کنید ...">
-              <option value="">منطقه را انتخاب کنید ...</option>
-            </select>
-          </div>
-
-          <!-- District -->
-          <div class="mb-3 col ecommerce-select2-dropdown">
-            <label class="form-label mb-1" for="district">ناحیه
-            </label>
-            <select id="district" class="form-select" data-placeholder="ناحیه را انتخاب کنید ...">
-              <option value="">ناحیه را انتخاب کنید ...</option>
-            </select>
-          </div>
-
-          <!-- Type Bread -->
-          <div class="mb-3 col ecommerce-select2-dropdown">
-            <label class="form-label mb-1" for="typeBread">نوع نان
-            </label>
-            <select id="typeBread" class="form-select" data-placeholder="نوع نان را انتخاب کنید ...">
-              <option value="">نوع نان را انتخاب کنید ...</option>
-            </select>
-          </div>
-
-          <!-- Type Bread -->
-          <div class="mb-3 col ecommerce-select2-dropdown">
-            <label class="form-label mb-1" for="typeFlour">نوع آرد
-            </label>
-            <select id="typeFlour" class="form-select" data-placeholder="نوع آرد را انتخاب کنید ...">
-              <option value="">نوع آرد را انتخاب کنید ...</option>
-            </select>
-          </div>
-
-          <!-- Type Bread -->
-          <div class="mb-3 col ecommerce-select2-dropdown">
-            <label class="form-label mb-1" for="secondFuel">سوخت دوم
-            </label>
-            <select id="secondFuel" class="form-select" data-placeholder="نوع سوخت دوم را انتخاب کنید ...">
-              <option value="">نوع سوخت دوم را انتخاب کنید ...</option>
-            </select>
-          </div>
-
-          <div class="row">
-            <div class="demo-inline-spacing justify-content-center d-inline-flex">
-              <button type="button" class="btn rounded-pill btn-label-primary" id="apply_filter">
-                <span class="tf-icons bx bx-plus-circle me-1"></span>اعمال فیلتر
-              </button>
-              <button type="button" class="btn rounded-pill btn-label-secondary" id="clear_filter">
-                <span class="tf-icons bx bx-minus-circle me-1"></span>حذف فیلتر
-              </button>
+        <!-- --------------------------------------------------------------- -->
+        <!-- Position -->
+        <!-- --------------------------------------------------------------- -->
+        <div class="accordion-item card active">
+          <h2 class="accordion-header">
+            <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#accordionStyle1-3"
+              aria-expanded="true">
+              انتخاب منطقه
+            </button>
+          </h2>
+          <div id="accordionStyle1-3" class="accordion-collapse collapse show" data-bs-parent="#accordionStyle1">
+            <div class="accordion-body m-2">
+              <!-- Ostan -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="ostan" class="form-label">استان</label>
+                  <select id="ostan" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Shahrestan -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="shahrestan" class="form-label">شهرستان</label>
+                  <select id="shahrestan" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Bakhsh -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="bakhsh" class="form-label">بخش</label>
+                  <select id="bakhsh" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Shahr / Rosta -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="shahr" class="form-label">شهر / روستایی</label>
+                  <select id="shahr" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Region -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="region" class="form-label">منطقه</label>
+                  <select id="region" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- District -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="district" class="form-label">ناحیه</label>
+                  <select id="district" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Clear Bottun -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="d-grid  mx-auto">
+                      <button class="btn btn-primary" type="button" id="clear-region-form">
+                        <span class="tf-icons bx bxs-brush-alt me-1"></span>پاک کردن
+                      </button>
+                    </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
+        <!-- --------------------------------------------------------------- -->
+        <!-- Parameter -->
+        <!-- --------------------------------------------------------------- -->
+        <div class="accordion-item card">
+          <h2 class="accordion-header">
+            <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+              data-bs-target="#accordionStyle1-2" aria-expanded="false">
+              انتخاب مشخصه
+            </button>
+          </h2>
+          <div id="accordionStyle1-2" class="accordion-collapse collapse" data-bs-parent="#accordionStyle1">
+            <div class="accordion-body">
+              <!-- Bread Types -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="bread_types" class="form-label">نوع نان</label>
+                  <select id="bread_types" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Flour Types -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="flour_types" class="form-label">نوع آرد</label>
+                  <select id="flour_types" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Second Fuel -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="second_fuel" class="form-label">سوخت دوم</label>
+                  <select id="second_fuel" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Bakers Risk -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="bakers_risk" class="form-label">ریسک نانوا</label>
+                  <select id="bakers_risk" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Household Risk -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="household_risk" class="form-label">ریسک خانوار</label>
+                  <select id="household_risk" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Ownership Status -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="ownership_status" class="form-label">وضعیت ملک</label>
+                  <select id="ownership_status" class="form-select w-100" data-style="btn-default"
+                    data-placeholder="انتخاب کنید ...">
+                    <option value="">انتخاب کنید ...</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Clear Bottun -->
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="d-grid  mx-auto">
+                      <button class="btn btn-primary" type="button" id="clear-parameter-form">
+                        <span class="tf-icons bx bxs-brush-alt me-1"></span>پاک کردن
+                      </button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- --------------------------------------------------------------- -->
+        <!-- Layers -->
+        <!-- --------------------------------------------------------------- -->
+        <div class="accordion-item card">
+          <h2 class="accordion-header">
+            <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+              data-bs-target="#accordionStyle1-1" aria-expanded="false">
+              تنظیمات لایه‌ها
+            </button>
+          </h2>
+          <div id="accordionStyle1-1" class="accordion-collapse collapse" data-bs-parent="#accordionStyle1">
+            <div class="accordion-body m-2">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="showRegion" checked />
+                <label class="form-check-label" for="showRegion">لایه مناطق شهری</label>
+              </div>
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="showDistrict" checked />
+                <label class="form-check-label" for="showDistrict">لایه مناطق و نواحی
+                  شهری</label>
+              </div>
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="showRatioRegion" checked />
+                <label class="form-check-label" for="showRatioRegion">نسبت نانوایی‌ها به جمعیت مناطق</label>
+              </div>
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="showRatioDistrict" checked />
+                <label class="form-check-label" for="showRatioDistrict">نسبت نانوایی‌ها به جمعیت نواحی</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
-    <div class="col-md-8 col-lg-9 col-xl-9 mb-4">
+    <!-- ------------------------------------------------------------------- -->
+    <!-- /Form Control -->
+    <!-- ------------------------------------------------------------------- -->
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- Map -->
+    <!-- ------------------------------------------------------------------- -->
+    <div class="col-lg-9 col-md-7 col-sm-12  mb-4">
       <div class="card h-100">
         <div class="card-body">
           <div class="leaflet-map w-100" id="map"></div>
         </div>
       </div>
     </div>
+    <!-- ------------------------------------------------------------------- -->
+    <!-- / Map -->
+    <!-- ------------------------------------------------------------------- -->
+
   </div>
-  <!--/ Cards with badge -->
-
-
-  <div class="row justify-content-center">
-    <div class="col-12 mb-2">
-      <div class="divider">
-        <div class="divider-text fs-4">نمودار اشعه خورشیدی</div>
-      </div>
-    </div>
-    <div class="col-md-12 col-lg-6 col-xl-6  order-3 order-lg-0 mb-4">
-      <div class="ecommerce-select2-dropdow">
-        <select id="selectColumn" class="select2 form-select" data-placeholder="پارامتر را انتخاب کنید ..."
-          onchange="fetchInfo()">
-          <option value="bread_types">نوع پخت</option>
-          <option value="bread_rations">سهمیه (تعداد کیسه)</option>
-          <option value="flour_types">نوع آرد</option>
-          <option value="household_risk">ریسک خانوار</option>
-          <option value="bakers_risk">ریسک نانوا</option>
-          <option value="ownership_status">نوع ملک نانوایی</option>
-          <option value="number_violations">تعداد تخلفات نانوایی</option>
-          <option value="second_fuel">سوخت دوم</option>
-        </select>
-      </div>
-      <div class="card card-sunburst" id="card-sunburst">
-        <div id="sunburst"></div>
-      </div>
-    </div>
-    <!-- <div class="col-md-12 col-lg-6 col-xl-6  order-3 order-lg-0 mb-4">
-      <div class="card">
-      </div>
-    </div> -->
-  </div>
-
-
+  <!--/ Controler and Map  -->
 </div>
 {% endblock %}
