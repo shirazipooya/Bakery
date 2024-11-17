@@ -66,12 +66,16 @@
                                     <td>${row.bakery_id}</td>
                                 </tr>
                                 <tr>
+                                    <th>نوع پخت</th>
+                                    <td>${row.bread_types}</td>
+                                </tr>
+                                <tr>
                                     <th>نوع آرد</th>
                                     <td>${row.flour_types}</td>
                                 </tr>
-                                 <tr>
-                                    <th>تعداد تخلفات نانوایی</th>
-                                    <td>${row.number_violations}</td>
+                                <tr>
+                                    <th>سهمیه</th>
+                                    <td>${row.bread_rations} کیسه</td>
                                 </tr>
                                  <tr>
                                     <th>نوع ملک نانوایی</th>
@@ -81,43 +85,34 @@
                                     <th>سوخت دوم</th>
                                     <td>${row.second_fuel}</td>
                                 </tr>
-                                <tr>
-                                    <th>نوع پخت</th>
-                                    <td>${row.bread_types}</td>
-                                </tr>
-                                <tr>
-                                    <th>سهمیه (تعداد کیسه)</th>
-                                    <td>${row.bread_rations}</td>
+                                 <tr>
+                                    <th>تعداد تخلفات نانوایی</th>
+                                    <td>${row.number_violations}</td>
                                 </tr>
                                 <tr>
                                     <th>ریسک خانوار</th>
-                                    <td>${row.bread_rations}</td>
+                                    <td>${row.household_risk}</td>
                                 </tr>
                                 <tr>
                                     <th>ریسک نانوا</th>
                                     <td>${row.bakers_risk}</td>
                                 </tr>
                                  <tr>
-                                    <th>شهر</th>
-                                    <td>${row.city}</td>
-                                </tr>
-                                 <tr>
-                                    <th>منطقه</th>
-                                    <td>${row.region}</td>
-                                </tr>
-                                 <tr>
-                                    <th>ناحیه</th>
-                                    <td>${row.district}</td>
+                                    <th>موقعیت</th>
+                                    <td>
+                                        ${row.shahr === 'روستایی' 
+                                            ? `استان ${row.ostan}, شهرستان ${row.shahrestan}, بخش ${row.bakhsh}, روستایی`
+                                            : `استان ${row.ostan}, شهرستان ${row.shahrestan}, بخش ${row.bakhsh}, شهر ${row.shahr}, منطقه ${row.region}, ناحیه ${row.district}`
+                                        }
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <th>طول جغرافیایی</th>
-                                    <td>${Number((row.lon).toFixed(2))}</td>
-                                </tr>
-                                <tr>
-                                    <th>عرض جغرافیایی</th>
-                                    <td>${Number((row.lat).toFixed(2))}</td>
+                                    <th>مختصات</th>
+                                    <td>${Number(row.lon.toFixed(2)).toString().replace('.', '/')} شمالی - ${Number(row.lat.toFixed(2)).toString().replace('.', '/')} شرقی</td>
                                 </tr>
                             </tbody>
+                        </table>
+                    </div>
                 `
             );
             markerClusters.addLayer(marker);
@@ -127,7 +122,6 @@
             map.fitBounds(bounds);        
         }
     }
-
 
     // =========================================================================
     // 1. Get Element by ID
@@ -150,8 +144,13 @@
     const ownership_status = document.getElementById("ownership_status");
 
 
-    // Form Control: Select Layers 
-
+    // Form Control: Select Layers
+    const ostan_layer_switch = document.getElementById("ostan_layer_switch");
+    const shahrestan_layer_switch = document.getElementById("shahrestan_layer_switch");
+    const bakhsh_layer_switch = document.getElementById("bakhsh_layer_switch");
+    const shahr_layer_switch = document.getElementById("shahr_layer_switch");
+    const region_layer_switch = document.getElementById("region_layer_switch");
+    const district_layer_switch = document.getElementById("district_layer_switch");
 
 
     // =========================================================================
@@ -215,8 +214,6 @@
         const data = await response.json();
         addMarkers(data.data);
     }
-
-
 
 
     // =========================================================================
@@ -575,20 +572,191 @@
         load_map_data();
     });
 
+
+    // -------------------------------------------------------------------------
+    // Layers
+    // -------------------------------------------------------------------------
+
+    const getLayer = async (api, func) => {
+        try {
+            const response = await fetch(api);
+            if (!response.ok) {
+                throw new Error(`Error fetching data: ${response.statusText}`);
+            }
+            const data = await response.json();
+            func(data);
+        } catch (error) {
+            console.error("Error in getLayer:", error);
+        }
+    };
+
+    // Shahrestan
+
+    let shahrestan_layer = null;
+
+    function addSahrestanLayer(data) {
+        shahrestan_layer = L.geoJSON(data, {
+            style: function (feature) {
+                return {
+                    color: "#3388ff",
+                    weight: 5,
+                    opacity: 1,
+                    fillColor: "#3388ff",
+                    fillOpacity: 0.2
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindTooltip(
+                    `
+                    <h6 class="" style="text-align: center !important;">شهرستان ${feature.properties.shahrestan}</h6>
+                    <div class="table-responsive medium">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr>
+                                    <th>استان</th>
+                                    <td>${feature.properties.ostan}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    `
+                );
+            }
+        });
+    }
+
+    getLayer('/assets/data/geodatabase/Shahrestan.geojson', addSahrestanLayer);
+
+    document.getElementById('shahrestan_layer_switch').addEventListener('change', function() {
+        if (this.checked) {           
+            if (shahrestan_layer) {
+                shahrestan_layer.addTo(map);
+            }
+        } else {
+            if (shahrestan_layer) {
+                map.removeLayer(shahrestan_layer);
+            }
+        }
+    })
+
+    
+    // Bakhsh
+
+    let bakhsh_layer = null;
+
+    function addBakhshLayer(data) {
+        bakhsh_layer = L.geoJSON(data, {
+            style: function (feature) {
+                return {
+                    color: "#3388ff",
+                    weight: 5,
+                    opacity: 1,
+                    fillColor: "#3388ff",
+                    fillOpacity: 0.2
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindTooltip(
+                    `
+                    <h6 class="" style="text-align: center !important;">بخش ${feature.properties.bakhsh}</h6>
+                    <div class="table-responsive medium">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr>
+                                    <th>شهرستان</th>
+                                    <td>${feature.properties.shahrestan}</td>
+                                </tr>
+                                <tr>
+                                    <th>استان</th>
+                                    <td>${feature.properties.ostan}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    `
+                );
+            }
+        });
+    }
+
+    getLayer('/assets/data/geodatabase/Bakhsh.geojson', addBakhshLayer);
+
+    document.getElementById('bakhsh_layer_switch').addEventListener('change', function() {
+        if (this.checked) {           
+            if (bakhsh_layer) {
+                bakhsh_layer.addTo(map);
+            }
+        } else {
+            if (bakhsh_layer) {
+                map.removeLayer(bakhsh_layer);
+            }
+        }
+    })
+
+
+    // Shahr
+
+    let shahr_layer = null;
+
+    function addShahrLayer(data) {
+        shahr_layer = L.geoJSON(data, {
+            style: function (feature) {
+                return {
+                    color: "#3388ff",
+                    weight: 5,
+                    opacity: 1,
+                    fillColor: "#3388ff",
+                    fillOpacity: 0.2
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindTooltip(
+                    `
+                    <h6 class="" style="text-align: center !important;">شهر ${feature.properties.shahr}</h6>
+                    <div class="table-responsive medium">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr>
+                                    <th>بخش</th>
+                                    <td>${feature.properties.bakhsh}</td>
+                                </tr>
+                                <tr>
+                                    <th>شهرستان</th>
+                                    <td>${feature.properties.shahrestan}</td>
+                                </tr>
+                                <tr>
+                                    <th>استان</th>
+                                    <td>${feature.properties.ostan}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    `
+                );
+            }
+        });
+    }
+
+    getLayer('/assets/data/geodatabase/Shahr.geojson', addShahrLayer);
+
+    document.getElementById('shahr_layer_switch').addEventListener('change', function() {
+        if (this.checked) {           
+            if (shahr_layer) {
+                shahr_layer.addTo(map);
+            }
+        } else {
+            if (shahr_layer) {
+                map.removeLayer(shahr_layer);
+            }
+        }
+    })
+
+
+
+
     // =========================================================================
     // /Form Control
     // =========================================================================
-
-
-    
-
-    // get_all_data();
-
-    // async function get_all_data() {
-    //     const response = await fetch('/api/dashboard/map/data/');
-    //     const data = await response.json();        
-    //     await addMarkers(data.data);    
-    // };
 
 
     
@@ -597,32 +765,7 @@
     // // Region
     // let geojsonLayerRegion = null;
 
-    // function addGeoJSONLayerRegion(geojsonData) {
-    //     geojsonLayerRegion = L.geoJSON(geojsonData, {
-    //         style: function (feature) {
-    //             return {
-    //                 color: "#3388ff",  // Outline color
-    //                 weight: 2,
-    //                 opacity: 1,
-    //                 fillColor: "#3388ff",
-    //                 fillOpacity: 0.2
-    //             };
-    //         },
-    //         onEachFeature: function (feature, layer) {
-    //             layer.bindTooltip(
-    //                 `منطقه ${feature.properties.region}`
-    //             );
-    //             // layer.on('click', function() {
-    //             //     fetch(`/region/${feature.properties.Region}`)
-    //             //         .then(response => response.json())
-    //             //         .then(data => {
-    //             //             console.log(data.n);
-                            
-    //             //         })
-    //             // });
-    //         }
-    //     }).addTo(map);
-    // }
+
 
     // fetch('/assets/data/geodatabase/Region.geojson')
     //     .then(response => response.json())
@@ -633,17 +776,6 @@
     //         console.error("Error loading the GeoJSON file:", error);
     //     })
     
-    // document.getElementById('showRegion').addEventListener('change', function() {
-    //     if (this.checked) {           
-    //         if (geojsonLayerRegion) {
-    //             geojsonLayerRegion.addTo(map);
-    //         }
-    //     } else {
-    //         if (geojsonLayerRegion) {
-    //             map.removeLayer(geojsonLayerRegion);
-    //         }
-    //     }
-    // })
 
     // // District
     // let geojsonLayerDistrict = null;
@@ -694,6 +826,8 @@
     //         }
     //     }
     // })
+
+
 
     // let ratio_map;
 
@@ -812,49 +946,6 @@
     //                 });
     //         })
 
-
-
-    
-
-
-    // Function to Add Markers to the Map
-
-    
-
-
-    // document.getElementById('apply_filter').addEventListener('click', function () {
-    //     let citySelect = document.getElementById('city').value;
-    //     let regionSelect = document.getElementById('region').value;
-    //     let districtSelect = document.getElementById('district').value;
-    //     let typeBreadSelect = document.getElementById('typeBread').value;
-    //     let typeFlourSelect = document.getElementById('typeFlour').value;
-    //     let secondFuelSelect = document.getElementById('secondFuel').value;
-
-    //     if (!citySelect) {
-    //         citySelect = "999";
-    //     }
-    //     if (!regionSelect) {
-    //         regionSelect = "999";
-    //     }
-    //     if (!districtSelect) {
-    //         districtSelect = "999";
-    //     }
-    //     if (!typeBreadSelect) {
-    //         typeBreadSelect = "999";
-    //     }
-    //     if (!typeFlourSelect) {
-    //         typeFlourSelect = "999";
-    //     }
-    //     if (!secondFuelSelect) {
-    //         secondFuelSelect = "999";
-    //     }
-
-    //     fetch(`/api/dashboard/map/filter/${citySelect}/${regionSelect}/${districtSelect}/${typeBreadSelect}/${typeFlourSelect}/${secondFuelSelect}`)
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         addMarkers(data.data);
-    //     });
-    // });
 
 
 
