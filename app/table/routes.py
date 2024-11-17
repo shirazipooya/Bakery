@@ -19,42 +19,67 @@ blueprint = Blueprint(
     import_name=__name__,
 )
 
-
+# ==============================================================================
+# Load Pages
+# ==============================================================================
 @blueprint.route(rule='/table', methods=['POST', 'GET'])
 @login_required
 def home():
-    form = BakeryForm()
-    if form.validate_on_submit():
-        bakery = Bakery(
-            first_name = form.first_name.data,
-            last_name = form.last_name.data,
-            nid = form.nid.data,
-            phone = form.phone.data,
-            bakery_id = form.bakery_id.data,
-            ownership_status = form.ownership_status.data,
-            number_violations = form.number_violations.data,
-            second_fuel = form.second_fuel.data,
-            city = form.city.data,
-            region = int(form.region.data),
-            district = int(form.district.data),
-            lat = form.lat.data,
-            lon = form.lon.data,
-            household_risk = form.household_risk.data,
-            bakers_risk = form.bakers_risk.data,
-            flour_types = int(form.flour_types.data),
-            bread_types = form.bread_types.data,
-            bread_rations = form.bread_rations.data,
-        )
-        db.session.add(bakery)
-        db.session.commit()
-        flash(message='رکورد جدید ایجاد گردید.', category='success')
-        return redirect(location=url_for(endpoint='table.home'))
-    return render_template(template_name_or_list='table/home.html', form=form)
+    query = OwnershipStatus.query.with_entities(OwnershipStatus.name).distinct()
+    items = query.all()
+    ownership_status_options = sorted([item[0] for item in items])
+    
+    query = SecondFuel.query.with_entities(SecondFuel.name).distinct()
+    items = query.all()
+    second_fuel_options = sorted([item[0] for item in items])
+    
+    query = HouseholdRisk.query.with_entities(HouseholdRisk.name).distinct()
+    items = query.all()
+    household_risk_options = sorted([item[0] for item in items])
+    
+    query = BakersRisk.query.with_entities(BakersRisk.name).distinct()
+    items = query.all()
+    bakers_risk_options = sorted([item[0] for item in items])
+    
+    query = TypeFlour.query.with_entities(TypeFlour.name).distinct()
+    items = query.all()
+    type_flour_options = sorted([item[0] for item in items])
+    
+    query = TypeBread.query.with_entities(TypeBread.name).distinct()
+    items = query.all()
+    type_bread_options = sorted([item[0] for item in items])
+    
+    data={
+        "ownership_status_options": ownership_status_options,
+        "second_fuel_options": second_fuel_options,
+        "household_risk_options": household_risk_options,
+        "bakers_risk_options": bakers_risk_options,
+        "type_flour_options": type_flour_options,
+        "type_bread_options": type_bread_options,
+    }
+    
+    return render_template(
+        template_name_or_list='table/home.html',
+        data=data
+    )
 
 
-@blueprint.route(rule='/api/database/table', methods=['GET'])
+# ==============================================================================
+# API
+# ==============================================================================
+@blueprint.route(rule='/api/table/headers', methods=['GET'])
 @login_required
-def show_table():
+def get_table_headers():
+    headers = [
+        {"field": key, "label": value} for key, value in Bakery.verbose_names.items()
+    ]
+    return jsonify(headers)
+
+
+
+@blueprint.route(rule='/api/table/data', methods=['GET'])
+@login_required
+def get_table_data():
     search = request.args.get('search', '')
     search = search.split()
     sort_by = request.args.get('sort_by', 'id')
@@ -100,9 +125,7 @@ def show_table():
     )
 
 
-
-
-@blueprint.route('/api/database/delete/<int:id>', methods=['DELETE'])
+@blueprint.route('/api/table/delete/<int:id>', methods=['DELETE'])
 @login_required
 def delete_record(id):
     record = Bakery.query.get(id)
@@ -114,8 +137,7 @@ def delete_record(id):
         return jsonify({"error": f"نانوایی با شماره ردیف {id} پیدا نشد"}), 404
 
 
-
-@blueprint.route('/api/database/update/<int:id>', methods=['GET', 'POST'])
+@blueprint.route('/api/table/update/<int:id>', methods=['GET', 'POST'])
 @login_required
 def update_record(id):
     data = request.json
@@ -129,11 +151,6 @@ def update_record(id):
         bakery.ownership_status = data.get('ownership_status')
         bakery.number_violations = data.get('number_violations')
         bakery.second_fuel = data.get('second_fuel')
-        bakery.city = data.get('city')
-        bakery.region = data.get('region')
-        bakery.district = data.get('district')
-        bakery.lat = data.get('lat')
-        bakery.lon = data.get('lon')
         bakery.household_risk = data.get('household_risk')
         bakery.bakers_risk = data.get('bakers_risk')
         bakery.flour_types = data.get('flour_types')
@@ -141,7 +158,3 @@ def update_record(id):
         bakery.bread_rations = data.get('bread_rations')
         db.session.commit()
         return jsonify({'message': 'Bakery Updated Successfully'})
-
-
-
-

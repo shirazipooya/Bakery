@@ -416,7 +416,8 @@ def clean_csv_file(df):
     
 
 
-@blueprint.route(rule='/database', methods=['POST', 'GET'])
+
+@blueprint.route(rule='/database', methods=['GET', 'POST'])
 @login_required
 def home():
     form = BakeryForm()
@@ -446,56 +447,8 @@ def home():
         flash(message='رکورد جدید ایجاد گردید.', category='success')
         return redirect(location=url_for(endpoint='database.home'))
     return render_template(template_name_or_list='database/home.html', form=form)
-
-
-@blueprint.route(rule='/api/database/table', methods=['GET'])
-@login_required
-def show_table():
-    search = request.args.get('search', '')
-    search = search.split()
-    sort_by = request.args.get('sort_by', 'id')
-    sort_order = request.args.get('sort_order', 'asc')
-    page = int(request.args.get('page', 1))
-    per_page = 10
-    offset = (page - 1) * per_page
     
-    columns = [column.name for column in Bakery.__table__.columns]
-    filters = []
-    for term in search:
-        term_filter = or_(
-            *[getattr(Bakery, column).ilike(f"%{term}%") for column in columns]
-        )
-        filters.append(term_filter)
-        
-    query = Bakery.query.filter(or_(*filters))
-    
-    if sort_by in Bakery.__table__.columns:
-        if sort_order == 'desc':
-            query = query.order_by(desc(getattr(Bakery, sort_by)))
-        else:
-            query = query.order_by(asc(getattr(Bakery, sort_by)))
-    
-    total_results = query.count()
-    
-    query = query.limit(per_page).offset(offset)
-    
-    results = query.all()
-    
-    result_list = [
-        {column: getattr(result, column) for column in columns}
-        for result in results
-    ]
-    
-    return jsonify(
-        {
-            'data': result_list,
-            'total_count': total_results,
-            'per_page': per_page,
-            'page': page
-        }
-    )
-
-
+      
 @blueprint.route(rule='/api/database/upload', methods=['POST'])
 @login_required
 def upload_csv():    

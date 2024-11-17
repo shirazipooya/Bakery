@@ -36,6 +36,30 @@
 
     L.control.layers(baseLayers).addTo(map);
 
+    L.control.scale({
+        metric: true,
+        imperial: false,
+        position: 'bottomleft'
+    }).addTo(map)
+
+    L.Control.Watermark = L.Control.extend({
+        onAdd:function(map){
+            var img = L.DomUtil.create('img');
+            img.src = "assets/img/HydroCode.png";
+            img.style.width = "65px";
+            return img
+        },
+        onRemove: function(map){},
+    })
+
+    L.control.watermark = function(opts){
+        return new L.Control.Watermark(opts);
+    }
+
+    L.control.watermark({position:'bottomleft'}).addTo(map);
+
+
+
     L.easyPrint({
         title: 'پرینت',
         sizeModes: ['Current'],
@@ -590,8 +614,49 @@
         }
     };
 
-    // Shahrestan
+    // Ostan
+    let ostan_layer = null;
 
+    function addOstanLayer(data) {
+        ostan_layer = L.geoJSON(data, {
+            style: function (feature) {
+                return {
+                    color: "#3388ff",
+                    weight: 5,
+                    opacity: 1,
+                    fillColor: "#3388ff",
+                    fillOpacity: 0.2
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindTooltip(
+                    `
+                    <h6 class="" style="text-align: center !important;">استان ${feature.properties.ostan}</h6>
+                    <div class="table-responsive medium">
+                    </div>
+                    `
+                );
+            }
+        });
+    }
+
+    getLayer('/assets/data/geodatabase/Ostan.geojson', addOstanLayer);
+
+    document.getElementById('ostan_layer_switch').addEventListener('change', function() {
+        if (this.checked) {           
+            if (ostan_layer) {
+                ostan_layer.addTo(map);
+                map.fitBounds(ostan_layer.getBounds());
+            }
+        } else {
+            if (ostan_layer) {
+                map.removeLayer(ostan_layer);
+            }
+        }
+    })
+
+
+    // Shahrestan
     let shahrestan_layer = null;
 
     function addSahrestanLayer(data) {
@@ -631,6 +696,7 @@
         if (this.checked) {           
             if (shahrestan_layer) {
                 shahrestan_layer.addTo(map);
+                map.fitBounds(shahrestan_layer.getBounds());
             }
         } else {
             if (shahrestan_layer) {
@@ -641,7 +707,6 @@
 
     
     // Bakhsh
-
     let bakhsh_layer = null;
 
     function addBakhshLayer(data) {
@@ -685,6 +750,7 @@
         if (this.checked) {           
             if (bakhsh_layer) {
                 bakhsh_layer.addTo(map);
+                map.fitBounds(bakhsh_layer.getBounds());
             }
         } else {
             if (bakhsh_layer) {
@@ -695,7 +761,6 @@
 
 
     // Shahr
-
     let shahr_layer = null;
 
     function addShahrLayer(data) {
@@ -743,10 +808,137 @@
         if (this.checked) {           
             if (shahr_layer) {
                 shahr_layer.addTo(map);
+                map.fitBounds(shahr_layer.getBounds());
             }
         } else {
             if (shahr_layer) {
                 map.removeLayer(shahr_layer);
+            }
+        }
+    })
+
+    // Region
+    let region_layer = null;
+
+    function addRegionLayer(data) {
+        region_layer = L.geoJSON(data, {
+            style: function (feature) {
+                return {
+                    color: "#3388ff",
+                    weight: 5,
+                    opacity: 1,
+                    fillColor: "#3388ff",
+                    fillOpacity: 0.2
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindTooltip(
+                    `
+                    <h6 class="" style="text-align: center !important;">منطقه ${feature.properties.region}</h6>
+                    <div class="table-responsive medium">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr>
+                                    <th>شهر</th>
+                                    <td>${feature.properties.shahr}</td>
+                                </tr>
+                                <tr>
+                                    <th>بخش</th>
+                                    <td>${feature.properties.bakhsh}</td>
+                                </tr>
+                                <tr>
+                                    <th>شهرستان</th>
+                                    <td>${feature.properties.shahrestan}</td>
+                                </tr>
+                                <tr>
+                                    <th>استان</th>
+                                    <td>${feature.properties.ostan}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    `
+                );
+            }
+        });
+    }
+
+    getLayer('/assets/data/geodatabase/Region.geojson', addRegionLayer);
+
+    document.getElementById('region_layer_switch').addEventListener('change', function() {
+        if (this.checked) {           
+            if (region_layer) {
+                region_layer.addTo(map);
+                map.fitBounds(region_layer.getBounds());
+            }
+        } else {
+            if (region_layer) {
+                map.removeLayer(region_layer);
+            }
+        }
+    })
+
+    // District
+    let district_layer = null;
+
+    function addDistrictLayer(data) {
+        district_layer = L.geoJSON(data, {
+            style: function (feature) {
+                return {
+                    color: "#3388ff",
+                    weight: 5,
+                    opacity: 1,
+                    fillColor: "#3388ff",
+                    fillOpacity: 0.2
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindTooltip(
+                    `
+                    <h6 class="" style="text-align: center !important;">ناحیه ${feature.properties.district}</h6>
+                    <div class="table-responsive medium">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr>
+                                    <th>منطقه</th>
+                                    <td>${feature.properties.region}</td>
+                                </tr>
+                                <tr>
+                                    <th>شهر</th>
+                                    <td>${feature.properties.shahr}</td>
+                                </tr>
+                                <tr>
+                                    <th>بخش</th>
+                                    <td>${feature.properties.bakhsh}</td>
+                                </tr>
+                                <tr>
+                                    <th>شهرستان</th>
+                                    <td>${feature.properties.shahrestan}</td>
+                                </tr>
+                                <tr>
+                                    <th>استان</th>
+                                    <td>${feature.properties.ostan}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    `
+                );
+            }
+        });
+    }
+
+    getLayer('/assets/data/geodatabase/District.geojson', addDistrictLayer);
+
+    document.getElementById('district_layer_switch').addEventListener('change', function() {
+        if (this.checked) {           
+            if (district_layer) {
+                district_layer.addTo(map);
+                map.fitBounds(district_layer.getBounds());
+            }
+        } else {
+            if (district_layer) {
+                map.removeLayer(district_layer);
             }
         }
     })

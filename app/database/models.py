@@ -26,7 +26,35 @@ class Bakery(BaseModel, UserMixin):
     bakers_risk = db.Column(db.String(30), unique=False, nullable=True)
     flour_types = db.Column(db.String(30), unique=False, nullable=True)
     bread_types = db.Column(db.String(30), unique=False, nullable=True)
-    bread_rations = db.Column(db.Integer, unique=False, nullable=True)    
+    bread_rations = db.Column(db.Integer, unique=False, nullable=True)
+    
+    verbose_names = {
+        "id": "ردیف",
+        "first_name": "نام",
+        "last_name": "نام خانوادگی",
+        "nid": "کدملی",
+        "phone": "تلفن همراه",
+        "bakery_id": "شماره خبازی",
+        "ownership_status": "نوع ملک نانوایی",
+        "number_violations": "تعداد تخلفات نانوایی",
+        "second_fuel": "سوخت دوم",
+        "household_risk": "ریسک خانوار",
+        "bakers_risk": "ریسک نانوا",
+        "flour_types": "نوع آرد",
+        "bread_types": "نوع پخت",
+        "bread_rations": "سهمیه",
+        "ostan": "استان",
+        "shahrestan": "شهرستان",
+        "bakhsh": "بخش",
+        "shahr": "شهر",
+        "city": "شهر",
+        "region": "منطقه",
+        "district": "ناحیه",
+        "lat": "عرض جغرافیایی",
+        "lon": "طول جغرافیایی",
+        "created_at": "تاریخ ایجاد",
+        "updated_at": "تاریخ ویرایش",
+    }  
     
     def __repr__(self):
         return f'{self.__class__.__name__} ({self.first_name}, {self.last_name}, {self.nid}, {self.bread_types}, {self.bread_rations})'
@@ -47,13 +75,6 @@ class Amarnameh(BaseModel):
     
     def __repr__(self):
         return f'{self.__class__.__name__} ({self.ostan}, {self.shahrestan}, {self.bakhsh}, {self.shahr}, {self.region}, {self.district}, {self.population})'
-
-
-
-
-
-
-
 
 
 class OwnershipStatus(BaseModel):

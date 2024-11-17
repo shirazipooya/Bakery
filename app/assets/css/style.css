@@ -25,3 +25,11 @@
   border: 0px;
   box-shadow: none;
 }
+
+.clickable-header {
+  cursor: pointer; /* Displays a hand cursor */
+  text-decoration: underline; /* Optional: Adds an underline for a visual cue */
+}
+.clickable-header:hover {
+  color: #007bff; /* Optional: Changes the color on hover */
+}

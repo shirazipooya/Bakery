@@ -26,16 +26,7 @@ def home():
     return render_template(template_name_or_list='settings/home.html')
     
 
-
-    
-
-
-
-
-
-
-
-@blueprint.route('/api/database/all_items', methods=['GET', 'POST'])
+@blueprint.route('/api/settings/all_items', methods=['GET', 'POST'])
 @login_required
 def all_items():
     column = request.json.get('column')
@@ -59,7 +50,7 @@ def all_items():
         return jsonify(items)
 
 
-@blueprint.route('/api/database/add_category', methods=['GET', 'POST'])
+@blueprint.route('/api/settings/add_category', methods=['GET', 'POST'])
 @login_required
 def add_category():
     column = request.json.get('column')
