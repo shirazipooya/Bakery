@@ -12,6 +12,9 @@ import geopandas as gpd
 from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_required
 from flask_socketio import emit
+from shapely.geometry import Point
+
+from app.users.routes import role_required
 
 
 blueprint = Blueprint(
@@ -96,7 +99,39 @@ def validate_iranian_national_code(code):
         return remainder == last_digit
     else:
         return 11 - remainder == last_digit
+
+
+
+
+def extract_location(lat, lon):
+    gdf_bakhsh = gpd.read_file('app/assets/data/geodatabase/Bakhsh.geojson')
+    gdf_shahr = gpd.read_file('app/assets/data/geodatabase/Shahr.geojson')
+    gdf_district = gpd.read_file('app/assets/data/geodatabase/District.geojson')
+    point = Point(lon, lat)
     
+    containing_feature = gdf_bakhsh[gdf_bakhsh.geometry.apply(lambda geom: geom.contains(point))]
+    ostan = containing_feature.iloc[0]['ostan']
+    shahrestan = containing_feature.iloc[0]['shahrestan']
+    bakhsh = containing_feature.iloc[0]['bakhsh']
+    
+    containing_feature = gdf_shahr[gdf_shahr.geometry.apply(lambda geom: geom.contains(point))]
+    if not containing_feature.empty:
+        shahr = containing_feature.iloc[0]['shahr']
+        
+        containing_feature = gdf_district[gdf_district.geometry.apply(lambda geom: geom.contains(point))]
+        if not containing_feature.empty:
+            region = containing_feature.iloc[0]['region']
+            district = containing_feature.iloc[0]['district']
+        else:
+            region = 1
+            district = 1  
+    else:
+        shahr = "روستایی"
+        region = 1
+        district = 1
+    
+    return ostan, shahrestan, bakhsh, shahr, region, district
+
 
 def clean_csv_file(df):
         
@@ -419,28 +454,57 @@ def clean_csv_file(df):
 
 @blueprint.route(rule='/database', methods=['GET', 'POST'])
 @login_required
+@role_required('کاربر عادی')
 def home():
     form = BakeryForm()
+    
+    items = OwnershipStatus.query.with_entities(OwnershipStatus.name).distinct().all()
+    form.ownership_status.choices = [(item[0], item[0]) for item in items]
+    
+    items = SecondFuel.query.with_entities(SecondFuel.name).distinct().all()
+    form.second_fuel.choices = [(item[0], item[0]) for item in items]
+    
+    items = HouseholdRisk.query.with_entities(HouseholdRisk.name).distinct().all()
+    form.household_risk.choices = [(item[0], item[0]) for item in items]
+    
+    items = BakersRisk.query.with_entities(BakersRisk.name).distinct().all()
+    form.bakers_risk.choices = [(item[0], item[0]) for item in items]
+    
+    items = TypeFlour.query.with_entities(TypeFlour.name).distinct().all()
+    form.flour_types.choices = [(item[0], item[0]) for item in items]
+    
+    items = TypeBread.query.with_entities(TypeBread.name).distinct().all()
+    form.bread_types.choices = [(item[0], item[0]) for item in items]
+    
     if form.validate_on_submit():
+        
+        first_name = virastarStr(form.first_name.data)
+        last_name = virastarStr(form.last_name.data)
+        ostan, shahrestan, bakhsh, shahr, region, district = extract_location(lat=float(form.lat.data), lon=float(form.lon.data))
+                
         bakery = Bakery(
-            first_name = form.first_name.data,
-            last_name = form.last_name.data,
+            first_name = first_name,
+            last_name = last_name,
             nid = form.nid.data,
             phone = form.phone.data,
             bakery_id = form.bakery_id.data,
             ownership_status = form.ownership_status.data,
-            number_violations = form.number_violations.data,
+            number_violations = int(form.number_violations.data),
             second_fuel = form.second_fuel.data,
-            city = form.city.data,
-            region = int(form.region.data),
-            district = int(form.district.data),
-            lat = form.lat.data,
-            lon = form.lon.data,
+            ostan = ostan,
+            shahrestan = shahrestan,
+            bakhsh = bakhsh,
+            shahr = shahr,
+            city = shahr,
+            region = int(region),
+            district = int(district),
+            lat = float(form.lat.data),
+            lon = float(form.lon.data),
             household_risk = form.household_risk.data,
             bakers_risk = form.bakers_risk.data,
-            flour_types = int(form.flour_types.data),
+            flour_types = form.flour_types.data,
             bread_types = form.bread_types.data,
-            bread_rations = form.bread_rations.data,
+            bread_rations = int(form.bread_rations.data),
         )
         db.session.add(bakery)
         db.session.commit()
@@ -451,6 +515,7 @@ def home():
       
 @blueprint.route(rule='/api/database/upload', methods=['POST'])
 @login_required
+@role_required('کاربر عادی')
 def upload_csv():    
     
     if 'file' not in request.files:
@@ -542,6 +607,7 @@ def upload_csv():
 
 @blueprint.route('/api/database/delete/<int:id>', methods=['DELETE'])
 @login_required
+@role_required('کاربر عادی')
 def delete_record(id):
     record = Bakery.query.get(id)
     if record:
@@ -553,6 +619,7 @@ def delete_record(id):
 
 @blueprint.route('/api/database/delete/', methods=['DELETE'])
 @login_required
+@role_required('کاربر عادی')
 def delete_table():
     try:
         db.session.query(Bakery).delete()
@@ -565,6 +632,7 @@ def delete_table():
 
 @blueprint.route('/api/database/update/<int:id>', methods=['GET', 'POST'])
 @login_required
+@role_required('کاربر عادی')
 def update_record(id):
     data = request.json
     bakery = Bakery.query.filter_by(id=id).first()
@@ -593,6 +661,7 @@ def update_record(id):
 
 @blueprint.route('/api/database/all_items', methods=['GET', 'POST'])
 @login_required
+@role_required('کاربر عادی')
 def all_items():
     column = request.json.get('column')
     if column == "ownership_status":
@@ -617,6 +686,7 @@ def all_items():
 
 @blueprint.route('/api/database/add_category', methods=['GET', 'POST'])
 @login_required
+@role_required('کاربر عادی')
 def add_category():
     column = request.json.get('column')
     new_category = request.json.get('new_category')

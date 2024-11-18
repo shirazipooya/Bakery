@@ -62,7 +62,7 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <span class="fw-medium d-block lh-1">{{ current_user.first_name }} {{ current_user.last_name }}</span>
-                                        <small>مدیر سیستم</small>
+                                        <small>{{ current_user.role }}</small>
                                     </div>
                                 </div>
                             </a>
@@ -76,15 +76,25 @@
                                 <span class="align-middle">پروفایل من</span>
                             </a>
                         </li>
+                        {% if current_user.role == 'مدیر سیستم' %}
                         <li>
-                            <a class="dropdown-item disabled" href="#">
+                            <a class="dropdown-item" href="{{ url_for('settings.home') }}">
                                 <i class="bx bx-cog me-2"></i>
                                 <span class="align-middle">تنظیمات</span>
                             </a>
                         </li>
+                        {% endif %}
                         <li>
                             <div class="dropdown-divider"></div>
                         </li>
+                        {% if current_user.role == 'مدیر سیستم' %}
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('users.register') }}">
+                                <i class='bx bx-user-plus me-2'></i>
+                                <span class="align-middle">ایجاد کاربر جدید</span>
+                            </a>
+                        </li>
+                        {% endif %}
                         <li>
                             <a class="dropdown-item" href="{{ url_for('users.logout') }}">
                                 <i class="bx bx-power-off me-2"></i>

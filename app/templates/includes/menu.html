@@ -19,18 +19,14 @@
                     <div>جدول‌ها</div>
                 </a>
             </li>
+            {% if current_user.role == 'مدیر سیستم' %}
             <li class="menu-item">
                 <a href={{ url_for('database.home' ) }} class="menu-link">
                     <i class="menu-icon tf-icons bx bx-data"></i>
                     <div>مدیریت پایگاه داده</div>
                 </a>
             </li>
-            <li class="menu-item">
-                <a href={{ url_for('settings.home' ) }} class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-data"></i>
-                    <div>تنظیمات</div>
-                </a>
-            </li>
+            {% endif %}
         </ul>
     </div>
 </aside>

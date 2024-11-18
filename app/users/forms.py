@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import  StringField, PasswordField, BooleanField
+from wtforms import  StringField, PasswordField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from app.users.models import User
 
@@ -63,6 +63,16 @@ class RegistrationForm(FlaskForm):
         render_kw={
             "placeholder": "گذرواژه خود را دوباره وارد کنید ..."
         }
+    )
+    role = SelectField(
+        label='نقش',
+        validators=[
+            DataRequired(),
+        ],
+        choices=[
+            ("کاربر عادی", "کاربر عادی"),
+            ("مدیر سیستم", "مدیر سیستم"),
+        ]
     )
     
     def validate_username(self, username):

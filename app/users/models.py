@@ -14,6 +14,7 @@ class User(BaseModel, UserMixin):
     username = db.Column(db.String(30), unique=True, nullable=False)
     password = db.Column(db.String(30), nullable=False)
     phone = db.Column(db.String(11), unique=True, nullable=False)
+    role = db.Column(db.String(30), unique=False, nullable=False)
     
     def __repr__(self):
         return f'{self.__class__.__name__} ({self.id}, {self.username})'

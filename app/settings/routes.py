@@ -13,6 +13,8 @@ from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_required
 from flask_socketio import emit
 
+from app.users.routes import role_required
+
 
 blueprint = Blueprint(
     name='settings',
@@ -22,12 +24,14 @@ blueprint = Blueprint(
 
 @blueprint.route('/settings', methods=['GET', 'POST'])
 @login_required
+@role_required('کاربر عادی')
 def home():
     return render_template(template_name_or_list='settings/home.html')
     
 
 @blueprint.route('/api/settings/all_items', methods=['GET', 'POST'])
 @login_required
+@role_required('کاربر عادی')
 def all_items():
     column = request.json.get('column')
     if column == "ownership_status":
@@ -52,6 +56,7 @@ def all_items():
 
 @blueprint.route('/api/settings/add_category', methods=['GET', 'POST'])
 @login_required
+@role_required('کاربر عادی')
 def add_category():
     column = request.json.get('column')
     new_category = request.json.get('new_category')

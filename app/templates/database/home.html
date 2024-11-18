@@ -5,34 +5,45 @@
 {% block content %}
 
 <div class="container-xxl flex-grow-1 container-p-y">
-  
-  <!-- Table -->
-  <div class="row">
-
-
-    <div>
-      <button type="button" class="btn btn-danger" onclick="showDeleteTableModal()">
-        <i class="bx bx-trash me-1"></i>حذف جدول داده‌ها
-      </button>
-    </div>
-      
-  </div>
-  <!-- / Table -->
-
   <!-- Add New Record -->
   {% include 'database/includes/add_new_record.html' %}
   <!-- / Add New Record -->
   <div class="row">
-    <div class="col">
-        <!-- Upload File -->
-  {% include 'database/includes/upload_file.html' %}
-  <!-- / Upload File -->
+    <!-- Upload File -->
+    <div class="col-md-6 col-12">
+      {% include 'database/includes/upload_file.html' %}
     </div>
+    <!-- / Upload File -->
+    <!-- Delete Table -->
+    <div class="col-md-6 col-12">
+      <div class="row">
+        <div class="col-12 mb-2">
+          <div class="divider">
+            <div class="divider-text fs-4">حذف جدول داده‌ها</div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body demo-vertical-spacing demo-only-element text-center">
+              <div>
+                <img src="{{ url_for('static', filename='svg/exclamation-mark.svg') }}" width="120"/>
+              </div>
+                <div class="pt-3">
+                  <h3 class="pb-4">هشدار!</h3>
+                  <button type="button" class="btn btn-warning btn-xl" onclick="showDeleteTableModal()">
+                    <i class="bx bx-trash me-1"></i>حذف جدول داده‌ها
+                  </button>
+                </div>
 
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- / Delete Table -->
   </div>
-
-
-
-
 </div>
 {% endblock %}
+
+
+

@@ -43,8 +43,8 @@
                     <button type="button" class="step-trigger">
                         <span class="bs-stepper-circle">2</span>
                         <span class="bs-stepper-label">
-                            <span class="bs-stepper-title">موقعیت جغرافیایی</span>
-                            <span class="bs-stepper-subtitle">مشخصات موقعیت مکانی</span>
+                            <span class="bs-stepper-title">مشخصات نانوایی</span>
+                            <span class="bs-stepper-subtitle">مشخصات نانوایی</span>
                         </span>
                     </button>
                 </div>
@@ -85,22 +85,6 @@
                                 {{ form.phone.label(class="form-label") }}
                                 {{ form.phone(class="form-control") }}
                             </div>
-                            <div class="col-sm-4">
-                                {{ form.bakery_id.label(class="form-label") }}
-                                {{ form.bakery_id(class="form-control") }}
-                            </div>
-                            <div class="col-sm-4">
-                                {{ form.ownership_status.label(class="form-label") }}
-                                {{ form.ownership_status(class="select2", **{"data-placeholder":"نوع ملک نانوایی را انتخاب کنید"}) }}
-                            </div>
-                            <div class="col-sm-4">
-                                {{ form.number_violations.label(class="form-label") }}
-                                {{ form.number_violations(class="form-control") }}
-                            </div>
-                            <div class="col-sm-4">
-                                {{ form.second_fuel.label(class="form-label") }}
-                                {{ form.second_fuel(class="select2", **{"data-placeholder":"نوع سوخت دوم را انتخاب کنید"}) }}
-                            </div>
                             <div class="col-12 d-flex justify-content-between">
                                 <a class="btn btn-label-secondary btn-prev disabled" style="color: white;">
                                     <i class="bx bx-chevron-left bx-sm ms-sm-n2"></i>
@@ -120,17 +104,18 @@
                         </div>
                         <div class="row g-3">
                             <div class="col-sm-4">
-                                {{ form.city.label(class="form-label") }}
-                                {{ form.city(class="select2", **{"data-placeholder":"شهر را انتخاب کنید"}) }}
+                                {{ form.bakery_id.label(class="form-label") }}
+                                {{ form.bakery_id(class="form-control") }}
                             </div>
                             <div class="col-sm-4">
-                                {{ form.region.label(class="form-label") }}
-                                {{ form.region(class="select2", **{"data-placeholder":"منطقه را انتخاب کنید"}) }}
+                                {{ form.ownership_status.label(class="form-label") }}
+                                {{ form.ownership_status(class="select2", **{"data-placeholder":"نوع ملک نانوایی را انتخاب کنید"}) }}
                             </div>
                             <div class="col-sm-4">
-                                {{ form.district.label(class="form-label") }}
-                                {{ form.district(class="select2", **{"data-placeholder":"ناحیه را انتخاب کنید"}) }}
+                                {{ form.second_fuel.label(class="form-label") }}
+                                {{ form.second_fuel(class="select2", **{"data-placeholder":"نوع سوخت دوم را انتخاب کنید"}) }}
                             </div>
+
                             <div class="col-sm-4">
                                 {{ form.lat.label(class="form-label") }}
                                 {{ form.lat(class="form-control") }}
@@ -170,11 +155,15 @@
                                 {{ form.bread_rations.label(class="form-label") }}
                                 {{ form.bread_rations(class="form-control") }}
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-4">
+                                {{ form.number_violations.label(class="form-label") }}
+                                {{ form.number_violations(class="form-control") }}
+                            </div>
+                            <div class="col-sm-4">
                                 {{ form.household_risk.label(class="form-label") }}
                                 {{ form.household_risk(class="select2", **{"data-placeholder":"ریسک خانوار را انتخاب کنید"}) }}
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-4">
                                 {{ form.bakers_risk.label(class="form-label") }}
                                 {{ form.bakers_risk(class="select2", **{"data-placeholder":"ریسک نانوا را انتخاب کنید"}) }}
                             </div>

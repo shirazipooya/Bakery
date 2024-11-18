@@ -1,17 +1,57 @@
 from flask_wtf import FlaskForm
 from wtforms import  StringField, IntegerField, FloatField, SelectField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
-from app.database.models import Bakery
+# from app.database.models import Bakery, OwnershipStatus, SecondFuel, HouseholdRisk, BakersRisk, TypeFlour, TypeBread
+from shapely.geometry import Point
+import geopandas as gpd
+
+def validate_phone_start(form, field):
+    if not field.data.startswith('09'):
+        raise ValidationError('شماره تلفن باید با 09 شروع شود!')
 
 
+def validate_iranian_national_code(form, field):
+    code = field.data
+    code_len = len(code)
+    
+    if code_len > 10 or code_len < 8:
+        raise ValidationError('کد ملی میتواند 8 تا 10 رقم باشد!')
+
+    if len(set(code)) == 1:
+        raise ValidationError('همه ارقام کدملی نمیتواند یکسان باشد!')
+
+    if len(code) < 10:
+        code = code.zfill(10)
+
+    factors = [10, 9, 8, 7, 6, 5, 4, 3, 2]
+    checksum = sum(int(code[i]) * factors[i] for i in range(len(code) - 1))
+    remainder = checksum % 11
+    last_digit = int(code[-1])
+
+    if remainder < 2:
+        if remainder != last_digit:
+            raise ValidationError('کدملی اشتباه وارد شده است!')  
+    else:
+        if 11 - remainder != last_digit:
+            raise ValidationError('کدملی اشتباه وارد شده است!') 
+
+
+def validate_lat_lon(form, field):
+    gdf_bakhsh = gpd.read_file('app/assets/data/geodatabase/Bakhsh.geojson')
+    point = Point(float(form.lon.data), float(form.lat.data))
+    containing_feature = gdf_bakhsh[gdf_bakhsh.geometry.apply(lambda geom: geom.contains(point))]
+    if containing_feature.empty:
+        raise ValidationError('طول و عرض جغرافیایی وارد شده در محدوده استان، شهرستان و بخش دیتابیس موجود نمی باشد!') 
+
+          
 class BakeryForm(FlaskForm):
     
     first_name = StringField(
         label='نام',
         validators=[
-            # DataRequired(
-            #     message="وارد کردن نام الزامیست!"
-            # ),
+            DataRequired(
+                message="وارد کردن نام الزامیست!"
+            ),
             Length(
                 # min=2,
                 max=30,
@@ -26,7 +66,9 @@ class BakeryForm(FlaskForm):
     last_name = StringField(
         label='نام خانوادگی',
         validators=[
-            # DataRequired(),
+            DataRequired(
+                message="وارد کردن نام خانوادگی الزامیست!"
+            ),
             Length(
                 # min=2,
                 max=30,
@@ -41,12 +83,10 @@ class BakeryForm(FlaskForm):
     nid = StringField(
         label='کدملی',
         validators=[
-            # DataRequired(),
-            Length(
-                min=10,
-                max=10,
-                message='10 رقم!'
-            )
+            DataRequired(
+                message="وارد کردن کدملی الزامیست!"
+            ),
+            validate_iranian_national_code
         ],
         render_kw={
             "placeholder": "0123456789"
@@ -56,12 +96,15 @@ class BakeryForm(FlaskForm):
     phone = StringField(
         label='تلفن همراه',
         validators=[
-            # DataRequired(),
+            DataRequired(
+                message="وارد کردن تلفن همراه الزامیست!"    
+            ),
             Length(
                 min=11,
                 max=11,
                 message='11 رقم!'
-            )
+            ),
+            validate_phone_start
         ],
         render_kw={
             "placeholder": "09151234567"
@@ -71,7 +114,9 @@ class BakeryForm(FlaskForm):
     bakery_id = StringField(
         label='شماره خبازی',
         validators=[
-            # DataRequired(),
+            DataRequired(
+                message="وارد کردن شماره خبازی الزامیست!"
+            ),
             Length(
                 # min=11,
                 max=30,
@@ -86,19 +131,16 @@ class BakeryForm(FlaskForm):
     ownership_status = SelectField(
         label='نوع ملک نانوایی',
         validators=[
-            # DataRequired(),
+            DataRequired(),
         ],
-        choices=[
-            ('', ''),
-            ('مالک', 'مالک'),
-            ('استیجاری', 'استیجاری'),
-        ]
     )
     
     number_violations = IntegerField(
         label='تعداد تخلفات نانوایی',
         validators=[
-            # DataRequired(),
+            DataRequired(
+                message="وارد کردن تعداد تخلفات نانوایی الزامیست!"
+            ),
         ],
         render_kw={
             "placeholder": "1"
@@ -108,70 +150,19 @@ class BakeryForm(FlaskForm):
     second_fuel = SelectField(
         label='سوخت دوم',
         validators=[
-            # DataRequired(),
+            DataRequired(),
         ],
-        choices=[
-            ('', ''),
-            ('ندارد', 'ندارد'),
-            ('گازوئیل', 'گازوئیل'),
-            ('نفت', 'نفت'),
-        ]
     )
-    
-    city = SelectField(
-        label='شهر',
-        validators=[
-            # DataRequired(),
-        ],
-        choices=[
-            ('', ''),
-            ('مشهد', 'مشهد'),
-        ]
-    )
-    
-    region = SelectField(
-        label='منطقه',
-        validators=[
-            # DataRequired(),
-        ],
-        choices=[
-            ('', ''),
-            ('1', 'منطقه 1'),
-            ('2', 'منطقه 2'),
-            ('3', 'منطقه 3'),
-            ('4', 'منطقه 4'),
-            ('5', 'منطقه 5'),
-            ('6', 'منطقه 6'),
-            ('7', 'منطقه 7'),
-            ('8', 'منطقه 8'),
-            ('9', 'منطقه 9'),
-            ('10', 'منطقه 10'),
-            ('11', 'منطقه 11'),
-            ('12', 'منطقه 12'),
-            ('13', 'منطقه 13'),
-        ]
-    )
-    
-    district = SelectField(
-        label='ناحیه',
-        validators=[
-            # DataRequired(),
-        ],
-        choices=[
-            ('', ''),
-            ('1', 'ناحیه 1'),
-            ('2', 'ناحیه 2'),
-            ('3', 'ناحیه 3'),
-            ('4', 'ناحیه 4'),
-            ('5', 'ناحیه 5'),
-        ]
-    )
+
     
     lat = FloatField(
         label='عرض جغرافیایی',
         validators=[
-            Optional(),
-            # DataRequired(),
+            # Optional(),
+            DataRequired(
+                message="وارد کردن عرض جغرافیایی الزامیست!"
+            ),
+            validate_lat_lon
         ],
         render_kw={
             "placeholder": "36.254687"
@@ -181,8 +172,11 @@ class BakeryForm(FlaskForm):
     lon = FloatField(
         label='طول جغرافیایی',
         validators=[
-            Optional(),
-            # DataRequired(),
+            # Optional(),
+            DataRequired(
+                message="وارد کردن طول جغرافیایی الزامیست!"
+            ),
+            validate_lat_lon
         ],
         render_kw={
             "placeholder": "59.254687"
@@ -192,67 +186,39 @@ class BakeryForm(FlaskForm):
     household_risk = SelectField(
         label='ریسک خانوار',
         validators=[
-            # DataRequired(),
+            DataRequired(),
         ],
-        choices=[
-            ('', ''),
-            ('کم ریسک', 'کم ریسک'),
-            ('ریسک متوسط', 'ریسک متوسط'),
-            ('پرریسک', 'پرریسک'),
-            ('خیلی پرریسک', 'خیلی پرریسک'),
-        ]
     )
     
     bakers_risk = SelectField(
         label='ریسک نانوا',
         validators=[
-            # DataRequired(),
+            DataRequired(),
         ],
-        choices=[
-            ('', ''),
-            ('کم ریسک', 'کم ریسک'),
-            ('ریسک متوسط', 'ریسک متوسط'),
-            ('پرریسک', 'پرریسک'),
-            ('خیلی پرریسک', 'خیلی پرریسک'),
-        ]
     )
 
     
     bread_types = SelectField(
         label='نوع پخت',
         validators=[
-            # DataRequired(),
+            DataRequired(),
         ],
-        choices=[
-            ('', ''),
-            ('بربری', 'بربری'),
-            ('سنگک', 'سنگک'),
-            ('تافتون', 'تافتون'),
-            ('لواش', 'لواش'),
-        ]
     )
     
       
     flour_types = SelectField(
         label='نوع آرد',
         validators=[
-            # DataRequired(),
+            DataRequired(),
         ],
-        choices=[
-            ('', ''),
-            ('1', '1'),
-            ('2', '2'),
-            ('3', '3'),
-            ('4', '4'),
-            ('5', '5'),
-            ('6', '6'),
-        ]
     )
     
     bread_rations = IntegerField(
         label='سهمیه آرد',
         validators=[
-            # DataRequired(),
+            DataRequired(
+                message="وارد کردن سهمیه آرد الزامیست!"
+            ),
         ],
         render_kw={
             "placeholder": "100"

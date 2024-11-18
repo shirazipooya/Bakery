@@ -3,6 +3,7 @@ from app.users.forms import RegistrationForm, LoginForm
 from app.users.models import User
 from app.extensions import db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
+from functools import wraps
 
 
 blueprint = Blueprint(
@@ -11,7 +12,26 @@ blueprint = Blueprint(
 )
 
 
+def role_required(required_role):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if current_user.role == required_role:
+                # Redirect to a page that you want users with the given role to go
+                return redirect(url_for('users.forbidden'))  # For example, a forbidden page
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+@blueprint.route('/forbidden')
+def forbidden():
+    return render_template(template_name_or_list='exceptions/403.html')
+
+
 @blueprint.route('/register', methods=['POST', 'GET'])
+@login_required
+@role_required('کاربر عادی')
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -22,6 +42,7 @@ def register():
             username = form.username.data,
             password = hashed_password,
             phone = form.phone.data,
+            role = form.role.data,
         )
         db.session.add(user)
         db.session.commit()
