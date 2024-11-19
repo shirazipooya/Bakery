@@ -21,7 +21,7 @@ blueprint = Blueprint(
 # ------------------------------------------------------------------------------
 # Home Page
 # ------------------------------------------------------------------------------
-@blueprint.route('/home')
+@blueprint.route('/map')
 @login_required
 def home():
     return render_template(template_name_or_list='map/home.html')
@@ -487,7 +487,6 @@ def load_map_data(ostan, shahrestan, bakhsh, shahr, region, district, bread_type
 # population_data_district = pd.read_csv('./app/assets/data/mashhad_amarnameh_district.csv', dtype=float)
 
 # def region_ratio_query():
-    
 #     data = db.session.query(
 #         Bakery.region,
 #         func.count(Bakery.id)
@@ -508,18 +507,157 @@ def load_map_data(ostan, shahrestan, bakhsh, shahr, region, district, bread_type
 #     }  
 
 
-# @blueprint.route('/api/dashboard/map/region_ratio', methods=['GET'])
-# @login_required
-# def region_ratio():
-#     region_bakery_counts = region_ratio_query().get("region_bakery_counts")
-#     region_bread_rations = region_ratio_query().get("region_bread_rations")
-#     data = pd.merge(population_data_region, region_bakery_counts, on='region', how='left').fillna(0)
-#     data = pd.merge(data, region_bread_rations, on='region', how='left').fillna(0)
-#     data['ratio'] = data['population'] / data['bakery_count']
-#     data['ration'] = (data['bread_rations'] * 100) / data['population']
+@blueprint.route('/api/map/choropleth/region', methods=['GET'])
+@login_required
+def region_choropleth():
     
-#     # Return the ratio data as JSON
-#     return data[['region', 'ratio', 'ration']].to_json(orient='records')
+    bakery_group  = db.session.query(
+        Bakery.ostan,
+        Bakery.shahrestan,
+        Bakery.bakhsh,
+        Bakery.shahr,
+        Bakery.region,
+        func.count(Bakery.id).label('bakery_count'),
+        func.sum(Bakery.bread_rations).label('bread_rations'),
+    ).group_by(
+        Bakery.ostan,
+        Bakery.shahrestan,
+        Bakery.bakhsh,
+        Bakery.shahr,
+        Bakery.region
+    ).subquery()
+    
+    result = db.session.query(
+        bakery_group.c.ostan,
+        bakery_group.c.shahrestan,
+        bakery_group.c.bakhsh,
+        bakery_group.c.shahr,
+        bakery_group.c.region,
+        bakery_group.c.bakery_count,
+        bakery_group.c.bread_rations,
+        func.sum(Amarnameh.area).label('area'),
+        func.sum(Amarnameh.population).label('total_population'),
+        func.sum(Amarnameh.population_male).label('male_population'),
+        func.sum(Amarnameh.population_female).label('female_population'),
+        func.sum(Amarnameh.n_households).label('total_households'),
+        (func.sum(Amarnameh.population) / bakery_group.c.bakery_count).label('population_per_bakery'),
+        (bakery_group.c.bread_rations * 100 / func.sum(Amarnameh.population)).label('ration_per_population_per_100')
+    ).join(
+        Amarnameh,
+        (bakery_group.c.ostan == Amarnameh.ostan) &
+        (bakery_group.c.shahrestan == Amarnameh.shahrestan) &
+        (bakery_group.c.bakhsh == Amarnameh.bakhsh) &
+        (bakery_group.c.shahr == Amarnameh.shahr) &
+        (bakery_group.c.region == Amarnameh.region)
+    ).group_by(
+        bakery_group.c.ostan,
+        bakery_group.c.shahrestan,
+        bakery_group.c.bakhsh,
+        bakery_group.c.shahr,
+        bakery_group.c.region
+    ).all()
+    
+    json_data = [
+        {
+            "ostan": row.ostan,
+            "shahrestan": row.shahrestan,
+            "bakhsh": row.bakhsh,
+            "shahr": row.shahr,
+            "region": row.region,
+            "bakery_count": row.bakery_count,
+            "bread_rations": row.bread_rations,
+            "area": row.area,
+            "total_population": row.total_population,
+            "male_population": row.male_population,
+            "female_population": row.female_population,
+            "total_households": row.total_households,
+            "population_per_bakery": row.population_per_bakery,
+            "ration_per_population_per_100": row.ration_per_population_per_100
+        }
+        for row in result
+    ]
+    
+    # Return the ratio data as JSON
+    return jsonify(json_data)
+
+@blueprint.route('/api/map/choropleth/district', methods=['GET'])
+@login_required
+def district_choropleth():
+    
+    bakery_group  = db.session.query(
+        Bakery.ostan,
+        Bakery.shahrestan,
+        Bakery.bakhsh,
+        Bakery.shahr,
+        Bakery.region,
+        Bakery.district,
+        func.count(Bakery.id).label('bakery_count'),
+        func.sum(Bakery.bread_rations).label('bread_rations'),
+    ).group_by(
+        Bakery.ostan,
+        Bakery.shahrestan,
+        Bakery.bakhsh,
+        Bakery.shahr,
+        Bakery.region,
+        Bakery.district
+    ).subquery()
+    
+    result = db.session.query(
+        bakery_group.c.ostan,
+        bakery_group.c.shahrestan,
+        bakery_group.c.bakhsh,
+        bakery_group.c.shahr,
+        bakery_group.c.region,
+        bakery_group.c.district,
+        bakery_group.c.bakery_count,
+        bakery_group.c.bread_rations,
+        func.sum(Amarnameh.area).label('area'),
+        func.sum(Amarnameh.population).label('total_population'),
+        func.sum(Amarnameh.population_male).label('male_population'),
+        func.sum(Amarnameh.population_female).label('female_population'),
+        func.sum(Amarnameh.n_households).label('total_households'),
+        (func.sum(Amarnameh.population) / bakery_group.c.bakery_count).label('population_per_bakery'),
+        (bakery_group.c.bread_rations * 100 / func.sum(Amarnameh.population)).label('ration_per_population_per_100')
+    ).join(
+        Amarnameh,
+        (bakery_group.c.ostan == Amarnameh.ostan) &
+        (bakery_group.c.shahrestan == Amarnameh.shahrestan) &
+        (bakery_group.c.bakhsh == Amarnameh.bakhsh) &
+        (bakery_group.c.shahr == Amarnameh.shahr) &
+        (bakery_group.c.region == Amarnameh.region) &
+        (bakery_group.c.district == Amarnameh.district)
+    ).group_by(
+        bakery_group.c.ostan,
+        bakery_group.c.shahrestan,
+        bakery_group.c.bakhsh,
+        bakery_group.c.shahr,
+        bakery_group.c.region,
+        bakery_group.c.district,
+    ).all()
+    
+    json_data = [
+        {
+            "ostan": row.ostan,
+            "shahrestan": row.shahrestan,
+            "bakhsh": row.bakhsh,
+            "shahr": row.shahr,
+            "region": row.region,
+            "district": row.district,
+            "bakery_count": row.bakery_count,
+            "bread_rations": row.bread_rations,
+            "area": row.area,
+            "total_population": row.total_population,
+            "male_population": row.male_population,
+            "female_population": row.female_population,
+            "total_households": row.total_households,
+            "population_per_bakery": row.population_per_bakery,
+            "ration_per_population_per_100": row.ration_per_population_per_100
+        }
+        for row in result
+    ]
+    
+    # Return the ratio data as JSON
+    return jsonify(json_data)
 
 
 

@@ -176,6 +176,9 @@
     const region_layer_switch = document.getElementById("region_layer_switch");
     const district_layer_switch = document.getElementById("district_layer_switch");
 
+    const region_choropleth_map = document.getElementById("region_choropleth_map");
+    const district_choropleth_map = document.getElementById("district_choropleth_map");
+
 
     // =========================================================================
     // 2. Load Map Data
@@ -944,6 +947,233 @@
     })
 
 
+    // Region Choropleth Map
+    let region_choropleth_layer = null;
+
+    fetch('/api/map/choropleth/region')
+        .then(response => response.json())
+        .then(data => {
+            // Load GeoJSON
+            
+            fetch('/assets/data/geodatabase/Region.geojson')
+                .then(response => response.json())
+                .then(geojson => {
+
+                    // Define a style function
+                    function style(feature) {
+                        const regionData = data.find(d =>
+                            d.ostan == feature.properties.ostan &&
+                            d.shahrestan == feature.properties.shahrestan &&
+                            d.bakhsh == feature.properties.bakhsh &&
+                            d.shahr == feature.properties.shahr &&
+                            d.region == feature.properties.region
+                        );
+                        const population_per_bakery = regionData ? regionData.population_per_bakery : 0;
+                        const ration_per_population_per_100 = regionData ? regionData.ration_per_population_per_100 : 0;
+                        return {
+                            fillColor: getColor(population_per_bakery),
+                            weight: 2,
+                            opacity: 1,
+                            color: 'white',
+                            dashArray: '3',
+                            fillOpacity: 0.7
+                        };
+                    }
+
+                    function highlightFeature(e) {
+                        const layer = e.target;
+                
+                        layer.setStyle({
+                            weight: 5,
+                            color: '#666',
+                            dashArray: '',
+                            fillOpacity: 0.7
+                        });
+                
+                        layer.bringToFront();
+                
+                    }
+
+                    function resetHighlight(e) {
+                        region_choropleth_layer.resetStyle(e.target);
+                    }
+
+                    function zoomToFeature(e) {
+                        map.fitBounds(e.target.getBounds());
+                    }
+
+                    // Function to get color based on ratio
+                    function getColor(population_per_bakery) {
+                        return population_per_bakery > 4000 ? '#fff5f0' :
+                            population_per_bakery > 3500 ? '#fee0d2' :
+                            population_per_bakery > 3000  ? '#fcbba1' :
+                            population_per_bakery > 2500 ? '#fc9272' :
+                            population_per_bakery > 2000   ? '#fb6a4a' :
+                            population_per_bakery > 1500   ? '#ef3b2c' :
+                            population_per_bakery > 1000    ? '#cb181d' :
+                                            '#99000d';
+                    }                    
+
+                    // Add GeoJSON layer
+                    region_choropleth_layer = L.geoJson(geojson, {
+                        style: style,
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup(
+                                '<b>منطقه: ' + feature.properties.region + '</b><br>' +
+                                '- به ازای هر  ' + (Math.floor(data.find(d => 
+                                    d.ostan == feature.properties.ostan &&
+                                    d.shahrestan == feature.properties.shahrestan &&
+                                    d.bakhsh == feature.properties.bakhsh &&
+                                    d.shahr == feature.properties.shahr &&
+                                    d.region == feature.properties.region
+                                )?.population_per_bakery) || 'N/A') + ' نفر، یک عدد نانوایی<br>' +
+                                '- به ازای هر 100 نفر،  ' + (Math.floor(data.find(d => 
+                                    d.ostan == feature.properties.ostan &&
+                                    d.shahrestan == feature.properties.shahrestan &&
+                                    d.bakhsh == feature.properties.bakhsh &&
+                                    d.shahr == feature.properties.shahr &&
+                                    d.region == feature.properties.region
+                                )?.ration_per_population_per_100) || 'N/A') + ' عدد کیسه آرد'
+                            );
+                            layer.on({
+                                mouseover: highlightFeature,
+                                mouseout: resetHighlight,
+                                click: zoomToFeature
+                            });
+                        }
+                    });
+
+                    region_choropleth_map.addEventListener('change', function() {
+                        if (this.checked) {           
+                            if (region_choropleth_layer) {
+                                region_choropleth_layer.addTo(map);
+                                map.fitBounds(region_choropleth_layer.getBounds());
+                            }
+                        } else {
+                            if (region_choropleth_layer) {
+                                map.removeLayer(region_choropleth_layer);
+                            }
+                        }
+                    })
+                });
+        })
+
+    // District Choropleth Map
+    let district_choropleth_layer = null;
+
+    fetch('/api/map/choropleth/district')
+        .then(response => response.json())
+        .then(data => {
+            // Load GeoJSON
+            
+            fetch('/assets/data/geodatabase/District.geojson')
+                .then(response => response.json())
+                .then(geojson => {
+
+                    // Define a style function
+                    function style(feature) {
+                        const districtData = data.find(d =>
+                            d.ostan == feature.properties.ostan &&
+                            d.shahrestan == feature.properties.shahrestan &&
+                            d.bakhsh == feature.properties.bakhsh &&
+                            d.shahr == feature.properties.shahr &&
+                            d.region == feature.properties.region &&
+                            d.district == feature.properties.district
+                        );
+                        const population_per_bakery = districtData ? districtData.population_per_bakery : 0;
+                        const ration_per_population_per_100 = districtData ? districtData.ration_per_population_per_100 : 0;
+                        return {
+                            fillColor: getColor(population_per_bakery),
+                            weight: 2,
+                            opacity: 1,
+                            color: 'white',
+                            dashArray: '3',
+                            fillOpacity: 0.7
+                        };
+                    }
+
+                    function highlightFeature(e) {
+                        const layer = e.target;
+                
+                        layer.setStyle({
+                            weight: 5,
+                            color: '#666',
+                            dashArray: '',
+                            fillOpacity: 0.7
+                        });
+                
+                        layer.bringToFront();
+                
+                    }
+
+                    function resetHighlight(e) {
+                        district_choropleth_layer.resetStyle(e.target);
+                    }
+
+                    function zoomToFeature(e) {
+                        map.fitBounds(e.target.getBounds());
+                    }
+
+                    // Function to get color based on ratio
+                    function getColor(population_per_bakery) {
+                        return population_per_bakery > 4000 ? '#fff5f0' :
+                            population_per_bakery > 3500 ? '#fee0d2' :
+                            population_per_bakery > 3000  ? '#fcbba1' :
+                            population_per_bakery > 2500 ? '#fc9272' :
+                            population_per_bakery > 2000   ? '#fb6a4a' :
+                            population_per_bakery > 1500   ? '#ef3b2c' :
+                            population_per_bakery > 1000    ? '#cb181d' :
+                                            '#99000d';
+                    }                    
+
+                    // Add GeoJSON layer
+                    district_choropleth_layer = L.geoJson(geojson, {
+                        style: style,
+                        onEachFeature: function(feature, layer) {
+                            layer.bindPopup(
+                                '<b>منطقه: ' + feature.properties.region + ' ناحیه: ' + feature.properties.district + '</b><br>' +
+                                '- به ازای هر  ' + (Math.floor(data.find(d => 
+                                    d.ostan == feature.properties.ostan &&
+                                    d.shahrestan == feature.properties.shahrestan &&
+                                    d.bakhsh == feature.properties.bakhsh &&
+                                    d.shahr == feature.properties.shahr &&
+                                    d.region == feature.properties.region &&
+                                    d.district == feature.properties.district
+                                )?.population_per_bakery) || 'N/A') + ' نفر، یک عدد نانوایی<br>' +
+                                '- به ازای هر 100 نفر،  ' + (Math.floor(data.find(d => 
+                                    d.ostan == feature.properties.ostan &&
+                                    d.shahrestan == feature.properties.shahrestan &&
+                                    d.bakhsh == feature.properties.bakhsh &&
+                                    d.shahr == feature.properties.shahr &&
+                                    d.region == feature.properties.region &&
+                                    d.district == feature.properties.district
+                                )?.ration_per_population_per_100) || 'N/A') + ' عدد کیسه آرد'
+                            );
+                            layer.on({
+                                mouseover: highlightFeature,
+                                mouseout: resetHighlight,
+                                click: zoomToFeature
+                            });
+                        }
+                    });
+
+                    district_choropleth_map.addEventListener('change', function() {
+                        if (this.checked) {           
+                            if (district_choropleth_layer) {
+                                district_choropleth_layer.addTo(map);
+                                map.fitBounds(district_choropleth_layer.getBounds());
+                            }
+                        } else {
+                            if (district_choropleth_layer) {
+                                map.removeLayer(district_choropleth_layer);
+                            }
+                        }
+                    })
+                });
+        })
+
+
+ 
 
 
     // =========================================================================
@@ -952,76 +1182,7 @@
 
 
     
-
-
-    // // Region
-    // let geojsonLayerRegion = null;
-
-
-
-    // fetch('/assets/data/geodatabase/Region.geojson')
-    //     .then(response => response.json())
-    //     .then(geojsonData => {  
-    //         addGeoJSONLayerRegion(geojsonData);
-    //     })
-    //     .catch(error => {
-    //         console.error("Error loading the GeoJSON file:", error);
-    //     })
-    
-
-    // // District
-    // let geojsonLayerDistrict = null;
-
-    // function addgeojsonLayerDistrict(geojsonData) {
-    //     geojsonLayerDistrict = L.geoJSON(geojsonData, {
-    //         style: function (feature) {
-    //             return {
-    //                 color: "#808080",  // Outline color
-    //                 weight: 2,
-    //                 opacity: 1,
-    //                 fillColor: "#808080",
-    //                 fillOpacity: 0.2
-    //             };
-    //         },
-    //         onEachFeature: function (feature, layer) {
-    //             layer.bindTooltip(
-    //                 `منطقه ${feature.properties.region} - ناحیه ${feature.properties.district}`,
-    //             );
-    //             // layer.on('click', function() {
-    //             //     fetch(`/region/${feature.properties.Region}`)
-    //             //         .then(response => response.json())
-    //             //         .then(data => {
-    //             //             console.log(data.n);
-    //             //         })
-    //             // });
-    //         }
-    //     }).addTo(map);
-    // }
-
-    // fetch('/assets/data/geodatabase/District.geojson')
-    //     .then(response => response.json())
-    //     .then(geojsonData => {                       
-    //         addgeojsonLayerDistrict(geojsonData);
-    //     })
-    //     .catch(error => {
-    //         console.error("Error loading the GeoJSON file:", error);
-    //     })
-    
-    // document.getElementById('showDistrict').addEventListener('change', function() {
-    //     if (this.checked) {           
-    //         if (geojsonLayerDistrict) {
-    //             geojsonLayerDistrict.addTo(map);
-    //         }
-    //     } else {
-    //         if (geojsonLayerDistrict) {
-    //             map.removeLayer(geojsonLayerDistrict);
-    //         }
-    //     }
-    // })
-
-
-
-    // let ratio_map;
+    // let region_choropleth_layer;
 
     // fetch('/api/dashboard/map/region_ratio')
     //     .then(response => response.json())
@@ -1057,7 +1218,7 @@
     //                 }                    
 
     //                 // Add GeoJSON layer
-    //                 ratio_map = L.geoJson(geojson, {
+    //                 region_choropleth_layer = L.geoJson(geojson, {
     //                     style: style,
     //                     onEachFeature: function(feature, layer) {
     //                         layer.bindPopup(
@@ -1070,9 +1231,9 @@
     //                 const toggleLayerCheckbox = document.getElementById('showRatioRegion');
     //                 toggleLayerCheckbox.addEventListener('change', function() {
     //                     if (this.checked) {
-    //                         map.addLayer(ratio_map); // Add layer when checked
+    //                         map.addLayer(region_choropleth_layer); // Add layer when checked
     //                     } else {
-    //                         map.removeLayer(ratio_map); // Remove layer when unchecked
+    //                         map.removeLayer(region_choropleth_layer); // Remove layer when unchecked
     //                     }
     //                 });
     //             });
