@@ -15,17 +15,33 @@
 
         <!-- Search Box -->
         <div class="search-container pb-2">
-          <div class="col-12">
-            <div class="input-group input-group-merge">
-              <span class="input-group-text" id="basic-addon-search31"><i class="bx bx-search"></i></span>
-              <input type="text" id="search" class="form-control" placeholder="جستجو ...">
+          <div class="row">
+            <div class="col-md-8 col-12 mt-1">
+              <div class="input-group input-group-merge">
+                <span class="input-group-text" id="basic-addon-search31"><i class="bx bx-search"></i></span>
+                <input type="text" id="search" class="form-control" placeholder="جستجو ...">
+              </div>
             </div>
-            <div class="pt-2 ps-2 text-muted">
-              <span>تعداد کل رکوردها: </span>
-              <span id="total">0</span>
-              <span>عدد</span>
+            <div class="col-md-4 col-12 mt-1">
+              <select id="table_column" class="form-select w-100" data-style="btn-default"
+                data-placeholder="انتخاب کنید ...">
+                <option value="all">همه ستون‌ها</option>
+                {% for key, name in data.table_columns.items() %}
+                  <option value="{{ key }}">{{ name }}</option>
+                {% endfor %}
+              </select>
             </div>
+
           </div>
+          <div class="ps-2 text-muted">
+            <span>تعداد کل رکوردها: </span>
+            <span id="total">0</span>
+            <span>عدد</span>
+          </div>
+          <!-- <div class="col-md-6 col-12">
+
+
+          </div> -->
         </div>
         <!-- Search Box -->
 

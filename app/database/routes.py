@@ -597,7 +597,7 @@ def upload_csv():
         os.remove(file_path)        
         db.session.commit()
         flash(message='پایگاه داده با موفقیت ایجاد گردید!', category='success')
-        return redirect(location=url_for(endpoint='database.home'))
+        return redirect(location=url_for(endpoint='table.home'))
     else:
         emit(warnings=warnings, message="\u274C فرمت فایل انتخابی حتما باید csv و نویسه کدگذاری آن utf-8 باشد!")
         return '', 204 
@@ -657,99 +657,3 @@ def update_record(id):
         bakery.bread_rations = data.get('bread_rations')
         db.session.commit()
         return jsonify({'message': 'Bakery Updated Successfully'})
-
-
-@blueprint.route('/api/database/all_items', methods=['GET', 'POST'])
-@login_required
-@role_required('کاربر عادی')
-def all_items():
-    column = request.json.get('column')
-    if column == "ownership_status":
-        items = sorted([x[0] for x in db.session.query(OwnershipStatus.name).all()])
-        return jsonify(items)
-    if column == "second_fuel":
-        items = sorted([x[0] for x in db.session.query(SecondFuel.name).all()])
-        return jsonify(items)
-    if column == "household_risk":
-        items = sorted([x[0] for x in db.session.query(HouseholdRisk.name).all()])
-        return jsonify(items)
-    if column == "bakers_risk":
-        items = sorted([x[0] for x in db.session.query(BakersRisk.name).all()])
-        return jsonify(items)
-    if column == "flour_types":
-        items = sorted([x[0] for x in db.session.query(TypeFlour.name).all()])
-        return jsonify(items)
-    if column == "bread_types":
-        items = sorted([x[0] for x in db.session.query(TypeBread.name).all()])
-        return jsonify(items)
-
-
-@blueprint.route('/api/database/add_category', methods=['GET', 'POST'])
-@login_required
-@role_required('کاربر عادی')
-def add_category():
-    column = request.json.get('column')
-    new_category = request.json.get('new_category')
-    
-   
-    if column == "ownership_status":
-        items = [x[0] for x in db.session.query(OwnershipStatus.name).all()]
-        if new_category not in items:               
-            item = OwnershipStatus(name=new_category)
-            db.session.add(item)
-            db.session.commit()
-            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
-        else:
-            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
-    
-    if column == "second_fuel":
-        items = [x[0] for x in db.session.query(SecondFuel.name).all()]
-        if new_category not in items:               
-            item = SecondFuel(name=new_category)
-            db.session.add(item)
-            db.session.commit()
-            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
-        else:
-            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
-    
-    if column == "household_risk":
-        items = [x[0] for x in db.session.query(HouseholdRisk.name).all()]
-        if new_category not in items:               
-            item = HouseholdRisk(name=new_category)
-            db.session.add(item)
-            db.session.commit()
-            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
-        else:
-            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
-    
-    if column == "bakers_risk":
-        items = [x[0] for x in db.session.query(BakersRisk.name).all()]
-        if new_category not in items:               
-            item = BakersRisk(name=new_category)
-            db.session.add(item)
-            db.session.commit()
-            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
-        else:
-            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
-    
-    if column == "flour_types":
-        items = [x[0] for x in db.session.query(TypeFlour.name).all()]
-        if new_category not in items:               
-            item = TypeFlour(name=new_category)
-            db.session.add(item)
-            db.session.commit()
-            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
-        else:
-            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
-    
-    if column == "bread_types":
-        items = [x[0] for x in db.session.query(TypeBread.name).all()]
-        if new_category not in items:               
-            item = TypeBread(name=new_category)
-            db.session.add(item)
-            db.session.commit()
-            return jsonify({'message': 'آیتم با موفقیت اضافه شد!', 'type': 'success'})
-        else:
-            return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
-    
-    jsonify({'message': 'مشخصه موجود نمی‌باشد!', 'type': 'danger'})

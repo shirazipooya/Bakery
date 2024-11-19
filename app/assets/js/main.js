@@ -170,19 +170,19 @@ $(document).ready(function() {
     if (storedStyle === 'light') {
       styleSwitcherIcon.classList.add('bx-sun');
       new bootstrap.Tooltip(styleSwitcherIcon, {
-        title: 'Light Mode',
+        title: 'تم روشن',
         fallbackPlacements: ['bottom']
       });
     } else if (storedStyle === 'dark') {
       styleSwitcherIcon.classList.add('bx-moon');
       new bootstrap.Tooltip(styleSwitcherIcon, {
-        title: 'Dark Mode',
+        title: 'تم تاریک',
         fallbackPlacements: ['bottom']
       });
     } else {
       styleSwitcherIcon.classList.add('bx-desktop');
       new bootstrap.Tooltip(styleSwitcherIcon, {
-        title: 'System Mode',
+        title: 'تم سیستم',
         fallbackPlacements: ['bottom']
       });
     }

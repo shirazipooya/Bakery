@@ -1,5 +1,3 @@
-
-
 function showDeleteTableModal() {
     $("#deleteTableModal").modal("show");
 };
@@ -13,20 +11,23 @@ $("#confirmTableDelete").on("click", function () {
             type: "DELETE",
             success: function () {
                 $("#deleteTableModal").modal("hide");
-                loadBakeriesTable();
+                window.location.href = "/table";
             },
         });
     }
 });
 
 
+// document.getElementById('fileInput').addEventListener('change', function() {
+//     const fileName = this.files[0] ? this.files[0].name : 'هیچ فایلی انتخاب نشده';
+//     document.getElementById('fileName').value = fileName;
+// });
 
-
-
-
-document.getElementById('fileInput').addEventListener('change', function() {
-    const fileName = this.files[0] ? this.files[0].name : 'هیچ فایلی انتخاب نشده';
-    document.getElementById('fileName').value = fileName;
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('fileInput').addEventListener('change', function() {
+        const fileName = this.files[0] ? this.files[0].name : 'هیچ فایلی انتخاب نشده';
+        document.getElementById('fileName').value = fileName;
+    });
 });
 
 

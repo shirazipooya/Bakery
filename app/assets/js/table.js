@@ -7,6 +7,7 @@ let currentSortOrder = "asc";
 let totalCountPage = 1;
 
 
+
 // =============================================================================
 // API
 // =============================================================================
@@ -34,9 +35,10 @@ async function get_table_headers() {
 async function get_table_data() {
     try {
         const search = $("#search").val();
+        const selected_column_search = $("#table_column").val();     
 
         // Fetch table data
-        const dataResponse = await fetch(`/api/table/data?search=${search}&sort_by=${currentSortBy}&sort_order=${currentSortOrder}&page=${currentPage}`);
+        const dataResponse = await fetch(`/api/table/data?column=${selected_column_search}&search=${search}&sort_by=${currentSortBy}&sort_order=${currentSortOrder}&page=${currentPage}`);
         if (!dataResponse.ok) {
             throw new Error("Failed to fetch table data");
         }
@@ -100,6 +102,13 @@ function sortTable(column) {
     currentPage = 1;
     get_table_data();
 };
+
+// nahyeh
+$(document).ready(function () {
+    $("#table_column").on("change", function () {
+        get_table_data();
+    });
+});
 
 
 // -----------------------------------------------------------------------------

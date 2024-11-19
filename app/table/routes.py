@@ -49,6 +49,15 @@ def home():
     items = query.all()
     type_bread_options = sorted([item[0] for item in items])
     
+    
+    excluded_columns = {"id", "city", "created_at", "updated_at"}
+    
+    table_columns = {
+        key: value for key, value in Bakery.verbose_names.items() if key not in excluded_columns
+    }
+    
+    print(table_columns)
+    
     data={
         "ownership_status_options": ownership_status_options,
         "second_fuel_options": second_fuel_options,
@@ -56,6 +65,7 @@ def home():
         "bakers_risk_options": bakers_risk_options,
         "type_flour_options": type_flour_options,
         "type_bread_options": type_bread_options,
+        "table_columns": table_columns
     }
     
     return render_template(
@@ -80,6 +90,7 @@ def get_table_headers():
 @blueprint.route(rule='/api/table/data', methods=['GET'])
 @login_required
 def get_table_data():
+    selected_column = request.args.get('column', 'all')
     search = request.args.get('search', '')
     search = search.split()
     sort_by = request.args.get('sort_by', 'id')
@@ -88,7 +99,10 @@ def get_table_data():
     per_page = 10
     offset = (page - 1) * per_page
     
-    columns = [column.name for column in Bakery.__table__.columns]
+    if selected_column == "all":
+        columns = [column.name for column in Bakery.__table__.columns]
+    else:
+        columns = [selected_column]
     filters = []
     for term in search:
         term_filter = or_(
@@ -109,6 +123,8 @@ def get_table_data():
     query = query.limit(per_page).offset(offset)
     
     results = query.all()
+    
+    columns = [column.name for column in Bakery.__table__.columns]
     
     result_list = [
         {column: getattr(result, column) for column in columns}
