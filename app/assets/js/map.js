@@ -1018,7 +1018,8 @@
                     region_choropleth_layer = L.geoJson(geojson, {
                         style: style,
                         onEachFeature: function(feature, layer) {
-                            layer.bindPopup(
+                            layer.bindTooltip(
+                            // layer.bindPopup(
                                 '<b>منطقه: ' + feature.properties.region + '</b><br>' +
                                 '- به ازای هر  ' + (Math.floor(data.find(d => 
                                     d.ostan == feature.properties.ostan &&
@@ -1130,7 +1131,8 @@
                     district_choropleth_layer = L.geoJson(geojson, {
                         style: style,
                         onEachFeature: function(feature, layer) {
-                            layer.bindPopup(
+                            layer.bindTooltip(
+                            // layer.bindPopup(
                                 '<b>منطقه: ' + feature.properties.region + ' ناحیه: ' + feature.properties.district + '</b><br>' +
                                 '- به ازای هر  ' + (Math.floor(data.find(d => 
                                     d.ostan == feature.properties.ostan &&
