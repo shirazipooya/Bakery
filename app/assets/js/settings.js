@@ -38,12 +38,54 @@ async function fetchCategories() {
     const itemsList = document.getElementById('itemsList');
     itemsList.innerHTML = '';
     items.forEach(item => {
+
         const li = document.createElement('li');
-        li.textContent = item;
-        li.className = "list-group-item list-group-timeline-primary"
+        li.className = "list-group-item list-group-timeline-primary d-flex align-items-center"
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.className = "btn px-0 pe-1";
+        deleteButton.innerHTML = '<i class="bx bx-x bx-xs text-danger"></i>';
+        // deleteButton.id = "confirm-text"
+        deleteButton.addEventListener('click', () => showDeleteItemModal(column, item));
+        li.appendChild(deleteButton);
+        
+        const textNode = document.createTextNode(item);
+        li.appendChild(textNode);
+        
         itemsList.appendChild(li);
     });
 }
+
+// -----------------------------------------------------------------------------
+// Delete Record
+// -----------------------------------------------------------------------------
+function showDeleteItemModal(column, item) {
+    columnValue = column;
+    itemValue = item;
+    $("#deleteItemModal").modal("show");
+};
+
+
+$("#confirmDeleteItem").on("click", function () {
+    console.log("Deleted!");
+    
+    if (columnValue && itemValue) {
+        $.ajax({
+            url: `/api/settings/delete/${columnValue}/${itemValue}`,
+            type: "DELETE",
+            success: function (result) {
+                $("#deleteItemModal").modal("hide");
+                fetchCategories();
+                showAlert(result.message, result.type);
+            },
+            error: function (result) {
+                $("#deleteItemModal").modal("hide");
+                showAlert(result.message, result.type);
+            },
+        });
+    }
+});
+
 
 
 

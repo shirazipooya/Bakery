@@ -12,6 +12,8 @@ import geopandas as gpd
 from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_required
 from flask_socketio import emit
+from sqlalchemy import distinct
+
 
 from app.users.routes import role_required
 
@@ -123,3 +125,80 @@ def add_category():
             return jsonify({'message': 'آیتم تکراری می‌باشد!', 'type': 'danger'})
     
     jsonify({'message': 'مشخصه موجود نمی‌باشد!', 'type': 'danger'})
+
+
+@blueprint.route('/api/settings/delete/<column>/<item>', methods=['DELETE'])
+@login_required
+@role_required('کاربر عادی')
+def delete_item(column, item):
+    
+    if column == "ownership_status":
+        items = Bakery.query.with_entities(distinct(Bakery.ownership_status)).all()
+        items_list = [i[0] for i in items]
+        if item in items_list:
+            return jsonify({'message': 'آیتم مورد نظر در دیتابیس وجود دارد و شما قادر به حذف آن نیستید!', 'type': 'danger'})
+        else:
+            record = OwnershipStatus.query.filter_by(name=item).first()
+            db.session.delete(record)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت حذف شد!', 'type': 'success'})
+    
+    if column == "second_fuel":
+        items = Bakery.query.with_entities(distinct(Bakery.second_fuel)).all()
+        items_list = [i[0] for i in items]
+        if item in items_list:
+            return jsonify({'message': 'آیتم مورد نظر در دیتابیس وجود دارد و شما قادر به حذف آن نیستید!', 'type': 'danger'})
+        else:
+            record = SecondFuel.query.filter_by(name=item).first()
+            db.session.delete(record)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت حذف شد!', 'type': 'success'})
+    
+    if column == "household_risk":
+        items = Bakery.query.with_entities(distinct(Bakery.household_risk)).all()
+        items_list = [i[0] for i in items]
+        if item in items_list:
+            return jsonify({'message': 'آیتم مورد نظر در دیتابیس وجود دارد و شما قادر به حذف آن نیستید!', 'type': 'danger'})
+        else:
+            record = HouseholdRisk.query.filter_by(name=item).first()
+            db.session.delete(record)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت حذف شد!', 'type': 'success'})
+    
+    if column == "bakers_risk":
+        items = Bakery.query.with_entities(distinct(Bakery.bakers_risk)).all()
+        items_list = [i[0] for i in items]
+        if item in items_list:
+            return jsonify({'message': 'آیتم مورد نظر در دیتابیس وجود دارد و شما قادر به حذف آن نیستید!', 'type': 'danger'})
+        else:
+            record = BakersRisk.query.filter_by(name=item).first()
+            db.session.delete(record)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت حذف شد!', 'type': 'success'})
+    
+    if column == "flour_types":
+        items = Bakery.query.with_entities(distinct(Bakery.flour_types)).all()
+        items_list = [i[0] for i in items]
+        if item in items_list:
+            return jsonify({'message': 'آیتم مورد نظر در دیتابیس وجود دارد و شما قادر به حذف آن نیستید!', 'type': 'danger'})
+        else:
+            record = TypeFlour.query.filter_by(name=item).first()
+            db.session.delete(record)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت حذف شد!', 'type': 'success'})
+    
+    if column == "bread_types":
+        items = Bakery.query.with_entities(distinct(Bakery.bread_types)).all()
+        items_list = [i[0] for i in items]
+        if item in items_list:
+            return jsonify({'message': 'آیتم مورد نظر در دیتابیس وجود دارد و شما قادر به حذف آن نیستید!', 'type': 'danger'})
+        else:
+            record = TypeBread.query.filter_by(name=item).first()
+            db.session.delete(record)
+            db.session.commit()
+            return jsonify({'message': 'آیتم با موفقیت حذف شد!', 'type': 'success'})
+    
+    
+    
+    
+    jsonify({'message': 'آیتم موجود نمی‌باشد!', 'type': 'danger'})
