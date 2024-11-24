@@ -11,7 +11,7 @@ import pandas as pd
 import geopandas as gpd
 from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_required
-from flask_socketio import emit
+# from flask_socketio import emit
 from shapely.geometry import Point
 
 from app.users.routes import role_required
