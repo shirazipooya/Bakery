@@ -1,7 +1,7 @@
 import csv
 import io
 import os
-from flask import Blueprint, render_template, flash, redirect, url_for, request, jsonify
+from flask import Blueprint, render_template, flash, redirect, url_for, request, jsonify, Response
 from app.database.forms import BakeryForm
 from app.database.models import Bakery, OwnershipStatus, SecondFuel, HouseholdRisk, BakersRisk, TypeFlour, TypeBread
 from app.extensions import db, socketio
@@ -29,6 +29,25 @@ blueprint = Blueprint(
 @role_required('کاربر عادی')
 def home():
     return render_template(template_name_or_list='settings/home.html')
+
+
+
+@blueprint.route('/api/settings/download', methods=['GET'])
+@login_required
+@role_required('کاربر عادی')
+def download_data():
+    query = db.session.query(Bakery)
+    df = pd.read_sql(str(query.statement), db.engine)
+    csv_data = df.to_csv(index=False, encoding='utf-8')
+    response = Response(
+        csv_data,
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': 'attachment;filename=data.csv',
+            'Content-Type': 'text/csv; charset=utf-8'
+        }
+    )
+    return response
     
 
 @blueprint.route('/api/settings/all_items', methods=['GET', 'POST'])

@@ -101,3 +101,25 @@ function closeAlert() {
     const alertBox = document.getElementById('alertBox');
     alertBox.style.display = 'none';
 }
+
+
+document.getElementById("downloadData").addEventListener("click", function () {
+    fetch('/api/settings/download')
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+            throw new Error("Failed to Download CSV");
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'data.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error('Error Downloading CSV:', error));
+});
