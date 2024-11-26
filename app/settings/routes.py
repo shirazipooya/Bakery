@@ -38,16 +38,29 @@ def home():
 def download_data():
     query = db.session.query(Bakery)
     df = pd.read_sql(str(query.statement), db.engine)
-    csv_data = df.to_csv(index=False, encoding='utf-8')
-    response = Response(
-        csv_data,
-        mimetype='text/csv',
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Data')
+    output.seek(0)
+
+    # Return the Excel file as a response
+    return Response(
+        output,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={
-            'Content-Disposition': 'attachment;filename=data.csv',
-            'Content-Type': 'text/csv; charset=utf-8'
-        }
+            "Content-Disposition": "attachment; filename=data.xlsx",
+        },
     )
-    return response
+    # csv_data = df.to_csv(index=False, encoding='utf-8')
+    # response = Response(
+    #     csv_data,
+    #     mimetype='text/csv',
+    #     headers={
+    #         'Content-Disposition': 'attachment;filename=data.csv',
+    #         'Content-Type': 'text/csv; charset=utf-8'
+    #     }
+    # )
+    # return response
     
 
 @blueprint.route('/api/settings/all_items', methods=['GET', 'POST'])

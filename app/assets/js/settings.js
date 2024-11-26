@@ -109,17 +109,17 @@ document.getElementById("downloadData").addEventListener("click", function () {
             if (response.ok) {
                 return response.blob();
             }
-            throw new Error("Failed to Download CSV");
+            throw new Error("Failed to Download data.xlsx");
         })
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = 'data.csv';
+            a.download = 'data.xlsx';
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
         })
-        .catch(error => console.error('Error Downloading CSV:', error));
+        .catch(error => console.error('Error Downloading data.xlsx:', error));
 });
