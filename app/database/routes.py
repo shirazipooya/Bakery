@@ -1,3 +1,4 @@
+import logging
 import csv
 import io
 import os
@@ -166,20 +167,24 @@ def clean_csv_file(df):
     # Check Columns Count
     if df.columns.__len__() != originalCols.__len__():
         emit(warnings=warnings, message=f"\u274C خطایی رخ داده است:\n ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
+        logging.info(f"\u274C خطایی رخ داده است:\n ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
         return None
     
     # Check Columns Name
     if set(originalCols) != set(df.columns):
         emit(warnings=warnings, message=f"\u274C خطایی رخ داده است:\n ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
+        logging.info(f"\u274C خطایی رخ داده است:\n ستون‌های فایل *.csv شما باید فقط شامل این موارد باشد:\n {', '.join(originalCols)}")
         return None
     
     if df.shape[0] == 0:
         emit(warnings=warnings, message=f"\u274C خطایی رخ داده است:\n فایل ورودی هیچگونه رکوردی ندارد!")
+        logging.info(f"\u274C خطایی رخ داده است:\n فایل ورودی هیچگونه رکوردی ندارد!")
         return None
     
     # Remove Duplicate Rows
     if df.duplicated().sum() > 0:
         emit(warnings=warnings, message=f"⚠️ در فایل ورودی شما {df.duplicated().sum()} ردیف تکراری وجود داشت که حذف گردید!")
+        logging.info(f"⚠️ در فایل ورودی شما {df.duplicated().sum()} ردیف تکراری وجود داشت که حذف گردید!")
         df.drop_duplicates(inplace=True)
     
     # Remove None lat and lon
@@ -189,11 +194,15 @@ def clean_csv_file(df):
     missing_lat_lon = df[(df['lat'].isna()) | (df['lon'].isna())]
     if missing_lat_lon.shape[0] == df.shape[0]:
         emit(warnings=warnings, message=f"\u274C دو ستون «طول جغرافیایی» و «عرض جغرافیایی» حتما باید دارای مقدار باشند!")
+        logging.info(f"\u274C دو ستون «طول جغرافیایی» و «عرض جغرافیایی» حتما باید دارای مقدار باشند!")
         emit(warnings=warnings, message=f"\u274C خطایی رخ داده است:\n تمام ردیف‌های این فایل فاقد مقدار برای دو ستون «طول جغرافیایی» و «عرض جغرافیایی» می‌باشند!")
+        logging.info(f"\u274C خطایی رخ داده است:\n تمام ردیف‌های این فایل فاقد مقدار برای دو ستون «طول جغرافیایی» و «عرض جغرافیایی» می‌باشند!")
         return None
     if missing_lat_lon.shape[0] != 0:
         emit(warnings=warnings, message=f"⚠️ دو ستون «طول جغرافیایی» و «عرض جغرافیایی» حتما باید دارای مقدار عددی باشند!")
+        logging.info(f"⚠️ دو ستون «طول جغرافیایی» و «عرض جغرافیایی» حتما باید دارای مقدار عددی باشند!")
         emit(warnings=warnings, message=f"\u2705 تعداد {missing_lat_lon.shape[0]} ردیف، بدون طول و عرض جغرافیایی، از فایل ورودی حذف شدند!")
+        logging.info(f"\u2705 تعداد {missing_lat_lon.shape[0]} ردیف، بدون طول و عرض جغرافیایی، از فایل ورودی حذف شدند!")
         df.dropna(subset=['lat', 'lon'], inplace=True)
         
     # Reset Index
@@ -216,6 +225,7 @@ def clean_csv_file(df):
     # nid:
     df['nid'] = df['nid'].astype(str)
     df = virastarNoSpace(df=df, columns=['nid'])
+    df['nid'] = df['nid'].apply(lambda x: x.replace("-", ""))
     df['nid'] = pd.to_numeric(df['nid'], errors='coerce')
     df['nid'] = df['nid'].astype('Int64')
     df['nid'] = df['nid'].fillna(0)
@@ -224,6 +234,7 @@ def clean_csv_file(df):
     df['nid'] = df['nid'].apply(lambda x: x if validate_iranian_national_code(x) else 'نامشخص')
     if number_wrong_nid != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «کد ملی» دارای {number_wrong_nid} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «کد ملی» دارای {number_wrong_nid} ردیف با مقدار «نامشخص» می‌باشد!")
     
     # phone:
     df['phone'] = df['phone'].astype(str)
@@ -236,6 +247,7 @@ def clean_csv_file(df):
     df['phone'] = df['phone'].apply(lambda x: x if validate_phone_number(x) else 'نامشخص')
     if number_wrong_phone != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «تلفن همراه» دارای {number_wrong_phone} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «تلفن همراه» دارای {number_wrong_phone} ردیف با مقدار «نامشخص» می‌باشد!")
     
     # bakery_id:
     df['bakery_id'] = df['bakery_id'].astype(str)
@@ -248,6 +260,7 @@ def clean_csv_file(df):
     df['bakery_id'] = df['bakery_id'].apply(lambda x: x if validate_bakery_id(x) else 'نامشخص')
     if number_wrong_bakery_id != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «شماره خبازی» دارای {number_wrong_bakery_id} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «شماره خبازی» دارای {number_wrong_bakery_id} ردیف با مقدار «نامشخص» می‌باشد!")
     
     # ownership_status:
     df['ownership_status'] = df['ownership_status'].fillna('نامشخص')
@@ -263,10 +276,12 @@ def clean_csv_file(df):
             warnings=warnings,
             message=f"\u274C خطایی رخ داده است:\n- در ستون «نوع ملک» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(os_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «نوع ملک» مقادیر زیر وجود دارد: {', '.join(os_items)}"
         )
+        logging.info(f"\u274C خطایی رخ داده است:\n- در ستون «نوع ملک» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(os_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «نوع ملک» مقادیر زیر وجود دارد: {', '.join(os_items)}")
         return None
     
     if df['ownership_status'].value_counts().get('نامشخص', 0) != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «نوع ملک» دارای {df['ownership_status'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «نوع ملک» دارای {df['ownership_status'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
     
     # second_fuel:
     df['second_fuel'] = df['second_fuel'].fillna('نامشخص')
@@ -282,10 +297,12 @@ def clean_csv_file(df):
             warnings=warnings,
             message=f"\u274C خطایی رخ داده است:\n- در ستون «سوخت دوم» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(sf_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «سوخت دوم» مقادیر زیر وجود دارد: {', '.join(sf_items)}"
         )
+        logging.info(f"\u274C خطایی رخ داده است:\n- در ستون «سوخت دوم» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(sf_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «سوخت دوم» مقادیر زیر وجود دارد: {', '.join(sf_items)}")
         return None
     
     if df['second_fuel'].value_counts().get('نامشخص', 0) != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «سوخت دوم» دارای {df['second_fuel'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «سوخت دوم» دارای {df['second_fuel'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
 
     
     # household_risk:
@@ -302,10 +319,12 @@ def clean_csv_file(df):
             warnings=warnings,
             message=f"\u274C خطایی رخ داده است:\n- در ستون «ریسک خانوار» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(hr_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «ریسک خانوار» مقادیر زیر وجود دارد: {', '.join(hr_items)}"
         )
+        logging.info(f"\u274C خطایی رخ داده است:\n- در ستون «ریسک خانوار» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(hr_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «ریسک خانوار» مقادیر زیر وجود دارد: {', '.join(hr_items)}")
         return None
     
     if df['household_risk'].value_counts().get('نامشخص', 0) != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «ریسک خانوار» دارای {df['household_risk'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «ریسک خانوار» دارای {df['household_risk'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
         
     # bakers_risk:
     df['bakers_risk'] = df['bakers_risk'].fillna('نامشخص')
@@ -321,10 +340,12 @@ def clean_csv_file(df):
             warnings=warnings,
             message=f"\u274C خطایی رخ داده است:\n- در ستون «ریسک نانوا» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(br_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «ریسک نانوا» مقادیر زیر وجود دارد: {', '.join(br_items)}"
         )
+        logging.info(f"\u274C خطایی رخ داده است:\n- در ستون «ریسک نانوا» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(br_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «ریسک نانوا» مقادیر زیر وجود دارد: {', '.join(br_items)}")
         return None
     
     if df['bakers_risk'].value_counts().get('نامشخص', 0) != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «ریسک نانوا» دارای {df['bakers_risk'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «ریسک نانوا» دارای {df['bakers_risk'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
     
     
     # flour_types:
@@ -341,10 +362,12 @@ def clean_csv_file(df):
             warnings=warnings,
             message=f"\u274C خطایی رخ داده است:\n- در ستون «نوع آرد» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(tf_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «نوع آرد» مقادیر زیر وجود دارد: {', '.join(tf_items)}"
         )
+        logging.info(f"\u274C خطایی رخ داده است:\n- در ستون «نوع آرد» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(tf_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «نوع آرد» مقادیر زیر وجود دارد: {', '.join(tf_items)}")
         return None
     
     if df['flour_types'].value_counts().get('نامشخص', 0) != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «نوع آرد» دارای {df['flour_types'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «نوع آرد» دارای {df['flour_types'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
     
     
     # bread_types:
@@ -361,10 +384,12 @@ def clean_csv_file(df):
             warnings=warnings,
             message=f"\u274C خطایی رخ داده است:\n- در ستون «نوع پخت» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(tb_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «نوع پخت» مقادیر زیر وجود دارد: {', '.join(tb_items)}"
         )
+        logging.info(f"\u274C خطایی رخ داده است:\n- در ستون «نوع پخت» داده‌های شما، مقادیر زیر وجود دارد: {', '.join(tb_df_unique)}\n- در حالیکه در مدیریت مشخصه‌ها برای ستون «نوع پخت» مقادیر زیر وجود دارد: {', '.join(tb_items)}")
         return None
     
     if df['bread_types'].value_counts().get('نامشخص', 0) != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «نوع پخت» دارای {df['bread_types'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «نوع پخت» دارای {df['bread_types'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
     
     # city:
     df['city'] = df['city'].fillna('نامشخص')
@@ -374,6 +399,7 @@ def clean_csv_file(df):
     
     if df['city'].value_counts().get('نامشخص', 0) != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «شهر» دارای {df['city'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
+        logging.info(f"⚠️ ستون «شهر» دارای {df['city'].value_counts().get('نامشخص', 0)} ردیف با مقدار «نامشخص» می‌باشد!")
     
     # number_violations:
     df['number_violations'] = df['number_violations'].astype(str)
@@ -385,17 +411,21 @@ def clean_csv_file(df):
 
     if number_na_nv != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «تعداد تخلفات نانوایی» دارای {number_na_nv} ردیف با مقدار «نامشخص» می‌باشد که با مقدار صفر جایگزین شد!")
+        logging.info(f"⚠️ ستون «تعداد تخلفات نانوایی» دارای {number_na_nv} ردیف با مقدار «نامشخص» می‌باشد که با مقدار صفر جایگزین شد!")
+        
     
     # bread_rations:
     df['bread_rations'] = df['bread_rations'].astype(str)
     df = virastarNoSpace(df=df, columns=['bread_rations'])
     df['bread_rations'] = pd.to_numeric(df['bread_rations'], errors='coerce')
+    df['bread_rations'] = df['bread_rations'].apply(lambda x: int(round(x, 0)))
     df['bread_rations'] = df['bread_rations'].astype('Int64')
     number_na_br = df['bread_rations'].isna().sum()
     df['bread_rations'] = df['bread_rations'].fillna(0)
 
     if number_na_br != 0:
         emit(warnings=warnings, message=f"⚠️ ستون «سهمیه» دارای {number_na_br} ردیف با مقدار «نامشخص» می‌باشد که با مقدار صفر جایگزین شد!")
+        logging.info(f"⚠️ ستون «سهمیه» دارای {number_na_br} ردیف با مقدار «نامشخص» می‌باشد که با مقدار صفر جایگزین شد!")
     
     
     gdf = gpd.GeoDataFrame(
@@ -437,6 +467,7 @@ def clean_csv_file(df):
     if n != 0:
         df.dropna(subset=['ostan', 'shahrestan', 'bakhsh'], inplace=True)
         emit(warnings=warnings, message=f"⚠️ {n} ردیف به علت نبودن در محدوده شهرستان از فایل ورودی حذف شدند!")
+        logging.info(f"⚠️ {n} ردیف به علت نبودن در محدوده شهرستان از فایل ورودی حذف شدند!")
     
     
     df['shahr'] = df['shahr'].apply(lambda x: x if pd.notna(x) else "روستایی")

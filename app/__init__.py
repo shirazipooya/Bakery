@@ -1,3 +1,4 @@
+import logging 
 import os
 from flask import Flask
 
@@ -11,6 +12,11 @@ from app.settings.routes import blueprint as settings_blueprint
 from app.extensions import db, migrate, login_manager, bcrypt, cache, socketio
 import app.exceptions as app_exception
 
+logging.basicConfig(
+    level=logging.INFO,
+    filename="log.log",
+    encoding="utf-8"
+)
 
 def register_blueprint(app):
     app.register_blueprint(blueprint=users_blueprint)
